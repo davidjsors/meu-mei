@@ -1,4 +1,4 @@
-# 📄 Documentação do Agente: Meu MEI
+# 📄 Documentação do Agente Base: Meu MEI
 
 ---
 
