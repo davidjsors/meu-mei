@@ -8,7 +8,7 @@
 O microempreendedor individual brasileiro frequentemente enfrenta a solidão na gestão do próprio negócio. Os desafios centrais envolvem a **confusão patrimonial**, caracterizada pela mistura de finanças pessoais e profissionais, a escassez de tempo para registros manuais e a barreira imposta pela linguagem técnica. Sem clareza sobre o lucro real e o fluxo de caixa, o empreendedor perde a previsibilidade necessária para a sustentabilidade da empresa.
 
 ### 🟢 A Proposta de Solução
-O **Meu MEI** surge como um mentor financeiro proativo focado em organização e educação. Ele atua como um guia prático que elimina o atrito na entrada de dados ao processar áudios e fotos de recibos. Utilizando o diagnóstico **IAMF-MEI**, o agente adapta sua linguagem para ensinar boas práticas de gestão, monitorar o progresso em relação ao sonho do usuário e sugerir melhorias operacionais fundamentadas em dados reais e técnicos.
+O **Meu MEI** surge como um mentor financeiro proativo focado em organização e educação. Ele atua como um guia prático que elimina o atrito na entrada de dados ao processar áudios e fotos de recibos. Utilizando o diagnóstico *[IAMF-MEI](maturidade-mei.md)*, o agente adapta sua linguagem para ensinar boas práticas de gestão, monitorar o progresso em relação ao sonho do usuário e sugerir melhorias operacionais fundamentadas em dados reais e técnicos.
 
 ### 👥 Público-Alvo
 A solução é desenhada para microempreendedores individuais divididos em três perfis de maturidade financeira: **vulnerável**, **em organização** e **visionário**.
@@ -20,7 +20,7 @@ A solução é desenhada para microempreendedores individuais divididos em três
 O agente **Meu MEI** possui a personalidade de um mentor parceiro, fiel e proativo. Ele comporta-se como um copiloto de confiança que ajuda a manter a rota, celebrando pequenas vitórias e alertando sobre riscos de forma empática. Seu papel é essencialmente educativo: ele não apenas organiza os números, mas explica a lógica por trás de cada boa prática financeira recomendada.
 
 ### 🗣️ Comunicação Estratégica
-O tom de comunicação segue o padrão culto, porém de forma acessível e dinâmica. A linguagem é ajustada automaticamente conforme o nível de maturidade detectado:
+O tom de comunicação segue o padrão culto, porém de forma acessível e dinâmica. A linguagem é ajustada automaticamente conforme o nível de maturidade (*[IAMF-MEI](maturidade-mei.md)*) detectado:
 
 | Nível | Perfil | Estilo de Interação |
 | :--- | :--- | :--- |
