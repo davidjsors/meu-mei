@@ -1,0 +1,19 @@
+# render.yaml — Deploy config for Render Free Tier
+# Docs: https://docs.render.com/blueprint-spec
+
+services:
+  - type: web
+    name: meu-mei-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: FRONTEND_URL
+        sync: false

@@ -1,0 +1,188 @@
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { sendMessage, streamResponse, getHistory, getProfile } from "../../lib/api";
+import MessageList from "../../components/MessageList";
+import ChatInput from "../../components/ChatInput";
+import Sidebar from "../../components/Sidebar";
+
+export default function ChatPage() {
+    const router = useRouter();
+    const [messages, setMessages] = useState([]);
+    const [profile, setProfile] = useState(null);
+    const [isTyping, setIsTyping] = useState(false);
+    const [streamingText, setStreamingText] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [phone, setPhone] = useState("");
+
+    // Load user data on mount
+    useEffect(() => {
+        const savedPhone = localStorage.getItem("meumei_phone");
+        if (!savedPhone) {
+            router.replace("/onboarding");
+            return;
+        }
+        setPhone(savedPhone);
+
+        const init = async () => {
+            try {
+                // Load profile and history in parallel
+                const [profileData, historyData] = await Promise.all([
+                    getProfile(savedPhone),
+                    getHistory(savedPhone),
+                ]);
+
+                if (!profileData) {
+                    router.replace("/onboarding");
+                    return;
+                }
+
+                setProfile(profileData);
+                setMessages(historyData || []);
+            } catch (err) {
+                console.error("Erro ao carregar dados:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        init();
+    }, [router]);
+
+    // Send message
+    const handleSend = useCallback(
+        async (text, file) => {
+            if (!phone) return;
+
+            // Add user message to UI immediately
+            const userMsg = {
+                id: `temp-${Date.now()}`,
+                phone_number: phone,
+                role: "user",
+                content: text || (file ? `[Arquivo: ${file.name}]` : ""),
+                content_type: file
+                    ? file.type.startsWith("image/")
+                        ? "image"
+                        : file.type.startsWith("audio/")
+                            ? "audio"
+                            : "pdf"
+                    : "text",
+                file_name: file?.name || null,
+                file_url: file ? URL.createObjectURL(file) : null,
+                created_at: new Date().toISOString(),
+            };
+
+            setMessages((prev) => [...prev, userMsg]);
+            setIsTyping(true);
+            setStreamingText("");
+
+            try {
+                const response = await sendMessage(phone, text, file);
+
+                // Stream the response
+                let accumulated = "";
+                await streamResponse(
+                    response,
+                    (chunk) => {
+                        accumulated += chunk;
+                        setStreamingText(accumulated);
+                        setIsTyping(false);
+                    },
+                    () => {
+                        // Done — add complete message
+                        setMessages((prev) => [
+                            ...prev,
+                            {
+                                id: `ai-${Date.now()}`,
+                                phone_number: phone,
+                                role: "assistant",
+                                content: accumulated,
+                                content_type: "text",
+                                created_at: new Date().toISOString(),
+                            },
+                        ]);
+                        setStreamingText("");
+                    },
+                    (error) => {
+                        console.error("Erro no streaming:", error);
+                        setMessages((prev) => [
+                            ...prev,
+                            {
+                                id: `error-${Date.now()}`,
+                                phone_number: phone,
+                                role: "assistant",
+                                content: "Desculpe, tive um problema ao processar sua mensagem. Pode tentar novamente? 😊",
+                                content_type: "text",
+                                created_at: new Date().toISOString(),
+                            },
+                        ]);
+                        setStreamingText("");
+                        setIsTyping(false);
+                    }
+                );
+            } catch (err) {
+                console.error("Erro ao enviar:", err);
+                setMessages((prev) => [
+                    ...prev,
+                    {
+                        id: `error-${Date.now()}`,
+                        phone_number: phone,
+                        role: "assistant",
+                        content: "Hmm, não consegui me conectar ao servidor. Verifique sua conexão e tente novamente.",
+                        content_type: "text",
+                        created_at: new Date().toISOString(),
+                    },
+                ]);
+                setIsTyping(false);
+            }
+        },
+        [phone]
+    );
+
+    if (loading) {
+        return (
+            <div className="loading-overlay">
+                <div className="loading-spinner"></div>
+                <p className="loading-text">
+                    Conectando ao Meu MEI...<br />
+                    <small style={{ color: "var(--text-muted)" }}>
+                        A primeira conexão pode levar até 30 segundos.
+                    </small>
+                </p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="app-container">
+            <Sidebar profile={profile} />
+
+            <main className="chat-area">
+                {/* Chat Header */}
+                <div className="chat-header">
+                    <div className="chat-header-avatar">💰</div>
+                    <div className="chat-header-info">
+                        <h2>Meu MEI</h2>
+                        <p>
+                            {isTyping || streamingText ? "digitando..." : "online"}
+                        </p>
+                    </div>
+                </div>
+
+                {/* Messages */}
+                <MessageList
+                    messages={messages}
+                    isTyping={isTyping}
+                    streamingText={streamingText}
+                />
+
+                {/* Input */}
+                <ChatInput
+                    onSend={handleSend}
+                    disabled={isTyping || !!streamingText}
+                />
+            </main>
+        </div>
+    );
+}
