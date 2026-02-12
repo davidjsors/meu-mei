@@ -223,17 +223,20 @@ async def send_message(
         "file_url": file_url,
         "file_name": file_name,
     }
-    db.table("messages").insert(user_message_data).execute()
+    insert_resp = db.table("messages").insert(user_message_data).execute()
+    current_msg_id = insert_resp.data[0]["id"] if insert_resp.data else None
 
     # 4. Gestão de Contexto e Memória (Token Optimization)
     # Busca apenas mensagens posteriores ao último resumo
-    query = db.table("messages").select("role, content, created_at").eq("phone_number", phone_number).order("created_at", desc=False)
+    # Inclui ID para filtrar a mensagem atual e evitar duplicação no prompt
+    query = db.table("messages").select("id, role, content, created_at").eq("phone_number", phone_number).order("created_at", desc=False)
     
     if last_summary_at:
         query = query.gt("created_at", last_summary_at)
         
     history_resp = query.limit(100).execute()
-    messages = history_resp.data or []
+    # Remove a mensagem atual da lista de histórico, pois ela será injetada explicitamente no generate_response_stream
+    messages = [msg for msg in (history_resp.data or []) if msg["id"] != current_msg_id]
     
     chat_history = []
     
