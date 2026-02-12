@@ -199,7 +199,10 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
         }
     };
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const toggleTransaction = (type) => {
+        setIsSubmitting(false); // Reset/ensure logic
         if (activeTransaction === type) {
             setActiveTransaction(null);
         } else {
@@ -211,7 +214,9 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
 
     const submitTransaction = (e) => {
         e.preventDefault();
-        if (!amount || !description) return;
+        if (isSubmitting || !amount || !description) return;
+
+        setIsSubmitting(true);
 
         if (onSendTransaction) {
             onSendTransaction({
@@ -220,9 +225,12 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                 description
             });
         }
-        setActiveTransaction(null); // Close form
+
+        // Slight delay or immediate close
+        setActiveTransaction(null);
         setAmount("");
         setDescription("");
+        setIsSubmitting(false);
     };
 
     return (

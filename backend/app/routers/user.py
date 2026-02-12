@@ -76,26 +76,42 @@ async def get_profile(phone_number: str):
 async def accept_terms(request: dict):
     """Registra o aceite dos termos de uso e privacidade."""
     from datetime import datetime
+    
+    try:
+        db = _get_db()
+        phone_number = request.get("phone_number")
+        if not phone_number:
+            raise HTTPException(status_code=400, detail="phone_number é obrigatório")
 
-    db = _get_db()
-    phone_number = request.get("phone_number")
-    if not phone_number:
-        raise HTTPException(status_code=400, detail="phone_number é obrigatório")
+        # Verifica se o perfil existe
+        existing = db.table("profiles").select("*").eq("phone_number", phone_number).execute()
+        
+        profile_data = {
+            "phone_number": phone_number,
+            "terms_accepted": True,
+            "terms_accepted_at": datetime.utcnow().isoformat(),
+        }
 
-    profile_data = {
-        "phone_number": phone_number,
-        "terms_accepted": True,
-        "terms_accepted_at": datetime.utcnow().isoformat(),
-    }
+        # Se já existe, garante que não apaga outros campos (upsert faria merge se configurado, mas postgrest upsert pode substituir)
+        # O comportamento padrão do supabase-py upsert é MERGE se não especificar ignoreDuplicates=False? 
+        # Na verdade, upsert substitui a linha se todas as colunas forem passadas, ou atualiza as passadas.
+        # Vamos usar update se existe, insert se não.
+        
+        if existing.data:
+            resp = db.table("profiles").update(profile_data).eq("phone_number", phone_number).execute()
+        else:
+            resp = db.table("profiles").insert(profile_data).execute()
 
-    resp = db.table("profiles").upsert(
-        profile_data, on_conflict="phone_number"
-    ).execute()
+        if not resp.data:
+            print(f"Erro ao salvar aceite para {phone_number}: Sem dados retornados")
+            raise HTTPException(status_code=500, detail="Erro ao salvar aceite")
+            
+        print(f"Termos aceitos para {phone_number}: {resp.data[0]}")
+        return {"success": True, "profile": resp.data[0]}
 
-    if not resp.data:
-        raise HTTPException(status_code=500, detail="Erro ao salvar aceite")
-
-    return {"success": True}
+    except Exception as e:
+        print(f"Exceção em accept_terms: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.delete("/delete-account")

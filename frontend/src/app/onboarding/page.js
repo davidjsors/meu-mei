@@ -77,7 +77,11 @@ export default function OnboardingPage() {
                 body: JSON.stringify({ phone_number: phone }),
             });
             if (!resp.ok) {
-                console.warn("Erro ao salvar aceite no backend:", resp.status);
+                const err = await resp.json().catch(() => ({}));
+                console.warn("Erro ao salvar aceite no backend:", resp.status, err);
+            } else {
+                const data = await resp.json();
+                console.log("Termos aceitos com sucesso:", data);
             }
         } catch (err) {
             console.warn("Erro ao salvar aceite:", err);
