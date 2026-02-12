@@ -248,7 +248,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                                 transition: "all 0.2s"
                             }}
                         >
-                            <span style={{ fontSize: "1.2em" }}>💰</span> Entrou
+                            <span style={{ fontSize: "1.2em" }}>💰</span> Entrou Dindin
                         </button>
                         <button
                             className="btn-quick-exit"
@@ -266,7 +266,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                                 transition: "all 0.2s"
                             }}
                         >
-                            <span style={{ fontSize: "1.2em" }}>💸</span> Saiu
+                            <span style={{ fontSize: "1.2em" }}>💸</span> Saiu Dindin
                         </button>
                     </div>
 
