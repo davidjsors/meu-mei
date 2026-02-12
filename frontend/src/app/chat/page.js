@@ -106,6 +106,7 @@ export default function ChatPage() {
 
                 // Stream the response
                 let accumulated = "";
+                let isDone = false;
                 await streamResponse(
                     response,
                     // onChunk
@@ -117,6 +118,7 @@ export default function ChatPage() {
                     },
                     // onDone
                     () => {
+                        isDone = true;
                         const cleanContent = cleanMarkers(accumulated);
                         setMessages((prev) => [
                             ...prev,
@@ -162,6 +164,23 @@ export default function ChatPage() {
                         setFinanceKey((k) => k + 1);
                     }
                 );
+
+                // Safety net: if stream ended but onDone never fired, finalize the message
+                if (!isDone && accumulated) {
+                    const cleanContent = cleanMarkers(accumulated);
+                    setMessages((prev) => [
+                        ...prev,
+                        {
+                            id: `ai-${Date.now()}`,
+                            phone_number: phone,
+                            role: "assistant",
+                            content: cleanContent,
+                            content_type: "text",
+                            created_at: new Date().toISOString(),
+                        },
+                    ]);
+                    setStreamingText("");
+                }
             } catch (err) {
                 console.error("Erro ao enviar:", err);
                 setMessages((prev) => [

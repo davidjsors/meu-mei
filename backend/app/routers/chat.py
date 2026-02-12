@@ -201,10 +201,10 @@ async def send_message(
     }
     db.table("messages").insert(user_message_data).execute()
 
-    # 4. Buscar histórico recente (últimas 20 mensagens)
+    # 4. Buscar histórico recente (últimas 50 mensagens para manter contexto)
     history_resp = db.table("messages").select("role, content").eq(
         "phone_number", phone_number
-    ).order("created_at", desc=False).limit(20).execute()
+    ).order("created_at", desc=False).limit(50).execute()
 
     chat_history = history_resp.data[:-1] if history_resp.data else []
 

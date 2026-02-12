@@ -108,7 +108,7 @@ async def generate_response_stream(
         config=types.GenerateContentConfig(
             system_instruction=system_prompt,
             temperature=0.7,
-            max_output_tokens=800,
+            max_output_tokens=8192,
         ),
     )
 
