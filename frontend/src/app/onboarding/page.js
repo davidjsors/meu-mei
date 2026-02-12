@@ -40,25 +40,18 @@ export default function OnboardingPage() {
 
     return (
         <div className="onboarding-container">
-            <div className="onboarding-card" style={{ maxWidth: 420 }}>
+            <div className="onboarding-card" style={{ maxWidth: 540 }}>
                 {/* Logo */}
-                <div className="login-logo">
+                <div className="login-logo" style={{ width: '100%', padding: 0 }}>
                     <img
-                        src="/logo.svg"
-                        alt="Meu MEI"
-                        width={100}
-                        height={100}
+                        src="/logo2.svg"
+                        alt="Meu MEI - finanças em dia, dinheiro no bolso"
+                        style={{ width: '100%', height: 'auto', display: 'block' }}
                     />
                 </div>
 
-                <h1 className="login-title">
-                    <span className="login-title-meu">Meu</span>{" "}
-                    <span className="login-title-mei">MEI</span>
-                </h1>
-                <p className="login-slogan">finanças em dia, dinheiro no bolso</p>
-
                 <p className="subtitle" style={{ marginTop: 24, marginBottom: 28, fontSize: 13 }}>
-                    Digite seu WhatsApp para começar a conversar<br />com seu mentor financeiro.
+                    Digite o número do seu telefone celular <br />para começar sua jornada rumo a sua <br />independência financeira.
                 </p>
 
                 {error && (
@@ -68,7 +61,7 @@ export default function OnboardingPage() {
                 )}
 
                 <div className="form-group">
-                    <label>Seu WhatsApp</label>
+                    <label>Seu Telefone</label>
                     <input
                         className="form-input"
                         placeholder="11-98765-4321"
