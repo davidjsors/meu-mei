@@ -32,9 +32,16 @@ export async function sendMessage(phoneNumber, message, file = null) {
 }
 
 /**
- * Lê SSE stream e chama callback para cada chunk de texto.
+ * Lê SSE stream e chama callbacks para cada evento.
+ * Agora parseia tanto o 'event:' quanto o 'data:' lines do SSE.
+ *
+ * Callbacks:
+ *  - onChunk(text): texto parcial recebido
+ *  - onDone(): streaming terminado
+ *  - onError(msg): erro ocorreu
+ *  - onOnboardingComplete(level): onboarding finalizado, pode recarregar perfil
  */
-export async function streamResponse(response, onChunk, onDone, onError) {
+export async function streamResponse(response, onChunk, onDone, onError, onOnboardingComplete, onFinanceUpdated) {
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let buffer = "";
@@ -48,22 +55,34 @@ export async function streamResponse(response, onChunk, onDone, onError) {
             const lines = buffer.split("\n");
             buffer = lines.pop() || "";
 
+            let currentEvent = "message";
+
             for (const line of lines) {
-                if (line.startsWith("data: ")) {
+                if (line.startsWith("event: ")) {
+                    currentEvent = line.slice(7).trim();
+                } else if (line.startsWith("data: ")) {
                     try {
                         const data = JSON.parse(line.slice(6));
-                        if (data.text) {
+
+                        if (currentEvent === "message" && data.text) {
                             onChunk(data.text);
                         }
-                        if (data.complete) {
+                        if (currentEvent === "done" && data.complete) {
                             onDone?.();
                         }
-                        if (data.error) {
+                        if (currentEvent === "error" && data.error) {
                             onError?.(data.error);
+                        }
+                        if (currentEvent === "onboarding_complete" && data.level) {
+                            onOnboardingComplete?.(data.level);
+                        }
+                        if (currentEvent === "finance_updated") {
+                            onFinanceUpdated?.();
                         }
                     } catch {
                         // ignore parse errors
                     }
+                    currentEvent = "message"; // reset after consuming
                 }
             }
         }
@@ -82,22 +101,6 @@ export async function getHistory(phoneNumber, limit = 50) {
     if (!resp.ok) throw new Error("Erro ao buscar histórico");
     const data = await resp.json();
     return data.messages;
-}
-
-/**
- * Envia respostas do IAMF-MEI.
- */
-export async function submitMaturity(payload) {
-    const resp = await fetch(`${API_BASE}/api/user/maturity`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-    });
-    if (!resp.ok) {
-        const error = await resp.json().catch(() => ({}));
-        throw new Error(error.detail || "Erro ao salvar perfil");
-    }
-    return resp.json();
 }
 
 /**

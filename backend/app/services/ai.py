@@ -8,7 +8,7 @@ import os
 from google import genai
 from google.genai import types
 from app.config import settings
-from app.prompts.system import build_system_prompt
+from app.prompts.system import build_system_prompt, build_onboarding_prompt
 
 # Inicializa o cliente Gemini
 client = genai.Client(api_key=settings.GEMINI_API_KEY)
@@ -53,9 +53,10 @@ def _build_chat_history(messages: list[dict]) -> list[types.Content]:
 
 async def generate_response_stream(
     message: str,
-    maturity_score: int,
-    dream: str,
     chat_history: list[dict],
+    maturity_score: int | None = None,
+    dream: str | None = None,
+    is_onboarding: bool = False,
     file_bytes: bytes | None = None,
     file_mime: str | None = None,
 ):
@@ -63,11 +64,19 @@ async def generate_response_stream(
     Gera resposta da IA via streaming.
     Suporta mensagens multimodal (texto + arquivo).
 
+    Se is_onboarding=True, usa o prompt de onboarding conversacional.
+    Caso contrário, usa o prompt de mentor com nível de maturidade.
+
     Yields chunks de texto conforme o Gemini responde.
     """
-    system_prompt = build_system_prompt(maturity_score, dream)
-    knowledge_context = _load_knowledge_context()
+    if is_onboarding:
+        system_prompt = build_onboarding_prompt()
+    else:
+        system_prompt = build_system_prompt(
+            maturity_score or 10, dream or "crescer o negócio"
+        )
 
+    knowledge_context = _load_knowledge_context()
     if knowledge_context:
         system_prompt += (
             "\n\n## Base de Conhecimento (Grounding)\n"
@@ -99,7 +108,7 @@ async def generate_response_stream(
         config=types.GenerateContentConfig(
             system_instruction=system_prompt,
             temperature=0.7,
-            max_output_tokens=2048,
+            max_output_tokens=800,
         ),
     )
 
@@ -110,16 +119,18 @@ async def generate_response_stream(
 
 async def generate_response(
     message: str,
-    maturity_score: int,
-    dream: str,
     chat_history: list[dict],
+    maturity_score: int | None = None,
+    dream: str | None = None,
+    is_onboarding: bool = False,
     file_bytes: bytes | None = None,
     file_mime: str | None = None,
 ) -> str:
     """Versão não-streaming (para testes ou fallback)."""
     full_response = []
     async for chunk in generate_response_stream(
-        message, maturity_score, dream, chat_history, file_bytes, file_mime
+        message, chat_history, maturity_score, dream,
+        is_onboarding, file_bytes, file_mime
     ):
         full_response.append(chunk)
     return "".join(full_response)

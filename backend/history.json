@@ -1,0 +1,222 @@
+[
+  {
+    "id": "5cea7c98-723e-4b9b-89e9-2958bc6d6596",
+    "phone_number": "11-99999-9999",
+    "role": "user",
+    "content": "[audio enviado: test_audio.mp3]",
+    "content_type": "audio",
+    "file_url": "data:audio/mpeg;base64,ZmFrZSBhdWRpbyBjb250ZW50",
+    "file_name": "test_audio.mp3",
+    "created_at": "2026-02-12T00:12:29.164566+00:00"
+  },
+  {
+    "id": "c7970615-c0c4-465b-9476-8f12a7c369d1",
+    "phone_number": "11-99999-9999",
+    "role": "assistant",
+    "content": "Oi! \ud83d\udc4b Eu sou o Meu MEI, seu mentor financeiro digital. T\u00f4 aqui pra te ajudar a organizar as finan\u00e7as do seu neg\u00f3cio!\n\nPra come\u00e7ar, como posso te chamar? E me conta: qual \u00e9 o seu grande sonho ou objetivo com o seu neg\u00f3cio este ano? \ud83c\udf1f",
+    "content_type": "text",
+    "file_url": null,
+    "file_name": null,
+    "created_at": "2026-02-12T00:12:31.740278+00:00"
+  },
+  {
+    "id": "d2f0ae13-f5e5-493e-8a3f-92c24f404d17",
+    "phone_number": "11-99999-9999",
+    "role": "user",
+    "content": "[audio enviado: test_audio.mp3]",
+    "content_type": "audio",
+    "file_url": "data:audio/mpeg;base64,ZmFrZSBhdWRpbyBjb250ZW50",
+    "file_name": "test_audio.mp3",
+    "created_at": "2026-02-12T00:13:06.20742+00:00"
+  },
+  {
+    "id": "5607351c-55cd-49d7-9ce3-6d8156e107a5",
+    "phone_number": "11-99999-9999",
+    "role": "assistant",
+    "content": "",
+    "content_type": "text",
+    "file_url": null,
+    "file_name": null,
+    "created_at": "2026-02-12T00:13:08.23804+00:00"
+  },
+  {
+    "id": "9b5f9f5a-42ff-4d79-bfa3-4ed7a27a8597",
+    "phone_number": "11-99999-9999",
+    "role": "user",
+    "content": " [DEBUG ERROR: {'statusCode': 404, 'error': Bucket not found, 'message': Bucket not found}]",
+    "content_type": "audio",
+    "file_url": "data:audio/mpeg;base64,ZmFrZSBhdWRpbyBjb250ZW50",
+    "file_name": "test_audio.mp3",
+    "created_at": "2026-02-12T00:13:37.539773+00:00"
+  },
+  {
+    "id": "6a913452-57de-47e3-a944-2f8569e9e923",
+    "phone_number": "11-99999-9999",
+    "role": "assistant",
+    "content": "Ah, entendi! Ent\u00e3o seu nome \u00e9 Ana e seu grande sonho \u00e9 conseguir investir na expans\u00e3o do seu ateli\u00ea este ano! Que legal! \ud83c\udfa8\n\nPra gente come\u00e7ar a planejar isso, me diz: voc\u00ea costuma registrar todas as entradas e sa\u00eddas do seu neg\u00f3cio? Tipo, anota tudo certinho o que vende e o que gasta? \ud83e\udd14",
+    "content_type": "text",
+    "file_url": null,
+    "file_name": null,
+    "created_at": "2026-02-12T00:13:39.939383+00:00"
+  },
+  {
+    "id": "76d380ea-dec0-4015-89b6-6fc45510604e",
+    "phone_number": "11-99999-9999",
+    "role": "user",
+    "content": " [DEBUG ERROR: {'statusCode': 404, 'error': Bucket not found, 'message': Bucket not found}]",
+    "content_type": "audio",
+    "file_url": "data:audio/mpeg;base64,ZmFrZSBhdWRpbyBjb250ZW50",
+    "file_name": "test_audio.mp3",
+    "created_at": "2026-02-12T00:14:01.690037+00:00"
+  },
+  {
+    "id": "8638e732-5a1d-40d0-923c-703cfbb2c103",
+    "phone_number": "11-99999-9999",
+    "role": "assistant",
+    "content": "Entendido, Ana! \u00c9 um bom come\u00e7o, mesmo que n\u00e3o seja sempre. O importante \u00e9 a gente criar esse h\u00e1bito juntos! \ud83d\ude09\n\nE sobre as contas: voc\u00ea usa conta separada pra vida pessoal e pro neg\u00f3cio, ou t\u00e1 tudo junto ainda? \ud83c\udfe6",
+    "content_type": "text",
+    "file_url": null,
+    "file_name": null,
+    "created_at": "2026-02-12T00:14:04.831492+00:00"
+  },
+  {
+    "id": "e19737cb-512a-4ec8-a5ab-c23803a57bc8",
+    "phone_number": "11-99999-9999",
+    "role": "user",
+    "content": " [DEBUG ERROR: {'statusCode': 404, 'error': Bucket not found, 'message': Bucket not found}]",
+    "content_type": "audio",
+    "file_url": "data:audio/mpeg;base64,ZmFrZSBhdWRpbyBjb250ZW50",
+    "file_name": "test_audio.mp3",
+    "created_at": "2026-02-12T00:15:26.854982+00:00"
+  },
+  {
+    "id": "9b616e9d-3e15-4a73-b434-b476035097f0",
+    "phone_number": "11-99999-9999",
+    "role": "assistant",
+    "content": "Compreendo, Ana. Misturar as contas \u00e9 bem comum no come\u00e7o, mas pode dificultar ver o real lucro do neg\u00f3cio. A gente vai organizar isso! \ud83d\ude09\n\nQuando chega a hora de pagar os boletos, voc\u00ea j\u00e1 sabe de antem\u00e3o se vai ter dinheiro? Voc\u00ea acompanha isso? \ud83d\udcc5",
+    "content_type": "text",
+    "file_url": null,
+    "file_name": null,
+    "created_at": "2026-02-12T00:15:30.246308+00:00"
+  },
+  {
+    "id": "4bf77672-dbba-46cd-8b80-261026a54668",
+    "phone_number": "11-99999-9999",
+    "role": "user",
+    "content": " [DEBUG ERROR: {'statusCode': 404, 'error': Bucket not found, 'message': Bucket not found}]",
+    "content_type": "audio",
+    "file_url": "data:audio/mpeg;base64,ZmFrZSBhdWRpbyBjb250ZW50",
+    "file_name": "test_audio.mp3",
+    "created_at": "2026-02-12T00:16:34.59364+00:00"
+  },
+  {
+    "id": "16a36709-9fb0-4b24-a6a4-9595387e588b",
+    "phone_number": "11-99999-9999",
+    "role": "assistant",
+    "content": "Entendi, Ana. Planejar os pagamentos \u00e9 fundamental pra evitar surpresas. A gente vai trabalhar pra ter essa vis\u00e3o mais clara! \ud83d\udca1\n\nE me conta: voc\u00ea costuma buscar aprender sobre gest\u00e3o financeira? Tipo, fazer cursos, ver v\u00eddeos, ler dicas sobre o assunto? \ud83d\udcda",
+    "content_type": "text",
+    "file_url": null,
+    "file_name": null,
+    "created_at": "2026-02-12T00:16:36.894254+00:00"
+  },
+  {
+    "id": "11346d0f-a360-4298-a741-44384609f23a",
+    "phone_number": "11-99999-9999",
+    "role": "user",
+    "content": " [DEBUG ERROR: {'statusCode': 404, 'error': Bucket not found, 'message': Bucket not found}]",
+    "content_type": "audio",
+    "file_url": "data:audio/mpeg;base64,ZmFrZSBhdWRpbyBjb250ZW50",
+    "file_name": "test_audio.mp3",
+    "created_at": "2026-02-12T00:17:48.215099+00:00"
+  },
+  {
+    "id": "83c3c177-bdad-469e-8fa8-d37a44d27efb",
+    "phone_number": "11-99999-9999",
+    "role": "assistant",
+    "content": "Que \u00f3timo, Ana! Buscar conhecimento \u00e9 um super diferencial. Isso vai nos ajudar muito a organizar suas finan\u00e7as! \u2728\n\nPor \u00faltimo, me diz: na hora de colocar pre\u00e7o no que voc\u00ea vende, voc\u00ea sabe direitinho quanto gasta pra produzir e quanto sobra de lucro em cada pe\u00e7a? \ud83d\udcb2",
+    "content_type": "text",
+    "file_url": null,
+    "file_name": null,
+    "created_at": "2026-02-12T00:17:50.654895+00:00"
+  },
+  {
+    "id": "3ee049d2-ccfa-41a1-b377-f8ef16de66a1",
+    "phone_number": "11-99999-9999",
+    "role": "user",
+    "content": " [DEBUG ERROR: {'statusCode': 404, 'error': Bucket not found, 'message': Bucket not found}]",
+    "content_type": "audio",
+    "file_url": "data:audio/mpeg;base64,ZmFrZSBhdWRpbyBjb250ZW50",
+    "file_name": "test_audio.mp3",
+    "created_at": "2026-02-12T00:19:17.664877+00:00"
+  },
+  {
+    "id": "6179cc1b-3c78-4031-921c-f7c305f9d011",
+    "phone_number": "11-99999-9999",
+    "role": "assistant",
+    "content": "Perfeito, Ana! Entendi bem como voc\u00ea est\u00e1 hoje com as finan\u00e7as do seu ateli\u00ea. J\u00e1 tenho um bom panorama e estou pronto pra te ajudar a trilhar o caminho rumo \u00e0 expans\u00e3o do seu neg\u00f3cio! Vamos juntos nessa jornada! \ud83d\udcaa",
+    "content_type": "text",
+    "file_url": null,
+    "file_name": null,
+    "created_at": "2026-02-12T00:19:20.222116+00:00"
+  },
+  {
+    "id": "873fdffa-e214-4096-8425-20bbe256787d",
+    "phone_number": "11-99999-9999",
+    "role": "user",
+    "content": " [DEBUG ERROR: {'statusCode': 404, 'error': Bucket not found, 'message': Bucket not found}]",
+    "content_type": "audio",
+    "file_url": "data:audio/mpeg;base64,ZmFrZSBhdWRpbyBjb250ZW50",
+    "file_name": "test_audio.mp3",
+    "created_at": "2026-02-12T00:20:30.501341+00:00"
+  },
+  {
+    "id": "5c3ea037-ee2d-4239-9863-fa9e60478995",
+    "phone_number": "11-99999-9999",
+    "role": "user",
+    "content": " [DEBUG ERROR: {'statusCode': 404, 'error': Bucket not found, 'message': Bucket not found}]",
+    "content_type": "audio",
+    "file_url": "data:audio/mpeg;base64,ZmFrZSBhdWRpbyBjb250ZW50",
+    "file_name": "test_audio.mp3",
+    "created_at": "2026-02-12T00:21:21.173623+00:00"
+  },
+  {
+    "id": "2d5d8beb-da39-4e7b-85ff-dc4727b090ae",
+    "phone_number": "11-99999-9999",
+    "role": "user",
+    "content": " [DEBUG ERROR: {'statusCode': 404, 'error': Bucket not found, 'message': Bucket not found}]",
+    "content_type": "audio",
+    "file_url": "data:audio/mpeg;base64,ZmFrZSBhdWRpbyBjb250ZW50",
+    "file_name": "test_audio.mp3",
+    "created_at": "2026-02-12T00:23:10.006166+00:00"
+  },
+  {
+    "id": "1f52f008-d45d-4889-b5eb-bd0e28c4299a",
+    "phone_number": "11-99999-9999",
+    "role": "user",
+    "content": "[audio enviado: test_audio.mp3]",
+    "content_type": "audio",
+    "file_url": "http://localhost:8000/uploads/b44691ac-e79a-4fd6-a73e-67367074da61.mp3",
+    "file_name": "test_audio.mp3",
+    "created_at": "2026-02-12T00:24:04.21331+00:00"
+  },
+  {
+    "id": "beb922a8-5572-43b5-a012-973f3a8b8d5f",
+    "phone_number": "11-99999-9999",
+    "role": "user",
+    "content": "[audio enviado: test.mp3]",
+    "content_type": "audio",
+    "file_url": "http://localhost:8000/uploads/32502c72-c2e1-49b8-8828-421f9bce9a67.mp3",
+    "file_name": "test.mp3",
+    "created_at": "2026-02-12T00:26:36.473483+00:00"
+  },
+  {
+    "id": "47d00915-224d-46e3-97e5-325bcc8cf658",
+    "phone_number": "11-99999-9999",
+    "role": "assistant",
+    "content": "Ops, parece que n\u00e3o consegui entender suas \u00faltimas mensagens de \u00e1udio, Ana. \ud83e\udd14\n\nVoc\u00ea poderia, por favor, tentar de novo ou me contar digitando o que voc\u00ea gostaria de me dizer? Assim a gente n\u00e3o perde o ritmo! \ud83d\ude09",
+    "content_type": "text",
+    "file_url": null,
+    "file_name": null,
+    "created_at": "2026-02-12T00:26:39.910644+00:00"
+  }
+]

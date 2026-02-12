@@ -1,8 +1,8 @@
-# 💰 Meu MEI — Mentor Financeiro Digital com IA
+# 💰 Meu MEI - Seu Mentor Financeiro 24/7
 
 **Finanças em dia, dinheiro no bolso.**
 
-Meu MEI é um mentor financeiro digital baseado em IA generativa, desenhado para o microempreendedor individual (MEI) brasileiro. A interface é inspirada no WhatsApp para máxima familiaridade.
+Meu MEI é um mentor financeiro digital baseado em IA generativa, desenhado para o microempreendedor individual (MEI) brasileiro.
 
 ## 🏗️ Arquitetura
 

@@ -1,6 +1,6 @@
 """
 Router de usuário.
-Endpoints para perfil e questionário de maturidade IAMF-MEI.
+Endpoints para perfil, questionário de maturidade IAMF-MEI e resumo financeiro.
 """
 
 from fastapi import APIRouter, HTTPException
@@ -57,7 +57,7 @@ async def submit_maturity(request: MaturityRequest):
     return ProfileResponse(**resp.data[0])
 
 
-@router.get("/profile/{phone_number}", response_model=ProfileResponse)
+@router.get("/profile/{phone_number}")
 async def get_profile(phone_number: str):
     """Retorna o perfil e nível de maturidade do usuário."""
     db = _get_db()
@@ -67,6 +67,35 @@ async def get_profile(phone_number: str):
     ).execute()
 
     if not resp.data:
-        raise HTTPException(status_code=404, detail="Perfil não encontrado")
+        return None
 
-    return ProfileResponse(**resp.data[0])
+    return resp.data[0]
+
+
+@router.get("/finance/{phone_number}")
+async def get_finance_summary(phone_number: str):
+    """Retorna resumo financeiro (entradas, saídas, saldo) do usuário."""
+    db = _get_db()
+
+    resp = db.table("financial_records").select("*").eq(
+        "phone_number", phone_number
+    ).execute()
+
+    records = resp.data or []
+
+    entradas = sum(
+        float(r.get("amount", 0))
+        for r in records
+        if r.get("type") == "entrada"
+    )
+    saidas = sum(
+        float(r.get("amount", 0))
+        for r in records
+        if r.get("type") == "saida"
+    )
+
+    return {
+        "entradas": entradas,
+        "saidas": saidas,
+        "saldo": entradas - saidas,
+    }

@@ -2,11 +2,42 @@
 
 /**
  * ChatBubble — Bolha de mensagem estilo WhatsApp.
- * Suporta texto, imagem, áudio e PDF.
+ * Suporta texto (com formatação markdown básica), imagem, áudio e PDF.
  */
+
+function formatMarkdown(text) {
+    if (!text) return "";
+
+    // Processar linhas
+    let html = text
+        // Escapar HTML
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        // Bold: **texto** ou __texto__
+        .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+        .replace(/__(.+?)__/g, "<strong>$1</strong>")
+        // Italic: *texto* ou _texto_
+        .replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, "<em>$1</em>")
+        // Emoji bullet points (manter)
+        // Listas com - ou •
+        .replace(/^[-•]\s+(.+)$/gm, "<li>$1</li>")
+        // Listas numeradas
+        .replace(/^\d+\.\s+(.+)$/gm, "<li>$1</li>")
+        // Quebras de linha
+        .replace(/\n/g, "<br>");
+
+    // Agrupar <li> consecutivos em <ul>
+    html = html.replace(/((?:<li>.*?<\/li><br>?)+)/g, (match) => {
+        const items = match.replace(/<br>/g, "");
+        return `<ul>${items}</ul>`;
+    });
+
+    return html;
+}
+
 export default function ChatBubble({ message }) {
     const { role, content, content_type, file_url, file_name, created_at } = message;
-    const isUser = role === "user";
 
     const time = created_at
         ? new Date(created_at).toLocaleTimeString("pt-BR", {
@@ -44,8 +75,18 @@ export default function ChatBubble({ message }) {
                     </a>
                 )}
 
-                {/* Texto */}
-                {content && <span>{content}</span>}
+                {/* Áudio sem URL — mostrar label amigável */}
+                {content_type === "audio" && !file_url && (
+                    <span className="message-text">🎤 Áudio enviado</span>
+                )}
+
+                {/* Texto com formatação — esconder placeholders de arquivo */}
+                {content && content_type === "text" && (
+                    <span
+                        className="message-text"
+                        dangerouslySetInnerHTML={{ __html: formatMarkdown(content) }}
+                    />
+                )}
             </div>
             {time && <span className="message-time">{time}</span>}
         </div>

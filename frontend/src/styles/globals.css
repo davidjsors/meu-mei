@@ -43,6 +43,7 @@
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
   --shadow-glow: 0 0 20px rgba(227, 38, 54, 0.2);
+  --green: #00D26A;
 
   /* Transitions */
   --transition-fast: 150ms ease;
@@ -876,4 +877,146 @@ html, body {
   .chat-textarea {
     font-size: 16px; /* prevent zoom on iOS */
   }
+}
+
+/* ─── Login Branding ─── */
+.login-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.login-logo img {
+  width: 100px;
+  height: 100px;
+  filter: drop-shadow(0 4px 12px rgba(227, 38, 54, 0.3));
+}
+
+.login-title {
+  font-size: 36px;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.login-title-meu {
+  color: var(--red-primary);
+}
+
+.login-title-mei {
+  color: var(--text-primary);
+}
+
+.login-slogan {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 0;
+}
+
+/* ─── Recording Bar ─── */
+.recording-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  padding: 4px 0;
+}
+
+.recording-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.recording-dot {
+  width: 12px;
+  height: 12px;
+  background: var(--red-primary);
+  border-radius: 50%;
+  animation: recordPulse 1s ease-in-out infinite;
+}
+
+@keyframes recordPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.recording-time {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.recording-cancel {
+  font-size: 18px !important;
+  color: var(--text-muted) !important;
+}
+
+.recording-cancel:hover {
+  color: var(--red-light) !important;
+}
+
+.recording-stop {
+  width: 42px !important;
+  height: 42px !important;
+  font-size: 14px !important;
+}
+
+.mic-btn {
+  background: transparent;
+  border: 2px solid var(--text-secondary);
+  color: var(--text-secondary);
+  font-size: 18px;
+}
+
+.mic-btn:hover {
+  background: transparent;
+  border-color: var(--red-primary);
+  color: var(--red-primary);
+}
+
+/* ─── Message text formatting ─── */
+.message-text {
+  display: block;
+  word-break: break-word;
+}
+
+.message-text strong {
+  font-weight: 700;
+}
+
+.message-text em {
+  font-style: italic;
+}
+
+.message-text ul {
+  margin: 6px 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.message-text ul li {
+  padding: 2px 0 2px 8px;
+  position: relative;
+}
+
+.message-text ul li::before {
+  content: '•';
+  position: absolute;
+  left: -4px;
+  color: var(--text-muted);
+}
+
+.message-wrapper.user .message-text ul li::before {
+  color: rgba(255,255,255,0.6);
+}
+
+.message-text br + br {
+  display: block;
+  content: '';
+  margin-top: 4px;
 }

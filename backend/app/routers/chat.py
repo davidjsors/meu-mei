@@ -2,15 +2,24 @@
 Router de chat.
 Endpoints para enviar mensagens (texto + arquivos) e consultar histórico.
 Respostas via Server-Sent Events (SSE) para streaming.
+
+Detecta automaticamente se o usuário é novo e inicia o onboarding
+conversacional (sonho + IAMF-MEI). Quando o onboarding é concluído
+pela IA, o marcador [ONBOARDING_COMPLETE] é parseado e o perfil
+é atualizado no banco.
 """
 
+import re
 import json
+import uuid
+import base64
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from sse_starlette.sse import EventSourceResponse
 from supabase import Client
 
 from app.services.ai import generate_response_stream
 from app.services.finance import get_financial_summary
+from app.prompts.system import get_maturity_level
 
 router = APIRouter(prefix="/api/chat", tags=["chat"])
 
@@ -39,6 +48,81 @@ ALLOWED_MIMES = {
 }
 
 
+def _normalize_mime(mime: str) -> str:
+    """Remove parâmetros do MIME type (ex: audio/webm;codecs=opus → audio/webm)."""
+    return mime.split(";")[0].strip().lower()
+
+# Regex para extrair dados do onboarding
+ONBOARDING_PATTERN = re.compile(
+    r"\[ONBOARDING_COMPLETE\]\s*"
+    r"nome:\s*(.+?)\s*\n"
+    r"sonho:\s*(.+?)\s*\n"
+    r"score:\s*(\d+)\s*"
+    r"\[/ONBOARDING_COMPLETE\]",
+    re.IGNORECASE | re.DOTALL,
+)
+
+# Regex para extrair transações financeiras
+TRANSACTION_PATTERN = re.compile(
+    r"\[TRANSACTION\]\s*"
+    r"tipo:\s*(entrada|saida)\s*\n"
+    r"valor:\s*([\d.]+)\s*\n"
+    r"descricao:\s*(.+?)\s*\n"
+    r"categoria:\s*(.+?)\s*"
+    r"\[/TRANSACTION\]",
+    re.IGNORECASE | re.DOTALL,
+)
+
+
+def _parse_onboarding(text: str) -> dict | None:
+    """
+    Verifica se a resposta da IA contém o marcador de onboarding completo.
+    Retorna dict com nome, sonho e score, ou None.
+    """
+    match = ONBOARDING_PATTERN.search(text)
+    if match:
+        return {
+            "name": match.group(1).strip(),
+            "dream": match.group(2).strip(),
+            "score": int(match.group(3).strip()),
+        }
+    return None
+
+
+def _clean_onboarding_markers(text: str) -> str:
+    """Remove marcadores [ONBOARDING_COMPLETE] da resposta visível ao usuário."""
+    return ONBOARDING_PATTERN.sub("", text).strip()
+
+
+def _parse_transactions(text: str) -> list[dict]:
+    """
+    Extrai todas as transações financeiras marcadas pela IA.
+    Retorna lista de dicts com tipo, valor, descricao, categoria.
+    """
+    transactions = []
+    for match in TRANSACTION_PATTERN.finditer(text):
+        try:
+            transactions.append({
+                "type": match.group(1).strip().lower(),
+                "amount": float(match.group(2).strip()),
+                "description": match.group(3).strip(),
+                "category": match.group(4).strip().lower(),
+            })
+        except (ValueError, IndexError):
+            continue
+    return transactions
+
+
+def _clean_transaction_markers(text: str) -> str:
+    """Remove marcadores [TRANSACTION] da resposta visível ao usuário."""
+    return TRANSACTION_PATTERN.sub("", text).strip()
+
+
+def _is_onboarding_mode(profile: dict) -> bool:
+    """Verifica se o usuário ainda está no onboarding (sem maturity_score)."""
+    return profile.get("maturity_score") is None
+
+
 @router.post("/send")
 async def send_message(
     phone_number: str = Form(...),
@@ -49,23 +133,29 @@ async def send_message(
     Envia mensagem ao Meu MEI.
     Aceita texto puro ou texto + arquivo (imagem, áudio, PDF).
     Retorna resposta via SSE (Server-Sent Events) para streaming.
+
+    Se o usuário é novo, cria o perfil automaticamente e entra em
+    modo de onboarding conversacional.
     """
     db = _get_db()
 
-    # 1. Buscar perfil do usuário
+    # 1. Buscar ou criar perfil do usuário
     profile_resp = db.table("profiles").select("*").eq(
         "phone_number", phone_number
     ).execute()
 
-    if not profile_resp.data:
-        raise HTTPException(
-            status_code=404,
-            detail="Perfil não encontrado. Complete o onboarding primeiro."
-        )
+    if profile_resp.data:
+        profile = profile_resp.data[0]
+    else:
+        # Novo usuário — criar perfil vazio
+        db.table("profiles").insert({
+            "phone_number": phone_number,
+        }).execute()
+        profile = {"phone_number": phone_number}
 
-    profile = profile_resp.data[0]
-    maturity_score = profile.get("maturity_score", 10)
-    dream = profile.get("dream", "crescer o negócio")
+    is_onboarding = _is_onboarding_mode(profile)
+    maturity_score = profile.get("maturity_score")
+    dream = profile.get("dream")
 
     # 2. Processar arquivo (se enviado)
     file_bytes = None
@@ -76,11 +166,14 @@ async def send_message(
 
     if file and file.filename:
         file_mime = file.content_type or "application/octet-stream"
-        if file_mime not in ALLOWED_MIMES:
+        file_mime_base = _normalize_mime(file_mime)
+        if file_mime_base not in ALLOWED_MIMES:
             raise HTTPException(
                 status_code=400,
                 detail=f"Tipo de arquivo não suportado: {file_mime}"
             )
+        # Usar o MIME normalizado para o Gemini
+        file_mime = file_mime_base
 
         file_bytes = await file.read()
         file_name = file.filename
@@ -93,18 +186,9 @@ async def send_message(
         elif file_mime == "application/pdf":
             content_type = "pdf"
 
-        # Upload para Supabase Storage
-        storage_path = f"{phone_number}/{file_name}"
-        try:
-            db.storage.from_("attachments").upload(
-                storage_path, file_bytes,
-                file_options={"content-type": file_mime}
-            )
-            file_url_resp = db.storage.from_("attachments").get_public_url(storage_path)
-            file_url = file_url_resp
-        except Exception:
-            # Se falhar o upload, continua sem URL mas com o conteúdo em memória
-            file_url = None
+        # Converter para data URL (evita dependência do Supabase Storage)
+        b64 = base64.b64encode(file_bytes).decode("utf-8")
+        file_url = f"data:{file_mime};base64,{b64}"
 
     # 3. Salvar mensagem do usuário
     user_message_data = {
@@ -124,19 +208,17 @@ async def send_message(
 
     chat_history = history_resp.data[:-1] if history_resp.data else []
 
-    # 5. Buscar registros financeiros para contexto
-    finance_resp = db.table("financial_records").select("*").eq(
-        "phone_number", phone_number
-    ).execute()
-
-    financial_context = get_financial_summary(finance_resp.data or [])
-
-    # Adicionar contexto financeiro à mensagem
+    # 5. Contexto financeiro (apenas se não onboarding)
     enriched_message = message
-    if financial_context and message:
-        enriched_message = (
-            f"{message}\n\n[Contexto financeiro atual do usuário:\n{financial_context}]"
-        )
+    if not is_onboarding:
+        finance_resp = db.table("financial_records").select("*").eq(
+            "phone_number", phone_number
+        ).execute()
+        financial_context = get_financial_summary(finance_resp.data or [])
+        if financial_context and message:
+            enriched_message = (
+                f"{message}\n\n[Contexto financeiro atual do usuário:\n{financial_context}]"
+            )
 
     # 6. Streaming da resposta via SSE
     async def event_generator():
@@ -144,17 +226,60 @@ async def send_message(
         try:
             async for chunk in generate_response_stream(
                 message=enriched_message,
+                chat_history=chat_history,
                 maturity_score=maturity_score,
                 dream=dream,
-                chat_history=chat_history,
+                is_onboarding=is_onboarding,
                 file_bytes=file_bytes,
                 file_mime=file_mime,
             ):
                 full_response.append(chunk)
                 yield {"event": "message", "data": json.dumps({"text": chunk})}
 
-            # Salvar resposta completa no banco
+            # Resposta completa
             assistant_content = "".join(full_response)
+
+            # Verificar se o onboarding foi concluído
+            if is_onboarding:
+                onboarding_data = _parse_onboarding(assistant_content)
+                if onboarding_data:
+                    level = get_maturity_level(onboarding_data["score"])
+                    db.table("profiles").update({
+                        "name": onboarding_data["name"],
+                        "dream": onboarding_data["dream"],
+                        "maturity_score": onboarding_data["score"],
+                        "maturity_level": level,
+                    }).eq("phone_number", phone_number).execute()
+
+                    # Limpar marcadores da resposta antes de salvar
+                    assistant_content = _clean_onboarding_markers(assistant_content)
+
+                    yield {
+                        "event": "onboarding_complete",
+                        "data": json.dumps({"level": level}),
+                    }
+
+            # Verificar e salvar transações financeiras
+            transactions = _parse_transactions(assistant_content)
+            if transactions:
+                for txn in transactions:
+                    db.table("financial_records").insert({
+                        "phone_number": phone_number,
+                        "type": txn["type"],
+                        "amount": txn["amount"],
+                        "description": txn["description"],
+                        "category": txn["category"],
+                    }).execute()
+
+                # Limpar marcadores de transação
+                assistant_content = _clean_transaction_markers(assistant_content)
+
+                yield {
+                    "event": "finance_updated",
+                    "data": json.dumps({"count": len(transactions)}),
+                }
+
+            # Salvar resposta no banco (já limpa de marcadores)
             db.table("messages").insert({
                 "phone_number": phone_number,
                 "role": "assistant",
