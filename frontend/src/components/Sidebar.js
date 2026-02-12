@@ -49,10 +49,10 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0 }) {
         <aside className="sidebar">
             {/* Header */}
             <div className="sidebar-header">
-                <div className="sidebar-logo">M</div>
+                <img src="/assets/logo.png" alt="MeuMEI" width={48} height={48} style={{ objectFit: 'contain' }} />
                 <div className="sidebar-title">
                     <h1>Meu MEI</h1>
-                    <p>Finanças em dia, dinheiro no bolso</p>
+                    <p>finanças em dia, dinheiro no bolso</p>
                 </div>
             </div>
 

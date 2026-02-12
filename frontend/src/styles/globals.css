@@ -59,7 +59,8 @@
   padding: 0;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: var(--bg-app);
@@ -99,19 +100,7 @@ html, body {
   border-bottom: 1px solid var(--border-color);
 }
 
-.sidebar-logo {
-  width: 42px;
-  height: 42px;
-  background: linear-gradient(135deg, var(--red-primary), var(--red-dark));
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 18px;
-  color: white;
-  box-shadow: var(--shadow-glow);
-}
+
 
 .sidebar-title {
   flex: 1;
@@ -126,7 +115,7 @@ html, body {
 
 .sidebar-title p {
   font-size: 12px;
-  color: var(--text-secondary);
+  color: #FFFFFF;
   margin-top: 2px;
 }
 
@@ -172,8 +161,13 @@ html, body {
   color: var(--text-primary);
 }
 
-.finance-row.positive span:last-child { color: #00D26A; }
-.finance-row.negative span:last-child { color: var(--red-light); }
+.finance-row.positive span:last-child {
+  color: #00D26A;
+}
+
+.finance-row.negative span:last-child {
+  color: var(--red-light);
+}
 
 /* Dream Card */
 .dream-card {
@@ -321,6 +315,7 @@ html, body {
     opacity: 0;
     transform: translateY(10px) scale(0.97);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -437,12 +432,27 @@ html, body {
   animation: typingBounce 1.4s ease-in-out infinite;
 }
 
-.typing-dot:nth-child(2) { animation-delay: 0.2s; }
-.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+.typing-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
 
 @keyframes typingBounce {
-  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-  30% { transform: translateY(-6px); opacity: 1; }
+
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+
+  30% {
+    transform: translateY(-6px);
+    opacity: 1;
+  }
 }
 
 /* ─── Chat Input ─── */
@@ -465,11 +475,20 @@ html, body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.file-preview-bar .file-icon { font-size: 24px; }
+.file-preview-bar .file-icon {
+  font-size: 24px;
+}
 
 .file-preview-bar .file-info {
   flex: 1;
@@ -730,7 +749,7 @@ html, body {
   background: var(--bg-hover);
 }
 
-.likert-option input:checked + label {
+.likert-option input:checked+label {
   border-color: var(--red-primary);
   background: var(--red-glow);
 }
@@ -826,7 +845,9 @@ html, body {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-text {
@@ -875,7 +896,8 @@ html, body {
   }
 
   .chat-textarea {
-    font-size: 16px; /* prevent zoom on iOS */
+    font-size: 16px;
+    /* prevent zoom on iOS */
   }
 }
 
@@ -889,7 +911,7 @@ html, body {
 .login-logo img {
   width: 100px;
   height: 100px;
-  filter: drop-shadow(0 4px 12px rgba(227, 38, 54, 0.3));
+  /* no shadow */
 }
 
 .login-title {
@@ -909,7 +931,7 @@ html, body {
 
 .login-slogan {
   text-align: center;
-  color: var(--text-secondary);
+  color: #FFFFFF;
   font-size: 14px;
   font-weight: 500;
   margin-bottom: 0;
@@ -940,8 +962,17 @@ html, body {
 }
 
 @keyframes recordPulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.85); }
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.4;
+    transform: scale(0.85);
+  }
 }
 
 .recording-time {
@@ -1012,10 +1043,10 @@ html, body {
 }
 
 .message-wrapper.user .message-text ul li::before {
-  color: rgba(255,255,255,0.6);
+  color: rgba(255, 255, 255, 0.6);
 }
 
-.message-text br + br {
+.message-text br+br {
   display: block;
   content: '';
   margin-top: 4px;
