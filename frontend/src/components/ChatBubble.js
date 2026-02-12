@@ -57,11 +57,18 @@ export default function ChatBubble({ message }) {
                 )}
 
                 {/* Áudio */}
-                {content_type === "audio" && file_url && (
-                    <audio controls className="message-audio">
-                        <source src={file_url} />
-                        Seu navegador não suporta áudio.
-                    </audio>
+                {content_type === "audio" && (
+                    file_url ? (
+                        <div className="audio-container" style={{ minWidth: "250px" }}>
+                            <audio controls className="message-audio" src={file_url} style={{ width: "100%", display: "block" }}>
+                                Seu navegador não suporta áudio.
+                            </audio>
+                        </div>
+                    ) : (
+                        <div className="audio-container">
+                            <span className="message-text">🎤 Áudio enviado</span>
+                        </div>
+                    )
                 )}
 
                 {/* PDF / Arquivo */}
@@ -73,11 +80,6 @@ export default function ChatBubble({ message }) {
                             <div className="message-file-type">PDF</div>
                         </div>
                     </a>
-                )}
-
-                {/* Áudio sem URL — mostrar label amigável */}
-                {content_type === "audio" && !file_url && (
-                    <span className="message-text">🎤 Áudio enviado</span>
                 )}
 
                 {/* Texto com formatação — esconder placeholders de arquivo */}
