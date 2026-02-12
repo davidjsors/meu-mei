@@ -12,11 +12,13 @@ import Sidebar from "../../components/Sidebar";
  */
 const ONBOARDING_MARKER_RE = /\[ONBOARDING_COMPLETE\][\s\S]*?\[\/ONBOARDING_COMPLETE\]/gi;
 const TRANSACTION_MARKER_RE = /\[TRANSACTION\][\s\S]*?\[\/TRANSACTION\]/gi;
+const RESET_MARKER_RE = /\[RESET_FINANCE.*?\]/gi;
 
 function cleanMarkers(text) {
     return text
         .replace(ONBOARDING_MARKER_RE, "")
         .replace(TRANSACTION_MARKER_RE, "")
+        .replace(RESET_MARKER_RE, "")
         .trim();
 }
 
