@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 const CATEGORY_LABELS = {
     vendas: "Vendas",
@@ -35,18 +36,23 @@ function getMonthRange(offset = 0) {
 }
 
 /**
- * Sidebar — Painel lateral com branding, resumo financeiro e sonho.
- * Dois modos: "home" (resumo) e "finance" (histórico detalhado).
+ * Sidebar — Painel lateral com branding, resumo financeiro, sonho, termos e logout.
+ * Três views: "home" (resumo), "finance" (histórico detalhado), "terms" (termos + deletar conta).
  */
 export default function Sidebar({ profile, phoneNumber, refreshKey = 0 }) {
+    const router = useRouter();
     const [finance, setFinance] = useState({ entradas: 0, saidas: 0, saldo: 0 });
-    const [view, setView] = useState("home"); // "home" | "finance"
+    const [view, setView] = useState("home"); // "home" | "finance" | "terms"
 
     // Finance detail state
     const [records, setRecords] = useState([]);
     const [loading, setLoading] = useState(false);
     const [monthOffset, setMonthOffset] = useState(0);
     const [category, setCategory] = useState("todas");
+
+    // Delete account state
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [deleting, setDeleting] = useState(false);
 
     const monthRange = getMonthRange(monthOffset);
 
@@ -113,6 +119,29 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0 }) {
         { entradas: 0, saidas: 0 }
     );
 
+    const handleLogout = () => {
+        localStorage.removeItem("meumei_phone");
+        localStorage.removeItem("meumei_login_at");
+        router.push("/onboarding");
+    };
+
+    const handleDeleteAccount = async () => {
+        setDeleting(true);
+        try {
+            const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
+            await fetch(`${API_BASE}/api/user/delete-account`, {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ phone_number: phoneNumber }),
+            });
+        } catch (err) {
+            console.error("Erro ao deletar conta:", err);
+        }
+        localStorage.removeItem("meumei_phone");
+        localStorage.removeItem("meumei_login_at");
+        router.push("/onboarding");
+    };
+
     return (
         <aside className="sidebar">
             {/* Header */}
@@ -176,15 +205,13 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0 }) {
                         </div>
                     )}
                 </div>
-            ) : (
+            ) : view === "finance" ? (
                 /* ═══ FINANCE DETAIL VIEW ═══ */
                 <div className="sidebar-content sidebar-finance-view">
-                    {/* Back button */}
                     <button className="finance-back-btn" onClick={() => setView("home")}>
                         ← Voltar
                     </button>
 
-                    {/* Month navigation */}
                     <div className="finance-detail-filters">
                         <div className="finance-month-nav">
                             <button onClick={() => setMonthOffset((o) => o - 1)}>◀</button>
@@ -202,7 +229,6 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0 }) {
                         </select>
                     </div>
 
-                    {/* Period summary */}
                     <div className="finance-detail-summary">
                         <div className="finance-detail-summary-item positive">
                             <span>Entradas</span>
@@ -218,7 +244,6 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0 }) {
                         </div>
                     </div>
 
-                    {/* Transaction list */}
                     <div className="finance-detail-list">
                         {loading ? (
                             <div className="finance-detail-empty">Carregando...</div>
@@ -248,7 +273,141 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0 }) {
                         )}
                     </div>
                 </div>
+            ) : (
+                /* ═══ TERMS VIEW ═══ */
+                <div className="sidebar-content sidebar-terms-view">
+                    <button className="finance-back-btn" onClick={() => { setView("home"); setShowDeleteConfirm(false); }}>
+                        ← Voltar
+                    </button>
+
+                    <div className="sidebar-terms-body">
+                        <h2 className="sidebar-terms-title">📜 Termos de Uso e Política de Privacidade</h2>
+                        <p className="sidebar-terms-subtitle"><strong>Meu MEI: Gestão Orientada ao Sonho</strong></p>
+
+                        <p>
+                            Bem-vindo ao <strong>Meu MEI</strong>. Ao utilizar nossa plataforma,
+                            você confia a nós a gestão de dados importantes para o seu crescimento.
+                            Este documento explica como protegemos seus dados, quais são seus
+                            direitos e as regras para o uso da nossa tecnologia de mentoria financeira.
+                        </p>
+
+                        <h3>1. Termos de Uso (Regras de Convivência)</h3>
+
+                        <h4>1.1. Objeto e Aceite</h4>
+                        <p>
+                            O Meu MEI é uma ferramenta de auxílio à gestão financeira e educação
+                            para Microempreendedores Individuais. Ao clicar em &quot;Aceito os Termos&quot;,
+                            você declara ter lido e concordado com estas regras.
+                        </p>
+
+                        <h4>1.2. Elegibilidade e Cadastro</h4>
+                        <p>
+                            A plataforma é destinada exclusivamente a MEIs devidamente registrados
+                            no território brasileiro. O usuário é responsável pela veracidade dos
+                            dados inseridos (CNPJ, faturamento, despesas).
+                        </p>
+
+                        <h4>1.3. Limitações da Inteligência Artificial</h4>
+                        <p>O Meu MEI atua como um mentor educativo. Você declara estar ciente de que:</p>
+                        <ul>
+                            <li>As recomendações da IA são baseadas em dados inseridos por você e em modelos estatísticos.</li>
+                            <li>O agente não substitui o aconselhamento profissional de um contador ou advogado.</li>
+                            <li>O sistema não realiza transações bancárias nem investimentos em seu nome.</li>
+                        </ul>
+
+                        <h4>1.4. Uso Proibido</h4>
+                        <p>
+                            É terminantemente proibido utilizar a plataforma para registrar atividades
+                            ilícitas, sonegação fiscal ou práticas que configurem lavagem de dinheiro ou fraude.
+                        </p>
+
+                        <h3>2. Política de Privacidade (LGPD)</h3>
+
+                        <h4>2.1. Quais dados coletamos?</h4>
+                        <ul>
+                            <li><strong>Dados Cadastrais:</strong> Nome, e-mail, CPF e CNPJ.</li>
+                            <li><strong>Dados Financeiros:</strong> Registros de entradas, saídas, boletos e fluxo de caixa.</li>
+                            <li><strong>Dados Multimodais:</strong> Áudios enviados para registro de voz e imagens/PDFs de recibos.</li>
+                            <li><strong>Dados de Diagnóstico:</strong> Respostas ao instrumento IAMF-MEI.</li>
+                        </ul>
+
+                        <h4>2.2. Para que usamos seus dados?</h4>
+                        <p>
+                            As finalidades incluem a personalização da linguagem conforme sua maturidade
+                            financeira, processamento automatizado de recibos e análise de progresso rumo
+                            ao seu &quot;Caminho para o Sonho&quot;.
+                        </p>
+
+                        <h4>2.3. Compartilhamento de Dados</h4>
+                        <p>
+                            Seus dados financeiros não são vendidos. Compartilhamos apenas com parceiros
+                            essenciais (Google Cloud/Vertex AI) ou com o ecossistema Bradesco mediante
+                            sua autorização prévia.
+                        </p>
+
+                        <h3>3. Segurança da Informação</h3>
+                        <p>
+                            Adotamos criptografia rigorosa em trânsito e em repouso, isolamento de domínio
+                            e monitoramento constante de logs para garantir a integridade do sistema.
+                        </p>
+
+                        <h3>4. Atualizações</h3>
+                        <p>
+                            Este documento pode ser atualizado para refletir melhorias técnicas.
+                            Notificaremos você sobre alterações importantes.
+                        </p>
+
+                        <p className="sidebar-terms-footer-note">Última atualização: 12 de Fevereiro de 2026.</p>
+
+                        {/* Delete account section */}
+                        <div className="sidebar-delete-section">
+                            <h3>⚠️ Exclusão de Conta</h3>
+                            <p>
+                                Conforme a LGPD, você tem o direito de solicitar a exclusão de todos os seus dados pessoais.
+                                Essa ação é <strong>irreversível</strong> e apagará permanentemente seu perfil,
+                                conversas e registros financeiros.
+                            </p>
+                            {!showDeleteConfirm ? (
+                                <button
+                                    className="sidebar-delete-btn"
+                                    onClick={() => setShowDeleteConfirm(true)}
+                                >
+                                    🗑️ Solicitar exclusão da minha conta
+                                </button>
+                            ) : (
+                                <div className="sidebar-delete-confirm">
+                                    <p><strong>Tem certeza?</strong> Todos os seus dados serão apagados permanentemente.</p>
+                                    <div className="sidebar-delete-confirm-btns">
+                                        <button
+                                            className="sidebar-delete-confirm-yes"
+                                            onClick={handleDeleteAccount}
+                                            disabled={deleting}
+                                        >
+                                            {deleting ? "Excluindo..." : "Sim, excluir minha conta"}
+                                        </button>
+                                        <button
+                                            className="sidebar-delete-confirm-no"
+                                            onClick={() => setShowDeleteConfirm(false)}
+                                        >
+                                            Cancelar
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
             )}
+
+            {/* ═══ SIDEBAR FOOTER ═══ */}
+            <div className="sidebar-footer">
+                <button className="sidebar-footer-btn" onClick={() => setView(view === "terms" ? "home" : "terms")}>
+                    📜 Termos
+                </button>
+                <button className="sidebar-footer-btn sidebar-logout-btn" onClick={handleLogout}>
+                    🚪 Sair
+                </button>
+            </div>
         </aside>
     );
 }
