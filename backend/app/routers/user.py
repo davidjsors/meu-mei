@@ -99,3 +99,40 @@ async def get_finance_summary(phone_number: str):
         "saidas": saidas,
         "saldo": entradas - saidas,
     }
+
+
+@router.get("/finance/{phone_number}/records")
+async def get_finance_records(
+    phone_number: str,
+    start_date: str | None = None,
+    end_date: str | None = None,
+    category: str | None = None,
+):
+    """
+    Retorna registros financeiros detalhados com filtros opcionais.
+    - start_date/end_date: formato ISO (YYYY-MM-DD). Default: mês vigente.
+    - category: filtrar por categoria específica.
+    """
+    from datetime import datetime, date
+
+    db = _get_db()
+
+    # Default: mês vigente
+    if not start_date:
+        today = date.today()
+        start_date = today.replace(day=1).isoformat()
+    if not end_date:
+        end_date = date.today().isoformat()
+
+    query = db.table("financial_records").select("*").eq(
+        "phone_number", phone_number
+    ).gte("created_at", f"{start_date}T00:00:00").lte(
+        "created_at", f"{end_date}T23:59:59"
+    ).order("created_at", desc=True)
+
+    if category and category != "todas":
+        query = query.eq("category", category)
+
+    resp = query.execute()
+
+    return {"records": resp.data or []}
