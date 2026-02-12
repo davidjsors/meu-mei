@@ -221,7 +221,16 @@ export default function ChatPage() {
             <main className="chat-area">
                 {/* Chat Header */}
                 <div className="chat-header">
-                    <div className="chat-header-avatar">💰</div>
+                    <div className="chat-header-avatar" style={{
+                        backgroundColor: '#CC0000', borderRadius: '50%',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                        <img src="/logo.svg" alt="MeuMEI" style={{
+                            width: '95%', height: '95%',
+                            objectFit: 'contain',
+                            filter: 'brightness(0) invert(1)',
+                        }} />
+                    </div>
                     <div className="chat-header-info">
                         <h2>Meu MEI</h2>
                         <p>
