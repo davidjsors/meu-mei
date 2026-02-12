@@ -200,6 +200,14 @@ export default function ChatPage() {
         [phone]
     );
 
+    // Handle Sidebar Quick Transactions
+    const handleTransaction = (data) => {
+        const { type, amount, description } = data;
+        const action = type === "entry" ? "entrada" : "saída";
+        const text = `Registre uma ${action} de R$ ${amount} referente a ${description}.`;
+        handleSend(text);
+    };
+
     if (loading) {
         return (
             <div className="loading-overlay">
@@ -216,7 +224,12 @@ export default function ChatPage() {
 
     return (
         <div className="app-container">
-            <Sidebar profile={profile} phoneNumber={phone} refreshKey={financeKey} />
+            <Sidebar
+                profile={profile}
+                phoneNumber={phone}
+                refreshKey={financeKey}
+                onSendTransaction={handleTransaction}
+            />
 
             <main className="chat-area">
                 {/* Chat Header */}

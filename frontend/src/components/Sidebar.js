@@ -36,13 +36,32 @@ function getMonthRange(offset = 0) {
 }
 
 /**
- * Sidebar — Painel lateral com branding, resumo financeiro, sonho, termos e logout.
+ * Sidebar — Painel lateral com branding, resumo financeiro, ações rápidas (inline) e navegação.
  * Três views: "home" (resumo), "finance" (histórico detalhado), "terms" (termos + deletar conta).
  */
-export default function Sidebar({ profile, phoneNumber, refreshKey = 0 }) {
+export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTransaction }) {
     const router = useRouter();
     const [finance, setFinance] = useState({ entradas: 0, saidas: 0, saldo: 0 });
     const [view, setView] = useState("home"); // "home" | "finance" | "terms"
+
+    // Transaction Inline Form State
+    const [activeTransaction, setActiveTransaction] = useState(null); // "entry" | "exit" | null
+    const [amount, setAmount] = useState("");
+
+    const handleAmountChange = (e) => {
+        let value = e.target.value.replace(/\D/g, "");
+        if (!value) {
+            setAmount("");
+            return;
+        }
+        const floatValue = parseInt(value) / 100;
+        const formatted = floatValue.toLocaleString("pt-BR", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        });
+        setAmount(formatted);
+    };
+    const [description, setDescription] = useState("");
 
     // Finance detail state
     const [records, setRecords] = useState([]);
@@ -55,12 +74,6 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0 }) {
     const [deleting, setDeleting] = useState(false);
 
     const monthRange = getMonthRange(monthOffset);
-
-    const levelLabels = {
-        vulneravel: "🚩 Vulnerável",
-        organizacao: "📊 Em Organização",
-        visionario: "🚀 Visionário",
-    };
 
     // Buscar resumo financeiro
     useEffect(() => {
@@ -142,6 +155,32 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0 }) {
         router.push("/onboarding");
     };
 
+    const toggleTransaction = (type) => {
+        if (activeTransaction === type) {
+            setActiveTransaction(null);
+        } else {
+            setActiveTransaction(type);
+            setAmount("");
+            setDescription("");
+        }
+    };
+
+    const submitTransaction = (e) => {
+        e.preventDefault();
+        if (!amount || !description) return;
+
+        if (onSendTransaction) {
+            onSendTransaction({
+                type: activeTransaction,
+                amount,
+                description
+            });
+        }
+        setActiveTransaction(null); // Close form
+        setAmount("");
+        setDescription("");
+    };
+
     return (
         <aside className="sidebar">
             {/* Header */}
@@ -191,19 +230,130 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0 }) {
                         </div>
                     </div>
 
-                    {/* Objetivo do Empreendedor */}
-                    {profile?.dream && (
-                        <div className="dream-card">
-                            <h3>🌟 Meu Objetivo</h3>
-                            <p>{profile.dream}</p>
-                            {profile.maturity_level && (
-                                <span className={`maturity-badge ${profile.maturity_level}`}>
-                                    {levelLabels[profile.maturity_level] || "—"}
-                                    {profile.maturity_score && ` (${profile.maturity_score}/25)`}
-                                </span>
-                            )}
-                        </div>
+                    {/* Quick Actions */}
+                    <div className="sidebar-quick-actions" style={{ padding: "0 16px", marginTop: 16, display: 'flex', gap: 10 }}>
+                        <button
+                            className="btn-quick-entry"
+                            onClick={() => toggleTransaction("entry")}
+                            style={{
+                                flex: 1,
+                                padding: "10px",
+                                borderRadius: "8px",
+                                background: activeTransaction === "entry" ? "rgba(34, 197, 94, 0.2)" : "rgba(34, 197, 94, 0.1)",
+                                border: `1px solid ${activeTransaction === "entry" ? "#4ade80" : "rgba(34, 197, 94, 0.3)"}`,
+                                color: "#4ade80",
+                                fontWeight: "bold",
+                                cursor: "pointer",
+                                display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
+                                transition: "all 0.2s"
+                            }}
+                        >
+                            <span style={{ fontSize: "1.2em" }}>💰</span> Entrou
+                        </button>
+                        <button
+                            className="btn-quick-exit"
+                            onClick={() => toggleTransaction("exit")}
+                            style={{
+                                flex: 1,
+                                padding: "10px",
+                                borderRadius: "8px",
+                                background: activeTransaction === "exit" ? "rgba(239, 68, 68, 0.2)" : "rgba(239, 68, 68, 0.1)",
+                                border: `1px solid ${activeTransaction === "exit" ? "#f87171" : "rgba(239, 68, 68, 0.3)"}`,
+                                color: "#f87171",
+                                fontWeight: "bold",
+                                cursor: "pointer",
+                                display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
+                                transition: "all 0.2s"
+                            }}
+                        >
+                            <span style={{ fontSize: "1.2em" }}>💸</span> Saiu
+                        </button>
+                    </div>
+
+                    {/* INLINE FORM */}
+                    {activeTransaction && (
+                        <form onSubmit={submitTransaction} style={{
+                            marginTop: 12,
+                            padding: "16px",
+                            background: "rgba(0,0,0,0.2)",
+                            borderTop: "1px solid var(--border-color)",
+                            borderBottom: "1px solid var(--border-color)",
+                            animation: "slideDown 0.2s ease-out"
+                        }}>
+                            <div style={{ marginBottom: 12 }}>
+                                <label style={{ display: "block", fontSize: 12, color: "var(--text-secondary)", marginBottom: 4 }}>
+                                    Valor (R$)
+                                </label>
+                                <input
+                                    type="tel"
+                                    inputMode="numeric"
+                                    placeholder="0,00"
+                                    value={amount}
+                                    onChange={handleAmountChange}
+                                    style={{
+                                        width: "100%", padding: "10px", borderRadius: 6,
+                                        border: "1px solid var(--border-color)",
+                                        background: "var(--bg-app)",
+                                        color: "var(--text-primary)",
+                                        fontSize: 14
+                                    }}
+                                    autoFocus
+                                />
+                            </div>
+                            <div style={{ marginBottom: 16 }}>
+                                <label style={{ display: "block", fontSize: 12, color: "var(--text-secondary)", marginBottom: 4 }}>
+                                    Descrição
+                                </label>
+                                <input
+                                    type="text"
+                                    placeholder={activeTransaction === "entry" ? "Ex: Venda de bolo" : "Ex: Conta de luz"}
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
+                                    style={{
+                                        width: "100%", padding: "10px", borderRadius: 6,
+                                        border: "1px solid var(--border-color)",
+                                        background: "var(--bg-app)",
+                                        color: "var(--text-primary)",
+                                        fontSize: 14
+                                    }}
+                                />
+                            </div>
+                            <div style={{ display: "flex", gap: 10 }}>
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveTransaction(null)}
+                                    style={{
+                                        flex: 1, padding: "10px",
+                                        background: "transparent",
+                                        border: "1px solid var(--border-color)",
+                                        color: "var(--text-secondary)",
+                                        borderRadius: 6,
+                                        cursor: "pointer"
+                                    }}
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={!amount || !description}
+                                    style={{
+                                        flex: 1, padding: "10px",
+                                        background: activeTransaction === "entry" ? "var(--green)" : "#ef4444",
+                                        border: "none",
+                                        color: "#fff",
+                                        borderRadius: 6,
+                                        cursor: "pointer",
+                                        fontWeight: "bold",
+                                        opacity: (!amount || !description) ? 0.5 : 1
+                                    }}
+                                >
+                                    Enviar
+                                </button>
+                            </div>
+                        </form>
                     )}
+
+                    {/* REMOVED DREAM CARD */}
                 </div>
             ) : view === "finance" ? (
                 /* ═══ FINANCE DETAIL VIEW ═══ */
