@@ -73,6 +73,10 @@ TRANSACTION_PATTERN = re.compile(
     re.IGNORECASE | re.DOTALL,
 )
 
+# Regex para resetar finanças (agora com argumento opcional)
+# Ex: [RESET_FINANCE: ALL] ou [RESET_FINANCE: 2023-01-01]
+RESET_PATTERN = re.compile(r"\[RESET_FINANCE(?::\s*(ALL|[\d-]+))?\]", re.IGNORECASE)
+
 
 def _parse_onboarding(text: str) -> dict | None:
     """
@@ -116,6 +120,24 @@ def _parse_transactions(text: str) -> list[dict]:
 def _clean_transaction_markers(text: str) -> str:
     """Remove marcadores [TRANSACTION] da resposta visível ao usuário."""
     return TRANSACTION_PATTERN.sub("", text).strip()
+
+
+def _has_reset_marker(text: str) -> bool:
+    """Verifica se há marcador de reset de finanças."""
+    return bool(RESET_PATTERN.search(text))
+
+
+def _get_reset_arg(text: str) -> str | None:
+    """Retorna o argumento do reset (ALL ou DATA)."""
+    match = RESET_PATTERN.search(text)
+    if match:
+        return match.group(1).upper() if match.group(1) else "ALL"
+    return None
+
+
+def _clean_reset_marker(text: str) -> str:
+    """Remove marcador [RESET_FINANCE...]."""
+    return RESET_PATTERN.sub("", text).strip()
 
 
 def _is_onboarding_mode(profile: dict) -> bool:
@@ -311,6 +333,36 @@ async def send_message(
                 yield {
                     "event": "finance_updated",
                     "data": json.dumps({"count": len(transactions)}),
+                }
+
+            # Verificar comando de RESET
+            if _has_reset_marker(assistant_content):
+                reset_arg = _get_reset_arg(assistant_content)
+                
+                query = db.table("financial_records").delete().eq("phone_number", phone_number)
+                
+                # Se for data, adiciona filtro
+                if reset_arg and reset_arg != "ALL":
+                    # Assume formato YYYY-MM-DD
+                    # Filtra registros criados APÓS ou IGUAL a data (usando string comparison no ISO)
+                    query = query.gte("created_at", reset_arg)
+
+                query.execute()
+                
+                # Só limpa resumo do perfil se for reset total
+                if reset_arg == "ALL":
+                    db.table("profiles").update({
+                        "summary": None, 
+                        "last_summary_at": None
+                    }).eq("phone_number", phone_number).execute()
+                
+                # 3. Limpar marcador da resposta
+                assistant_content = _clean_reset_marker(assistant_content)
+                
+                # 4. Enviar evento de atualização
+                yield {
+                    "event": "finance_updated",
+                    "data": json.dumps({"reset": True, "arg": reset_arg}),
                 }
 
             # Salvar resposta no banco (já limpa de marcadores)

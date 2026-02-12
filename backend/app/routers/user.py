@@ -188,3 +188,28 @@ async def get_finance_records(
     resp = query.execute()
 
     return {"records": resp.data or []}
+
+
+@router.delete("/finance/record/{record_id}")
+async def delete_financial_record(record_id: int, phone_number: str):
+    """
+    Exclui um registro financeiro específico.
+    Verifica se o registro pertence ao usuário (phone_number).
+    """
+    db = _get_db()
+
+    # 1. Verificar se o registro existe e pertence ao usuário
+    # (Select com count ou apenas tentar deletar co filtro)
+    # Tentar deletar direto com filtro de phone_number é mais seguro e atômico.
+    
+    resp = db.table("financial_records").delete().eq("id", record_id).eq("phone_number", phone_number).execute()
+    
+    if not resp.data:
+        # Se não retornou dados, pode ser que n existisse ou não fosse do usuário
+        # Mas para idempotência, podemos retornar sucesso ou 404.
+        # Vamos retornar sucesso com aviso se não deletou nada?
+        # Supabase delete returns the deleted rows.
+        # Se vazio, não deletou.
+        raise HTTPException(status_code=404, detail="Registro não encontrado ou não pertence ao usuário")
+
+    return {"success": True, "deleted_id": record_id}

@@ -60,9 +60,14 @@ categoria: {uma de: vendas, servicos, outros_receita, insumos, aluguel, transpor
 - Se o empreendedor mencionar MÚLTIPLAS transações, inclua um marcador [TRANSACTION]...[/TRANSACTION] para CADA uma.
 - Se o valor não for claro, PERGUNTE ao empreendedor antes de registrar. NÃO invente valores.
 - Categorias de entrada: vendas, servicos, outros_receita
-- Categorias de saída: insumos, aluguel, transporte, marketing, salarios, impostos, utilidades, outros_despesa
-- O marcador é INVISÍVEL para o empreendedor. Ele só verá sua resposta textual.
-- Na resposta textual, confirme o registro de forma natural (ex: "Anotado! Registrei a venda de R$ 500,00 💰")
+## Comando de Reset (Recomeçar)
+Se o empreendedor pedir para "recomeçar", "zerar tudo", "apagar tudo" ou "começar do zero", você deve:
+1.  **ALERTE** que a ação apagará os dados financeiros permanentemente.
+2.  **PERGUNTE**: "Você quer apagar TODO o histórico ou apenas a partir de uma data específica?"
+3.  **SOMENTE APÓS CONFIRMAÇÃO EXPLÍCITA** do usuário:
+    -   Se for para apagar TUDO: inclua no final o marcador: [RESET_FINANCE: ALL]
+    -   Se for a partir de uma data (ex: 01/01/2026): inclua no final o marcador: [RESET_FINANCE: YYYY-MM-DD] (ex: [RESET_FINANCE: 2026-01-01])
+    -   O sistema apagará registros com data igual ou posterior à indicada.
 """
 
 # ─────────────────────────────────────────────────────

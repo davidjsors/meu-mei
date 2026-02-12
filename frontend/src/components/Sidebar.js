@@ -100,20 +100,36 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
     // Buscar registros detalhados (quando na view "finance")
     useEffect(() => {
         if (view !== "finance" || !phoneNumber) return;
+
+        let active = true;
         setLoading(true);
 
-        const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
-        const params = new URLSearchParams({
-            start_date: monthRange.start,
-            end_date: monthRange.end,
-        });
-        if (category !== "todas") params.append("category", category);
+        const fetchRecords = async () => {
+            try {
+                const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
+                const params = new URLSearchParams({
+                    start_date: monthRange.start,
+                    end_date: monthRange.end,
+                });
+                if (category !== "todas") params.append("category", category);
 
-        fetch(`${API_BASE}/api/user/finance/${phoneNumber}/records?${params}`)
-            .then((r) => r.json())
-            .then((data) => setRecords(data.records || []))
-            .catch((err) => console.error("Erro ao buscar registros:", err))
-            .finally(() => setLoading(false));
+                const resp = await fetch(`${API_BASE}/api/user/finance/${phoneNumber}/records?${params}`);
+                if (resp.ok) {
+                    const data = await resp.json();
+                    if (active) setRecords(data.records || []);
+                } else {
+                    if (active) setRecords([]);
+                }
+            } catch (err) {
+                console.error("Erro ao buscar registros:", err);
+                if (active) setRecords([]);
+            } finally {
+                if (active) setLoading(false);
+            }
+        };
+
+        fetchRecords();
+        return () => { active = false; };
     }, [view, phoneNumber, monthRange.start, monthRange.end, category]);
 
     const formatCurrency = (value) =>
@@ -153,6 +169,34 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
         localStorage.removeItem("meumei_phone");
         localStorage.removeItem("meumei_login_at");
         router.push("/onboarding");
+    };
+
+    const handleDeleteRecord = async (id) => {
+        if (!confirm("Tem certeza que deseja excluir esta transação?")) return;
+
+        try {
+            const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
+            const resp = await fetch(`${API_BASE}/api/user/finance/record/${id}?phone_number=${phoneNumber}`, {
+                method: "DELETE",
+            });
+
+            if (resp.ok) {
+                // Remove from local state immediately
+                setRecords(prev => prev.filter(r => r.id !== id));
+                // Update finance summary locally or refetch
+                // Refetching is safer to ensure consistency
+                const financeResp = await fetch(`${API_BASE}/api/user/finance/${phoneNumber}`);
+                if (financeResp.ok) {
+                    const data = await financeResp.json();
+                    setFinance(data);
+                }
+            } else {
+                alert("Erro ao excluir transação.");
+            }
+        } catch (err) {
+            console.error("Erro ao excluir transação:", err);
+            alert("Erro ao excluir transação.");
+        }
     };
 
     const toggleTransaction = (type) => {
@@ -417,6 +461,19 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                                     <div className={`finance-record-amount ${r.type}`}>
                                         {r.type === "saida" ? "- " : "+ "}
                                         {formatCurrency(r.amount)}
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDeleteRecord(r.id);
+                                            }}
+                                            style={{
+                                                background: "none", border: "none", cursor: "pointer",
+                                                marginLeft: "8px", fontSize: "14px", opacity: 0.7
+                                            }}
+                                            title="Excluir"
+                                        >
+                                            🗑️
+                                        </button>
                                     </div>
                                 </div>
                             ))
