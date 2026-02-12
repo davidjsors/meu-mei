@@ -1,13 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+
+const SESSION_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+function isSessionValid() {
+    const phone = typeof window !== "undefined" ? localStorage.getItem("meumei_phone") : null;
+    const loginAt = typeof window !== "undefined" ? localStorage.getItem("meumei_login_at") : null;
+    if (!phone || !loginAt) return false;
+    return Date.now() - Number(loginAt) < SESSION_DURATION_MS;
+}
 
 export default function OnboardingPage() {
     const router = useRouter();
     const [phone, setPhone] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+
+    // If session is still valid, redirect straight to chat
+    useEffect(() => {
+        if (isSessionValid()) {
+            router.replace("/chat");
+        }
+    }, [router]);
 
     const formatPhone = (value) => {
         const digits = value.replace(/\D/g, "").slice(0, 11);
@@ -27,6 +43,7 @@ export default function OnboardingPage() {
 
         try {
             localStorage.setItem("meumei_phone", phone);
+            localStorage.setItem("meumei_login_at", String(Date.now()));
             router.push("/chat");
         } catch (err) {
             setError("Erro ao continuar. Tente novamente.");

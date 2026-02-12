@@ -33,7 +33,13 @@ export default function ChatPage() {
     // Load user data on mount
     useEffect(() => {
         const savedPhone = localStorage.getItem("meumei_phone");
-        if (!savedPhone) {
+        const loginAt = localStorage.getItem("meumei_login_at");
+        const SESSION_DURATION_MS = 24 * 60 * 60 * 1000; // 24h
+
+        if (!savedPhone || !loginAt || (Date.now() - Number(loginAt)) >= SESSION_DURATION_MS) {
+            // Session missing or expired — clear and redirect
+            localStorage.removeItem("meumei_phone");
+            localStorage.removeItem("meumei_login_at");
             router.replace("/onboarding");
             return;
         }
