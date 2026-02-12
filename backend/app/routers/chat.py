@@ -17,7 +17,7 @@ from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from sse_starlette.sse import EventSourceResponse
 from supabase import Client
 
-from app.services.ai import generate_response_stream
+from app.services.ai import generate_response_stream, summarize_context
 from app.services.finance import get_financial_summary
 from app.prompts.system import get_maturity_level
 
@@ -156,6 +156,8 @@ async def send_message(
     is_onboarding = _is_onboarding_mode(profile)
     maturity_score = profile.get("maturity_score")
     dream = profile.get("dream")
+    user_summary = profile.get("summary")
+    last_summary_at = profile.get("last_summary_at")
 
     # 2. Processar arquivo (se enviado)
     file_bytes = None
@@ -201,12 +203,43 @@ async def send_message(
     }
     db.table("messages").insert(user_message_data).execute()
 
-    # 4. Buscar histórico recente (últimas 50 mensagens para manter contexto)
-    history_resp = db.table("messages").select("role, content").eq(
-        "phone_number", phone_number
-    ).order("created_at", desc=False).limit(50).execute()
-
-    chat_history = history_resp.data[:-1] if history_resp.data else []
+    # 4. Gestão de Contexto e Memória (Token Optimization)
+    # Busca apenas mensagens posteriores ao último resumo
+    query = db.table("messages").select("role, content, created_at").eq("phone_number", phone_number).order("created_at", desc=False)
+    
+    if last_summary_at:
+        query = query.gt("created_at", last_summary_at)
+        
+    history_resp = query.limit(100).execute()
+    messages = history_resp.data or []
+    
+    chat_history = []
+    
+    # Se houver muitas mensagens novas, sumariza as antigas
+    # Threshold: 20 mensagens. Mantém 10 no contexto, sumariza o resto.
+    if len(messages) > 20:
+        # Separa: [mensagens para sumarizar] ... [contexto ativo]
+        to_summarize = messages[:-10]
+        active_context = messages[-10:]
+        
+        # Gera novo resumo
+        try:
+            new_summary = await summarize_context(user_summary, to_summarize)
+            
+            # Atualiza perfil com novo resumo e novo cursor
+            last_msg = to_summarize[-1]
+            db.table("profiles").update({
+                "summary": new_summary,
+                "last_summary_at": last_msg["created_at"]
+            }).eq("phone_number", phone_number).execute()
+            
+            user_summary = new_summary
+            chat_history = active_context
+        except Exception as e:
+            print(f"Erro na sumarização: {e}")
+            chat_history = messages # Fallback: usa tudo
+    else:
+        chat_history = messages
 
     # 5. Contexto financeiro (apenas se não onboarding)
     enriched_message = message
@@ -232,6 +265,7 @@ async def send_message(
                 is_onboarding=is_onboarding,
                 file_bytes=file_bytes,
                 file_mime=file_mime,
+                user_summary=user_summary,
             ):
                 full_response.append(chunk)
                 yield {"event": "message", "data": json.dumps({"text": chunk})}

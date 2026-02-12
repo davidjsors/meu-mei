@@ -59,6 +59,7 @@ async def generate_response_stream(
     is_onboarding: bool = False,
     file_bytes: bytes | None = None,
     file_mime: str | None = None,
+    user_summary: str | None = None,
 ):
     """
     Gera resposta da IA via streaming.
@@ -73,7 +74,7 @@ async def generate_response_stream(
         system_prompt = build_onboarding_prompt()
     else:
         system_prompt = build_system_prompt(
-            maturity_score or 10, dream or "crescer o negócio"
+            maturity_score or 10, dream or "crescer o negócio", user_summary
         )
 
     knowledge_context = _load_knowledge_context()
@@ -125,12 +126,55 @@ async def generate_response(
     is_onboarding: bool = False,
     file_bytes: bytes | None = None,
     file_mime: str | None = None,
+    user_summary: str | None = None,
 ) -> str:
     """Versão não-streaming (para testes ou fallback)."""
     full_response = []
     async for chunk in generate_response_stream(
         message, chat_history, maturity_score, dream,
-        is_onboarding, file_bytes, file_mime
+        is_onboarding, file_bytes, file_mime, user_summary
     ):
         full_response.append(chunk)
     return "".join(full_response)
+
+
+async def summarize_context(current_summary: str | None, recent_messages: list[dict]) -> str:
+    """
+    Gera um novo resumo combinando o resumo anterior e as mensagens recentes.
+    """
+    # Converte mensagens para texto simples
+    history_text = ""
+    for msg in recent_messages:
+        role = "Usuário" if msg["role"] == "user" else "Meu MEI"
+        content = msg.get("content", "")
+        if content:
+            history_text += f"{role}: {content}\n"
+
+    prompt = f"""
+Você é um especialista em sumarização de contexto para assistentes de IA.
+Seu objetivo é criar um perfil atualizado do usuário com base no resumo anterior (se houver) e nas novas interações.
+
+## Resumo Anterior:
+{current_summary or "Nenhum resumo anterior."}
+
+## Novas Interações:
+{history_text}
+
+## Instruções:
+1. Atualize o resumo mantendo fatos importantes: Nome, Tipo de Negócio (ramo), Grande Sonho, Dores/Dificuldades Financeiras, Faturamento/Custos mencionados.
+2. Descarte cumprimentos ou conversas triviais.
+3. Se houver informações conflitantes, priorize as mais recentes.
+4. Mantenha o texto conciso, direto e informativo.
+5. SAÍDA: Apenas o texto do novo resumo.
+"""
+
+    response = client.models.generate_content(
+        model=settings.GEMINI_MODEL,
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            temperature=0.5,
+            max_output_tokens=1024,
+        ),
+    )
+    
+    return response.text if response.text else (current_summary or "")
