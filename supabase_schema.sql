@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS profiles (
   dream TEXT,
   maturity_score INT CHECK (maturity_score BETWEEN 5 AND 25),
   maturity_level TEXT CHECK (maturity_level IN ('vulneravel', 'organizacao', 'visionario')),
+  revenue_goal DECIMAL(10,2),
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

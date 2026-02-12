@@ -72,6 +72,27 @@ async def get_profile(phone_number: str):
     return resp.data[0]
 
 
+@router.put("/profile/goal")
+async def update_revenue_goal(request: dict):
+    """
+    Atualiza a meta de faturamento do usuário.
+    Esperado: { "phone_number": "...", "revenue_goal": 5000.00 }
+    """
+    db = _get_db()
+    phone_number = request.get("phone_number")
+    revenue_goal = request.get("revenue_goal")
+
+    if not phone_number or revenue_goal is None:
+        raise HTTPException(status_code=400, detail="Dados incompletos")
+
+    resp = db.table("profiles").update({"revenue_goal": revenue_goal}).eq("phone_number", phone_number).execute()
+    
+    if not resp.data:
+        raise HTTPException(status_code=404, detail="Perfil não encontrado")
+
+    return {"success": True, "profile": resp.data[0]}
+
+
 @router.post("/accept-terms")
 async def accept_terms(request: dict):
     """Registra o aceite dos termos de uso e privacidade."""

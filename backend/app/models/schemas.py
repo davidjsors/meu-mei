@@ -23,7 +23,13 @@ class ProfileResponse(BaseModel):
     dream: str
     maturity_score: int
     maturity_level: str
+    revenue_goal: Optional[float] = None
     created_at: Optional[datetime] = None
+
+
+class GoalUpdateRequest(BaseModel):
+    phone_number: str = Field(..., pattern=r"^\d{2}-\d{5}-\d{4}$")
+    revenue_goal: float = Field(..., gt=0, description="Meta de faturamento mensal")
 
 
 # ─── Chat ───

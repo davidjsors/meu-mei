@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import { TrendingUp, TrendingDown } from 'lucide-react';
 
 const CATEGORY_LABELS = {
     vendas: "Vendas",
@@ -43,6 +45,12 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
     const router = useRouter();
     const [finance, setFinance] = useState({ entradas: 0, saidas: 0, saldo: 0 });
     const [view, setView] = useState("home"); // "home" | "finance" | "terms"
+
+    // Revenue Goal State
+    const [revenueGoal, setRevenueGoal] = useState(null);
+    const [isEditingGoal, setIsEditingGoal] = useState(false);
+    const [tempGoal, setTempGoal] = useState("");
+    const [goalLoading, setGoalLoading] = useState(false);
 
     // Transaction Inline Form State
     const [activeTransaction, setActiveTransaction] = useState(null); // "entry" | "exit" | null
@@ -97,9 +105,27 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
         return () => clearInterval(interval);
     }, [phoneNumber, refreshKey]);
 
-    // Buscar registros detalhados (quando na view "finance")
+    // Buscar Meta de Faturamento
     useEffect(() => {
-        if (view !== "finance" || !phoneNumber) return;
+        if (!phoneNumber) return;
+        const fetchProfile = async () => {
+            try {
+                const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
+                const resp = await fetch(`${API_BASE}/api/user/profile/${phoneNumber}`);
+                if (resp.ok) {
+                    const data = await resp.json();
+                    if (data.revenue_goal) setRevenueGoal(parseFloat(data.revenue_goal));
+                }
+            } catch (err) {
+                console.error("Erro ao buscar perfil:", err);
+            }
+        };
+        fetchProfile();
+    }, [phoneNumber]);
+
+    // Buscar registros detalhados (quando na view "finance" OU "home" para o gráfico)
+    useEffect(() => {
+        if ((view !== "finance" && view !== "home") || !phoneNumber) return;
 
         let active = true;
         setLoading(true);
@@ -233,6 +259,69 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
         setIsSubmitting(false);
     };
 
+    const handleSaveGoal = async () => {
+        if (!tempGoal) return;
+        setGoalLoading(true);
+        const val = parseFloat(tempGoal.replace(/\./g, '').replace(',', '.'));
+
+        try {
+            const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
+            const resp = await fetch(`${API_BASE}/api/user/profile/goal`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ phone_number: phoneNumber, revenue_goal: val })
+            });
+            if (resp.ok) {
+                setRevenueGoal(val);
+                setIsEditingGoal(false);
+                setTempGoal("");
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setGoalLoading(false);
+        }
+    };
+
+    const chartData = useMemo(() => {
+        if (!records.length) return [];
+
+        // Filter for income only and sort by date
+        const incomeRecords = records
+            .filter(r => r.type === "entrada")
+            .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
+        // Create cumulative data
+        let cumulative = 0;
+        const data = [];
+
+        // Group by day to avoid too many points? Or just exact points?
+        // Let's group by day for smoother chart
+        const byDay = {};
+        incomeRecords.forEach(r => {
+            const day = new Date(r.created_at).getDate();
+            if (!byDay[day]) byDay[day] = 0;
+            byDay[day] += parseFloat(r.amount);
+        });
+
+        const days = Object.keys(byDay).sort((a, b) => parseInt(a) - parseInt(b));
+
+        // Fill days 1 to today (or end of month)
+        // Actually, just showing progress points is enough
+
+        days.forEach(day => {
+            cumulative += byDay[day];
+            data.push({ day: parseInt(day), value: cumulative });
+        });
+
+        // Ensure we have a point for today if not present? 
+        // Or just let it be.
+
+        return data;
+    }, [records]);
+
+    const percentAchieved = revenueGoal ? Math.min(100, (chartData.length > 0 ? chartData[chartData.length - 1].value : 0) / revenueGoal * 100) : 0;
+
     return (
         <aside className="sidebar">
             {/* Header */}
@@ -282,6 +371,116 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                         </div>
                     </div>
 
+                    {/* META DE FATURAMENTO */}
+                    <div className="finance-card" style={{ marginTop: 16 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                            <h3>🎯 Meta Mensal</h3>
+                            {revenueGoal && !isEditingGoal && (
+                                <button onClick={() => { setIsEditingGoal(true); setTempGoal(revenueGoal.toString()); }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, opacity: 0.7 }}>
+                                    ✏️
+                                </button>
+                            )}
+                        </div>
+
+                        {!revenueGoal || isEditingGoal ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                <label style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Defina sua meta de vendas para este mês:</label>
+                                <div style={{ display: 'flex', gap: 8 }}>
+                                    <input
+                                        type="text"
+                                        placeholder="Ex: 5000,00"
+                                        value={tempGoal}
+                                        onChange={(e) => {
+                                            let v = e.target.value.replace(/\D/g, "");
+                                            v = (parseInt(v) / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+                                            if (v === 'NaN') v = '';
+                                            setTempGoal(v);
+                                        }}
+                                        style={{
+                                            flex: 1, padding: 8, borderRadius: 6, border: '1px solid var(--border-color)',
+                                            background: 'var(--bg-app)', color: 'var(--text-primary)', fontSize: 14
+                                        }}
+                                    />
+                                    <button
+                                        onClick={handleSaveGoal}
+                                        disabled={goalLoading}
+                                        style={{
+                                            padding: '8px 12px', background: 'var(--green)', border: 'none',
+                                            borderRadius: 6, color: '#fff', fontWeight: 'bold', cursor: 'pointer'
+                                        }}
+                                    >
+                                        {goalLoading ? "..." : "Salvar"}
+                                    </button>
+                                </div>
+                                {isEditingGoal && <button onClick={() => setIsEditingGoal(false)} style={{ fontSize: 12, background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', alignSelf: 'start' }}>Cancelar</button>}
+                            </div>
+                        ) : (
+                            <div>
+
+
+                                <div style={{ height: 100, width: '100%', marginLeft: -20, position: 'relative' }}>
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <PieChart>
+                                            <Pie
+                                                dataKey="value"
+                                                startAngle={180}
+                                                endAngle={0}
+                                                data={[
+                                                    { name: 'Achieved', value: Math.min(percentAchieved, 100), fill: 'var(--green)' },
+                                                    { name: 'Remaining', value: Math.max(100 - percentAchieved, 0), fill: 'rgba(255,255,255,0.1)' },
+                                                ]}
+                                                cx="50%"
+                                                cy="85%"
+                                                innerRadius={60}
+                                                outerRadius={80}
+                                                stroke="none"
+                                            >
+                                                <Cell key="achieved" fill="var(--green)" />
+                                                <Cell key="remaining" fill="rgba(255,255,255,0.1)" />
+                                            </Pie>
+                                        </PieChart>
+                                    </ResponsiveContainer>
+
+                                    {/* Needle */}
+                                    <div style={{
+                                        position: 'absolute',
+                                        bottom: '15%', // Matches cy=85%
+                                        left: 'calc(50% - 2px)',
+                                        width: '4px',
+                                        height: '65px',
+                                        background: '#fff',
+                                        borderRadius: '2px 2px 0 0',
+                                        transformOrigin: 'bottom center',
+                                        transform: `rotate(${-90 + (Math.min(percentAchieved, 100) * 1.8)}deg)`,
+                                        transition: 'transform 0.5s ease-out',
+                                        zIndex: 5,
+                                        boxShadow: '0 0 4px rgba(0,0,0,0.5)'
+                                    }} />
+                                    {/* Needle Pivot */}
+                                    <div style={{
+                                        position: 'absolute',
+                                        bottom: 'calc(15% - 4px)',
+                                        left: 'calc(50% - 4px)',
+                                        width: '8px',
+                                        height: '8px',
+                                        borderRadius: '50%',
+                                        background: '#fff',
+                                        zIndex: 6,
+                                        boxShadow: '0 1px 2px rgba(0,0,0,0.5)'
+                                    }} />
+                                </div>
+
+                                <div style={{ textAlign: 'center', fontSize: 12, color: '#fff', fontWeight: 'bold', marginTop: -20, position: 'relative', zIndex: 10 }}>
+                                    {percentAchieved.toFixed(0)}%
+                                </div>
+                                <div style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
+                                    {formatCurrency(records.filter(r => r.type === 'entrada').reduce((acc, r) => acc + parseFloat(r.amount), 0))} / <span style={{ color: '#fff' }}>{formatCurrency(revenueGoal)}</span>
+                                </div>
+
+                            </div>
+                        )}
+                    </div>
+
                     {/* Quick Actions */}
                     <div className="sidebar-quick-actions" style={{ padding: "0 16px", marginTop: 16, display: 'flex', gap: 10 }}>
                         <button
@@ -289,36 +488,38 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                             onClick={() => toggleTransaction("entry")}
                             style={{
                                 flex: 1,
-                                padding: "10px",
+                                padding: "12px",
                                 borderRadius: "8px",
                                 background: activeTransaction === "entry" ? "rgba(34, 197, 94, 0.2)" : "rgba(34, 197, 94, 0.1)",
                                 border: `1px solid ${activeTransaction === "entry" ? "#4ade80" : "rgba(34, 197, 94, 0.3)"}`,
                                 color: "#4ade80",
                                 fontWeight: "bold",
                                 cursor: "pointer",
-                                display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
+                                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "6px",
                                 transition: "all 0.2s"
                             }}
                         >
-                            <span style={{ fontSize: "1.2em" }}>💰</span> Entrou Dindin
+                            <TrendingUp size={24} />
+                            <span>Entrou Dindin</span>
                         </button>
                         <button
                             className="btn-quick-exit"
                             onClick={() => toggleTransaction("exit")}
                             style={{
                                 flex: 1,
-                                padding: "10px",
+                                padding: "12px",
                                 borderRadius: "8px",
                                 background: activeTransaction === "exit" ? "rgba(239, 68, 68, 0.2)" : "rgba(239, 68, 68, 0.1)",
                                 border: `1px solid ${activeTransaction === "exit" ? "#f87171" : "rgba(239, 68, 68, 0.3)"}`,
                                 color: "#f87171",
                                 fontWeight: "bold",
                                 cursor: "pointer",
-                                display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
+                                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "6px",
                                 transition: "all 0.2s"
                             }}
                         >
-                            <span style={{ fontSize: "1.2em" }}>💸</span> Saiu Dindin
+                            <TrendingDown size={24} />
+                            <span>Saiu Dindin</span>
                         </button>
                     </div>
 
