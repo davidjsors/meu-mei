@@ -45,6 +45,36 @@ export async function streamResponse(response, onChunk, onDone, onError, onOnboa
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let buffer = "";
+    let currentEvent = "message";
+
+    const processLine = (line) => {
+        if (line.startsWith("event: ")) {
+            currentEvent = line.slice(7).trim();
+        } else if (line.startsWith("data: ")) {
+            try {
+                const data = JSON.parse(line.slice(6));
+
+                if (currentEvent === "message" && data.text) {
+                    onChunk(data.text);
+                }
+                if (currentEvent === "done" && data.complete) {
+                    onDone?.();
+                }
+                if (currentEvent === "error" && data.error) {
+                    onError?.(data.error);
+                }
+                if (currentEvent === "onboarding_complete" && data.level) {
+                    onOnboardingComplete?.(data.level);
+                }
+                if (currentEvent === "finance_updated") {
+                    onFinanceUpdated?.();
+                }
+            } catch {
+                // ignore parse errors
+            }
+            currentEvent = "message";
+        }
+    };
 
     try {
         while (true) {
@@ -55,35 +85,16 @@ export async function streamResponse(response, onChunk, onDone, onError, onOnboa
             const lines = buffer.split("\n");
             buffer = lines.pop() || "";
 
-            let currentEvent = "message";
-
             for (const line of lines) {
-                if (line.startsWith("event: ")) {
-                    currentEvent = line.slice(7).trim();
-                } else if (line.startsWith("data: ")) {
-                    try {
-                        const data = JSON.parse(line.slice(6));
+                processLine(line);
+            }
+        }
 
-                        if (currentEvent === "message" && data.text) {
-                            onChunk(data.text);
-                        }
-                        if (currentEvent === "done" && data.complete) {
-                            onDone?.();
-                        }
-                        if (currentEvent === "error" && data.error) {
-                            onError?.(data.error);
-                        }
-                        if (currentEvent === "onboarding_complete" && data.level) {
-                            onOnboardingComplete?.(data.level);
-                        }
-                        if (currentEvent === "finance_updated") {
-                            onFinanceUpdated?.();
-                        }
-                    } catch {
-                        // ignore parse errors
-                    }
-                    currentEvent = "message"; // reset after consuming
-                }
+        // Flush remaining buffer after stream ends
+        if (buffer.trim()) {
+            const remaining = buffer.split("\n");
+            for (const line of remaining) {
+                processLine(line);
             }
         }
     } catch (err) {
