@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import TermsModal from "../../components/TermsModal";
 
 const SESSION_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
 
@@ -17,6 +18,7 @@ export default function OnboardingPage() {
     const [phone, setPhone] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [showTerms, setShowTerms] = useState(false);
 
     // If session is still valid, redirect straight to chat
     useEffect(() => {
@@ -42,13 +44,49 @@ export default function OnboardingPage() {
         setError("");
 
         try {
-            localStorage.setItem("meumei_phone", phone);
-            localStorage.setItem("meumei_login_at", String(Date.now()));
-            router.push("/chat");
+            // Check if user already exists (returning user)
+            const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
+            const resp = await fetch(`${API_BASE}/api/user/profile/${phone}`);
+            const profile = resp.ok ? await resp.json() : null;
+
+            if (profile && profile.terms_accepted) {
+                // Returning user who already accepted terms — proceed
+                localStorage.setItem("meumei_phone", phone);
+                localStorage.setItem("meumei_login_at", String(Date.now()));
+                router.push("/chat");
+            } else {
+                // New user or hasn't accepted terms — show modal
+                setLoading(false);
+                setShowTerms(true);
+            }
         } catch (err) {
-            setError("Erro ao continuar. Tente novamente.");
+            // On error, show terms to be safe
             setLoading(false);
+            setShowTerms(true);
         }
+    };
+
+    const handleAcceptTerms = async () => {
+        setLoading(true);
+        try {
+            // Save terms acceptance in backend (best-effort)
+            const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
+            const resp = await fetch(`${API_BASE}/api/user/accept-terms`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ phone_number: phone }),
+            });
+            if (!resp.ok) {
+                console.warn("Erro ao salvar aceite no backend:", resp.status);
+            }
+        } catch (err) {
+            console.warn("Erro ao salvar aceite:", err);
+        }
+
+        // Proceed regardless — don't block the user
+        localStorage.setItem("meumei_phone", phone);
+        localStorage.setItem("meumei_login_at", String(Date.now()));
+        router.push("/chat");
     };
 
     const handleKeyDown = (e) => {
@@ -110,6 +148,14 @@ export default function OnboardingPage() {
                     Seus dados ficam seguros. 🔒
                 </p>
             </div>
+
+            {/* Terms Modal */}
+            {showTerms && (
+                <TermsModal
+                    onAccept={handleAcceptTerms}
+                    onClose={() => setShowTerms(false)}
+                />
+            )}
         </div>
     );
 }

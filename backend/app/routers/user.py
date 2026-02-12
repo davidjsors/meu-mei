@@ -72,6 +72,32 @@ async def get_profile(phone_number: str):
     return resp.data[0]
 
 
+@router.post("/accept-terms")
+async def accept_terms(request: dict):
+    """Registra o aceite dos termos de uso e privacidade."""
+    from datetime import datetime
+
+    db = _get_db()
+    phone_number = request.get("phone_number")
+    if not phone_number:
+        raise HTTPException(status_code=400, detail="phone_number é obrigatório")
+
+    profile_data = {
+        "phone_number": phone_number,
+        "terms_accepted": True,
+        "terms_accepted_at": datetime.utcnow().isoformat(),
+    }
+
+    resp = db.table("profiles").upsert(
+        profile_data, on_conflict="phone_number"
+    ).execute()
+
+    if not resp.data:
+        raise HTTPException(status_code=500, detail="Erro ao salvar aceite")
+
+    return {"success": True}
+
+
 @router.get("/finance/{phone_number}")
 async def get_finance_summary(phone_number: str):
     """Retorna resumo financeiro (entradas, saídas, saldo) do usuário."""
