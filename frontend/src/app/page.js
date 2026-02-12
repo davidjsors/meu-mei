@@ -13,9 +13,14 @@ export default function Home() {
 
     useEffect(() => {
         const phone = localStorage.getItem("meumei_phone");
-        if (phone) {
+        const loginAt = localStorage.getItem("meumei_login_at");
+        const SESSION_DURATION_MS = 24 * 60 * 60 * 1000; // 24h
+
+        if (phone && loginAt && (Date.now() - Number(loginAt)) < SESSION_DURATION_MS) {
             router.replace("/chat");
         } else {
+            localStorage.removeItem("meumei_phone");
+            localStorage.removeItem("meumei_login_at");
             router.replace("/onboarding");
         }
     }, [router]);
