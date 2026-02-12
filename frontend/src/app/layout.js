@@ -1,7 +1,7 @@
 import "../styles/globals.css";
 
 export const metadata = {
-    title: "Meu MEI — Mentor Financeiro Digital",
+    title: "Meu MEI - Seu Mentor Financeiro 24/7",
     description:
         "Assessoria financeira 24/7 com IA para microempreendedores individuais. Finanças em dia, dinheiro no bolso.",
 };
