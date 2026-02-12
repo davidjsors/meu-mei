@@ -98,6 +98,32 @@ async def accept_terms(request: dict):
     return {"success": True}
 
 
+@router.delete("/delete-account")
+async def delete_account(request: dict):
+    """Exclui todos os dados do usuário (LGPD)."""
+    db = _get_db()
+    phone_number = request.get("phone_number")
+    if not phone_number:
+        raise HTTPException(status_code=400, detail="phone_number é obrigatório")
+
+    # Delete in order: financial_records, messages, profile
+    try:
+        db.table("financial_records").delete().eq("phone_number", phone_number).execute()
+    except Exception:
+        pass
+
+    try:
+        db.table("messages").delete().eq("phone_number", phone_number).execute()
+    except Exception:
+        pass
+
+    try:
+        db.table("profiles").delete().eq("phone_number", phone_number).execute()
+    except Exception:
+        pass
+
+    return {"success": True, "message": "Conta excluída com sucesso"}
+
 @router.get("/finance/{phone_number}")
 async def get_finance_summary(phone_number: str):
     """Retorna resumo financeiro (entradas, saídas, saldo) do usuário."""
