@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
-import { TrendingUp, TrendingDown, ShieldCheck, LogOut, Quote } from 'lucide-react';
+import { TrendingUp, TrendingDown, ShieldCheck, LogOut, Quote, Hand, BarChart3, Target, PencilLine } from 'lucide-react';
 import { MOTIVATIONAL_QUOTES } from "../data/quotes";
 
 const CATEGORY_LABELS = {
@@ -344,14 +344,17 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                 <div className="sidebar-content">
                     {/* Saudação */}
                     {profile?.name && (
-                        <div style={{ padding: "0 16px 8px", color: "var(--text-secondary)", fontSize: 13 }}>
-                            Olá, <strong>{profile.name}</strong>! 👋
+                        <div style={{ padding: "0 16px 8px", color: "var(--text-secondary)", fontSize: 13, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            Olá, <strong>{profile.name}</strong>! <Hand size={14} style={{ color: "var(--red-light)" }} />
                         </div>
                     )}
 
                     {/* Resumo Financeiro — clicável */}
                     <div className="finance-card" onClick={() => setView("finance")} style={{ cursor: 'pointer' }}>
-                        <h3>📊 Resumo Financeiro</h3>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                            <BarChart3 size={18} color="var(--red-light)" />
+                            <h3 style={{ margin: 0 }}>Resumo Financeiro</h3>
+                        </div>
                         <div className="finance-row positive">
                             <span>Entradas</span>
                             <span>{formatCurrency(finance.entradas)}</span>
@@ -380,10 +383,13 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                     {/* META DE FATURAMENTO */}
                     <div className="finance-card" style={{ marginTop: 16 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                            <h3>🎯 Meta Mensal</h3>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <Target size={18} color="var(--red-light)" />
+                                <h3 style={{ margin: 0 }}>Meta Mensal</h3>
+                            </div>
                             {revenueGoal && !isEditingGoal && (
-                                <button onClick={() => { setIsEditingGoal(true); setTempGoal(revenueGoal.toString()); }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, opacity: 0.7 }}>
-                                    ✏️
+                                <button onClick={() => { setIsEditingGoal(true); setTempGoal(revenueGoal.toString()); }} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', opacity: 0.7 }}>
+                                    <PencilLine size={16} color="var(--text-muted)" />
                                 </button>
                             )}
                         </div>
