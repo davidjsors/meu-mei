@@ -612,16 +612,6 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                         </form>
                     )}
 
-                    {/* 3) Motive-se */}
-                    <div className="quote-card">
-                        <div className="quote-header">
-                            <Quote size={18} color="var(--red-light)" />
-                            <h3>Motive-se</h3>
-                        </div>
-                        <p>{currentQuote.text}</p>
-                        {currentQuote.author && <span className="quote-author">— {currentQuote.author}</span>}
-                    </div>
-
                     {/* REMOVED DREAM CARD */}
                 </div>
             ) : view === "finance" ? (
@@ -830,6 +820,16 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                     </div>
                 </div>
             )}
+
+            {/* 3) Motive-se — Fixed at bottom */}
+            <div className="quote-card">
+                <div className="quote-header">
+                    <Quote size={14} color="var(--red-light)" />
+                    <h3>Motive-se</h3>
+                </div>
+                <p>{currentQuote.text}</p>
+                {currentQuote.author && <span className="quote-author">— {currentQuote.author}</span>}
+            </div>
 
             {/* ═══ SIDEBAR FOOTER ═══ */}
             <div className="sidebar-footer">
