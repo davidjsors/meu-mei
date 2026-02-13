@@ -102,16 +102,27 @@ def _parse_transactions(text: str) -> list[dict]:
     """
     Extrai todas as transações financeiras marcadas pela IA.
     Retorna lista de dicts com tipo, valor, descricao, categoria.
+    Deduplica transações idênticas na mesma resposta da IA.
     """
     transactions = []
+    seen = set()
     for match in TRANSACTION_PATTERN.finditer(text):
         try:
-            transactions.append({
-                "type": match.group(1).strip().lower(),
-                "amount": float(match.group(2).strip()),
-                "description": match.group(3).strip(),
-                "category": match.group(4).strip().lower(),
-            })
+            tipo = match.group(1).strip().lower()
+            valor = float(match.group(2).strip())
+            desc = match.group(3).strip()
+            cat = match.group(4).strip().lower()
+            
+            # Chave única para evitar duplicados na mesma resposta
+            tx_key = (tipo, valor, desc, cat)
+            if tx_key not in seen:
+                transactions.append({
+                    "type": tipo,
+                    "amount": valor,
+                    "description": desc,
+                    "category": cat,
+                })
+                seen.add(tx_key)
         except (ValueError, IndexError):
             continue
     return transactions
