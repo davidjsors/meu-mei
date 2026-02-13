@@ -1559,7 +1559,10 @@ body {
   font-family: inherit;
   cursor: pointer;
   transition: var(--transition-fast);
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 .sidebar-footer-btn:hover {
