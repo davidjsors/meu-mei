@@ -445,10 +445,13 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                 <Target size={18} color="var(--text-secondary)" />
-                                <h3 style={{ margin: 0 }}>Meta Mensal</h3>
+                                <h3 style={{ margin: 0 }}>Meta de Vendas</h3>
                             </div>
                             {revenueGoal && !isEditingGoal && (
-                                <button onClick={() => { setIsEditingGoal(true); setTempGoal(revenueGoal.toString()); }} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', opacity: 0.7 }}>
+                                <button onClick={() => {
+                                    setIsEditingGoal(true);
+                                    setTempGoal(revenueGoal.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+                                }} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', opacity: 0.7 }}>
                                     <PencilLine size={16} color="var(--text-muted)" />
                                 </button>
                             )}
@@ -458,21 +461,31 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                                 <label style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Defina sua meta de vendas para este mês:</label>
                                 <div style={{ display: 'flex', gap: 8 }}>
-                                    <input
-                                        type="text"
-                                        placeholder="Ex: 5000,00"
-                                        value={tempGoal}
-                                        onChange={(e) => {
-                                            let v = e.target.value.replace(/\D/g, "");
-                                            v = (parseInt(v) / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
-                                            if (v === 'NaN') v = '';
-                                            setTempGoal(v);
-                                        }}
-                                        style={{
-                                            flex: 1, padding: 8, borderRadius: 6, border: '1px solid var(--border-color)',
-                                            background: 'var(--bg-app)', color: 'var(--text-primary)', fontSize: 14
-                                        }}
-                                    />
+                                    <div style={{ position: 'relative', flex: 1 }}>
+                                        <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', fontSize: 14 }}>R$</span>
+                                        <input
+                                            type="text"
+                                            placeholder="0,00"
+                                            value={tempGoal}
+                                            onChange={(e) => {
+                                                let v = e.target.value.replace(/\D/g, "");
+                                                if (!v) {
+                                                    setTempGoal("");
+                                                    return;
+                                                }
+                                                const floatValue = parseInt(v) / 100;
+                                                const formatted = floatValue.toLocaleString("pt-BR", {
+                                                    minimumFractionDigits: 2,
+                                                    maximumFractionDigits: 2,
+                                                });
+                                                setTempGoal(formatted);
+                                            }}
+                                            style={{
+                                                width: '100%', padding: '8px 8px 8px 32px', borderRadius: 6, border: '1px solid var(--border-color)',
+                                                background: 'var(--bg-app)', color: 'var(--text-primary)', fontSize: 14
+                                            }}
+                                        />
+                                    </div>
                                     <button
                                         onClick={handleSaveGoal}
                                         disabled={goalLoading}
@@ -607,7 +620,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                         }}>
                             <div style={{ marginBottom: 12 }}>
                                 <label style={{ display: "block", fontSize: 12, color: "var(--text-secondary)", marginBottom: 4 }}>
-                                    Valor (R$)
+                                    Valor (R$) *
                                 </label>
                                 <input
                                     type="tel"
@@ -627,14 +640,14 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                             </div>
                             <div style={{ marginBottom: 16 }}>
                                 <label style={{ display: "block", fontSize: 12, color: "var(--text-secondary)", marginBottom: 4 }}>
-                                    Categoria <span style={{ color: "var(--red-light)" }}>*</span>
+                                    Categoria *
                                 </label>
                                 <div className="custom-dropdown">
                                     <button
                                         type="button"
                                         className="dropdown-trigger"
                                         onClick={() => setIsShortcutCategoryOpen(!isShortcutCategoryOpen)}
-                                        style={{ height: '42px' }}
+                                        style={{ height: '42px', background: 'var(--bg-app)' }}
                                     >
                                         <span>
                                             {shortcutCategory
