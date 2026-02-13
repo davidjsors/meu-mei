@@ -76,6 +76,8 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
         setAmount(formatted);
     };
     const [description, setDescription] = useState("");
+    const [shortcutCategory, setShortcutCategory] = useState("");
+    const [isShortcutCategoryOpen, setIsShortcutCategoryOpen] = useState(false);
 
     // Finance detail state (filtered)
     const [records, setRecords] = useState([]);
@@ -268,12 +270,31 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
             setActiveTransaction(type);
             setAmount("");
             setDescription("");
+            setShortcutCategory("");
+            setIsShortcutCategoryOpen(false);
         }
     };
 
+    const INCOME_CATEGORIES = [
+        { value: "vendas", label: "Vendas" },
+        { value: "servicos", label: "Serviços" },
+        { value: "outros_receita", label: "Outros (Receita)" },
+    ];
+
+    const EXPENSE_CATEGORIES = [
+        { value: "insumos", label: "Insumos" },
+        { value: "aluguel", label: "Aluguel" },
+        { value: "transporte", label: "Transporte" },
+        { value: "marketing", label: "Marketing" },
+        { value: "salarios", label: "Salários" },
+        { value: "impostos", label: "Impostos" },
+        { value: "utilidades", label: "Utilidades" },
+        { value: "outros_despesa", label: "Outros (Despesa)" },
+    ];
+
     const submitTransaction = (e) => {
         e.preventDefault();
-        if (isSubmitting || !amount || !description) return;
+        if (isSubmitting || !amount || !shortcutCategory) return;
 
         setIsSubmitting(true);
 
@@ -281,7 +302,8 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
             onSendTransaction({
                 type: activeTransaction,
                 amount,
-                description
+                description: description || null,
+                categoryLabel: CATEGORY_LABELS[shortcutCategory]
             });
         }
 
@@ -289,6 +311,8 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
         setActiveTransaction(null);
         setAmount("");
         setDescription("");
+        setShortcutCategory("");
+        setIsShortcutCategoryOpen(false);
         setIsSubmitting(false);
     };
 
@@ -599,7 +623,44 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                             </div>
                             <div style={{ marginBottom: 16 }}>
                                 <label style={{ display: "block", fontSize: 12, color: "var(--text-secondary)", marginBottom: 4 }}>
-                                    Descrição
+                                    Categoria <span style={{ color: "var(--red-light)" }}>*</span>
+                                </label>
+                                <div className="custom-dropdown">
+                                    <button
+                                        type="button"
+                                        className="dropdown-trigger"
+                                        onClick={() => setIsShortcutCategoryOpen(!isShortcutCategoryOpen)}
+                                        style={{ height: '42px' }}
+                                    >
+                                        <span>
+                                            {shortcutCategory
+                                                ? (activeTransaction === "entry" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES).find(c => c.value === shortcutCategory)?.label
+                                                : "Selecione..."}
+                                        </span>
+                                        {isShortcutCategoryOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                    </button>
+
+                                    {isShortcutCategoryOpen && (
+                                        <div className="dropdown-menu" style={{ bottom: '100%', top: 'auto', marginBottom: '8px' }}>
+                                            {(activeTransaction === "entry" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES).map((cat) => (
+                                                <div
+                                                    key={cat.value}
+                                                    className={`dropdown-item ${shortcutCategory === cat.value ? 'active' : ''}`}
+                                                    onClick={() => {
+                                                        setShortcutCategory(cat.value);
+                                                        setIsShortcutCategoryOpen(false);
+                                                    }}
+                                                >
+                                                    {cat.label}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            <div style={{ marginBottom: 16 }}>
+                                <label style={{ display: "block", fontSize: 12, color: "var(--text-secondary)", marginBottom: 4 }}>
+                                    Descrição (opcional)
                                 </label>
                                 <input
                                     type="text"
@@ -632,16 +693,16 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                                 </button>
                                 <button
                                     type="submit"
-                                    disabled={!amount || !description}
+                                    disabled={!amount || !shortcutCategory}
                                     style={{
-                                        flex: 1, padding: "10px",
+                                        flex: 2, padding: "10px",
                                         background: activeTransaction === "entry" ? "var(--green)" : "#ef4444",
                                         border: "none",
                                         color: "#fff",
                                         borderRadius: 6,
                                         cursor: "pointer",
                                         fontWeight: "bold",
-                                        opacity: (!amount || !description) ? 0.5 : 1
+                                        opacity: (!amount || !shortcutCategory) ? 0.5 : 1
                                     }}
                                 >
                                     Enviar

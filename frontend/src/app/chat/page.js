@@ -204,9 +204,15 @@ export default function ChatPage() {
 
     // Handle Sidebar Quick Transactions
     const handleTransaction = (data) => {
-        const { type, amount, description } = data;
+        const { type, amount, description, categoryLabel } = data;
         const action = type === "entry" ? "entrada" : "saída";
-        const text = `Registre uma ${action} de R$ ${amount} referente a ${description}.`;
+        const emoji = type === "entry" ? "💰" : "💸";
+
+        let text = `Registre uma **${action}** de **R$ ${amount}** ${emoji} | **${categoryLabel}**`;
+        if (description) {
+            text += ` | *${description}*`;
+        }
+
         handleSend(text);
     };
 
