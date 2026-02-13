@@ -400,8 +400,15 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                 <div className="sidebar-content">
                     {/* Saudação */}
                     {profile?.name && (
-                        <div style={{ padding: "0 16px 8px", color: "var(--text-secondary)", fontSize: 13, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            Olá, <strong>{profile.name}</strong>! <Hand size={14} style={{ color: "var(--red-light)" }} />
+                        <div style={{ padding: "0 16px 8px", display: 'flex', flexDirection: 'column' }}>
+                            <div style={{ color: "var(--text-secondary)", fontSize: 13, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                Olá, <strong>{profile.name}</strong>! <Hand size={14} style={{ color: "var(--red-light)" }} />
+                            </div>
+                            {profile.business_type && (
+                                <div style={{ color: "var(--text-muted)", fontSize: 11, marginTop: 2 }}>
+                                    {profile.business_type}
+                                </div>
+                            )}
                         </div>
                     )}
 
@@ -567,7 +574,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                     </div>
 
                     {/* Quick Actions */}
-                    <div className="sidebar-quick-actions" style={{ padding: "0 16px", marginTop: 16, display: 'flex', gap: 10 }}>
+                    <div className="sidebar-quick-actions" style={{ marginTop: 16, display: 'flex', gap: 10 }}>
                         <button
                             className="btn-quick-entry"
                             onClick={() => toggleTransaction("entry")}

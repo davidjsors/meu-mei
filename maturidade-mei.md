@@ -13,48 +13,65 @@ Diagnosticar a maturidade financeira do MEI para personalizar a mentoria digital
 ### 🚀 Uso e Aplicação
 O instrumento deve ser aplicado no primeiro contacto do utilizador com o agente de IA. A interação deve ser conduzida de forma leve e conversacional, utilizando uma **Escala Likert de cinco pontos**.
 
----
-
-## 📏 2. Legenda da Escala
-Para cada afirmação abaixo, selecione o nível que melhor descreve sua realidade atual:
-
-* **1:** Nunca / Discordo totalmente
-* **2:** Raramente / Discordo parcialmente
-* **3:** Às vezes / Neutro
-* **4:** Frequentemente / Concordo parcialmente
-* **5:** Sempre / Concordo totalmente
-
----
-
-## 📝 3. Itens do Questionário
+## � 2. Itens do Questionário
 
 ### 1. Registro e controle
 **Afirmação:** Eu registro todas as entradas e saídas de dinheiro do meu negócio, identificando exatamente para onde vai cada valor.
-*( ) 1  ( ) 2  ( ) 3  ( ) 4  ( ) 5*
+
+* **1:** Nunca
+* **2:** Raramente
+* **3:** Às vezes
+* **4:** Frequentemente
+* **5:** Sempre
+
 > _Fundamentação:_ anotar tudo o que se vende e gasta é o primeiro passo para gerir a saúde do negócio (SEBRAE, [s.d.]).
 
 ### 2. Separação de contas
 **Afirmação:** Eu utilizo contas bancárias diferentes para minha vida pessoal e para minha empresa.
-*( ) 1  ( ) 2  ( ) 3  ( ) 4  ( ) 5*
+
+* **1:** Minha conta pessoal e profissional é uma só
+* **2:** Tudo na mesma conta, mas controlo no papel/excel
+* **3:** Tudo na mesma conta, mas uso bancos diferentes para organizar
+* **4:** Contas separadas, mas ainda transfiro entre elas sem muito critério
+* **5:** Tenho uma conta pessoal e outra da empresa
+
 > _Fundamentação:_ a confusão patrimonial compromete a análise do lucro real e a sustentabilidade da empresa (BANCO DO NORDESTE, 2024).
 
 ### 3. Olhar para o futuro
 **Afirmação:** Eu acompanho meu saldo e sei com antecedência se terei dinheiro para pagar os boletos da próxima semana ou do próximo mês.
-*( ) 1  ( ) 2  ( ) 3  ( ) 4  ( ) 5*
+
+* **1:** Nunca
+* **2:** Raramente
+* **3:** Às vezes
+* **4:** Frequentemente
+* **5:** Sempre
+
 > _Fundamentação:_ a falta de previsão de saldo é um dos principais riscos detectados em microempreendedores (SEBRAE, 2018).
 
 ### 4. Busca por conhecimento
 **Afirmação:** Eu procuro aprender novas formas de cuidar do dinheiro e de melhorar a gestão da minha empresa.
-*( ) 1  ( ) 2  ( ) 3  ( ) 4  ( ) 5*
+
+* **1:** Nunca
+* **2:** Raramente
+* **3:** Às vezes
+* **4:** Frequentemente
+* **5:** Sempre
+
 > _Fundamentação:_ o aprendizado contínuo sobre gestão financeira tende a gerar resultados positivos na longevidade dos negócios (BANCO CENTRAL DO BRASIL, 2018).
 
 ### 5. Cálculo de lucro
 **Afirmação:** Eu defino meus preços sabendo exatamente quanto gasto para produzir e qual será minha sobra (lucro) final.
-*( ) 1  ( ) 2  ( ) 3  ( ) 4  ( ) 5*
+
+* **1:** Nunca
+* **2:** Raramente
+* **3:** Às vezes
+* **4:** Frequentemente
+* **5:** Sempre
+
 > _Fundamentação:_ entender a diferença entre faturamento e lucro é vital para a continuidade do empreendimento (BANCO DO NORDESTE, 2024).
 ---
 
-## 🧠 4. Lógica de Pontuação e Abordagem da IA
+## 🧠 3. Lógica de Pontuação e Abordagem da IA
 
 A soma das respostas (5 a 25 pontos) define o perfil de interação do agente:
 
@@ -66,7 +83,7 @@ A soma das respostas (5 a 25 pontos) define o perfil de interação do agente:
 
 ---
 
-## 📚 5. Referências
+## 📚 4. Referências
 
 BANCO CENTRAL DO BRASIL. **Educação financeira dos microempreendedores individuais**. Brasília: BCB, 2018. Disponível em: https://www.bcb.gov.br/nor/relcidfin/docs/art9_educacao_finanaceira_MEIs.pdf. Acesso em: 04 fev. 2026.
 

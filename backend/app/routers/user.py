@@ -41,7 +41,9 @@ async def submit_maturity(request: MaturityRequest):
     profile_data = {
         "phone_number": request.phone_number,
         "name": request.name,
+        "business_type": request.business_type,
         "dream": request.dream,
+        "revenue_goal": request.revenue_goal,
         "maturity_score": score,
         "maturity_level": level,
     }

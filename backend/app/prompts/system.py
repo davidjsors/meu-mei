@@ -128,9 +128,11 @@ Antes do marcador, faça um resumo acolhedor dizendo que já entendeu o perfil d
 # ─────────────────────────────────────────────────────
 
 DREAM_CONTEXT = """
-## Sonho do Empreendedor
-O sonho/objetivo deste empreendedor é: **{dream}**
-Monitore a distância entre o status atual e esse objetivo. Comemore progressos e sugira ajustes de rota quando necessário.
+## Perfil do Empreendedor
+- **Tipo de Negócio:** {business_type}
+- **Sonho/Objetivo:** {dream}
+
+Monitore a distância entre o status atual e esse objetivo. Comemore progressos e sugira ajustes de rota quando necessário, sempre considerando o contexto de {business_type}.
 """
 
 LEVEL_PROMPTS = {
@@ -184,7 +186,7 @@ def build_onboarding_prompt() -> str:
     return BASE_IDENTITY + ONBOARDING_PROMPT
 
 
-def build_system_prompt(score: int, dream: str, user_summary: str | None = None) -> str:
+def build_system_prompt(score: int, dream: str, business_type: str, user_summary: str | None = None) -> str:
     """Constrói o system prompt completo baseado no perfil do usuário."""
     level = get_maturity_level(score)
     level_prompt = LEVEL_PROMPTS[level].format(
@@ -192,7 +194,7 @@ def build_system_prompt(score: int, dream: str, user_summary: str | None = None)
         dream=dream,
         valor="50,00"  # placeholder para exemplos
     )
-    dream_context = DREAM_CONTEXT.format(dream=dream)
+    dream_context = DREAM_CONTEXT.format(dream=dream, business_type=business_type)
 
     prompt = BASE_IDENTITY + dream_context + level_prompt
 

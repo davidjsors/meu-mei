@@ -56,6 +56,7 @@ async def generate_response_stream(
     chat_history: list[dict],
     maturity_score: int | None = None,
     dream: str | None = None,
+    business_type: str | None = None,
     is_onboarding: bool = False,
     file_bytes: bytes | None = None,
     file_mime: str | None = None,
@@ -74,7 +75,10 @@ async def generate_response_stream(
         system_prompt = build_onboarding_prompt()
     else:
         system_prompt = build_system_prompt(
-            maturity_score or 10, dream or "crescer o negócio", user_summary
+            maturity_score or 10, 
+            dream or "crescer o negócio", 
+            business_type or "empreendedor",
+            user_summary
         )
 
     knowledge_context = _load_knowledge_context()
@@ -123,6 +127,7 @@ async def generate_response(
     chat_history: list[dict],
     maturity_score: int | None = None,
     dream: str | None = None,
+    business_type: str | None = None,
     is_onboarding: bool = False,
     file_bytes: bytes | None = None,
     file_mime: str | None = None,
@@ -131,7 +136,7 @@ async def generate_response(
     """Versão não-streaming (para testes ou fallback)."""
     full_response = []
     async for chunk in generate_response_stream(
-        message, chat_history, maturity_score, dream,
+        message, chat_history, maturity_score, dream, business_type,
         is_onboarding, file_bytes, file_mime, user_summary
     ):
         full_response.append(chunk)

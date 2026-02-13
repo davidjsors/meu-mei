@@ -13,16 +13,19 @@ class MaturityRequest(BaseModel):
     """Payload do questionário IAMF-MEI."""
     phone_number: str = Field(..., pattern=r"^\d{2}-\d{5}-\d{4}$", examples=["11-98765-4321"])
     name: str
+    business_type: str
     dream: str
+    revenue_goal: float
     answers: list[int] = Field(..., min_length=5, max_length=5, description="5 respostas Likert (1-5)")
 
 
 class ProfileResponse(BaseModel):
     phone_number: str
-    name: str
-    dream: str
-    maturity_score: int
-    maturity_level: str
+    name: Optional[str] = None
+    business_type: Optional[str] = None
+    dream: Optional[str] = None
+    maturity_score: Optional[int] = None
+    maturity_level: Optional[str] = None
     revenue_goal: Optional[float] = None
     created_at: Optional[datetime] = None
 

@@ -169,15 +169,16 @@ async def send_message(
     if profile_resp.data:
         profile = profile_resp.data[0]
     else:
-        # Novo usuário — criar perfil vazio
-        db.table("profiles").insert({
+        # Novo usuário — criar perfil (upsert para garantir unicidade)
+        db.table("profiles").upsert({
             "phone_number": phone_number,
-        }).execute()
+        }, on_conflict="phone_number").execute()
         profile = {"phone_number": phone_number}
 
     is_onboarding = _is_onboarding_mode(profile)
     maturity_score = profile.get("maturity_score")
     dream = profile.get("dream")
+    business_type = profile.get("business_type")
     user_summary = profile.get("summary")
     last_summary_at = profile.get("last_summary_at")
 
@@ -287,6 +288,7 @@ async def send_message(
                 chat_history=chat_history,
                 maturity_score=maturity_score,
                 dream=dream,
+                business_type=business_type,
                 is_onboarding=is_onboarding,
                 file_bytes=file_bytes,
                 file_mime=file_mime,

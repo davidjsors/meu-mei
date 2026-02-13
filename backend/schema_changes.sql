@@ -17,3 +17,6 @@ ALTER TABLE profiles ADD PRIMARY KEY (phone_number);
 -- ADD CONSTRAINT fk_profile_messages 
 -- FOREIGN KEY (phone_number) REFERENCES profiles(phone_number)
 -- ON DELETE CASCADE;
+
+-- 3. Adicionar coluna para tipo de negócio
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS business_type TEXT;
