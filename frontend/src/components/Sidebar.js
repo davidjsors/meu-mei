@@ -578,14 +578,13 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                                 background: activeTransaction === "entry" ? "rgba(34, 197, 94, 0.2)" : "rgba(34, 197, 94, 0.1)",
                                 border: `1px solid ${activeTransaction === "entry" ? "#4ade80" : "rgba(34, 197, 94, 0.3)"}`,
                                 color: "#4ade80",
-                                fontWeight: "bold",
                                 cursor: "pointer",
                                 display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "6px",
                                 transition: "all 0.2s"
                             }}
                         >
                             <TrendingUp size={24} />
-                            <span>Entrou Dindin</span>
+                            <span style={{ color: '#fff', fontWeight: 500 }}>Entrou Dindin</span>
                         </button>
                         <button
                             className="btn-quick-exit"
@@ -597,14 +596,13 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                                 background: activeTransaction === "exit" ? "rgba(239, 68, 68, 0.2)" : "rgba(239, 68, 68, 0.1)",
                                 border: `1px solid ${activeTransaction === "exit" ? "#f87171" : "rgba(239, 68, 68, 0.3)"}`,
                                 color: "#f87171",
-                                fontWeight: "bold",
                                 cursor: "pointer",
                                 display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "6px",
                                 transition: "all 0.2s"
                             }}
                         >
                             <TrendingDown size={24} />
-                            <span>Saiu Dindin</span>
+                            <span style={{ color: '#fff', fontWeight: 500 }}>Saiu Dindin</span>
                         </button>
                     </div>
 
