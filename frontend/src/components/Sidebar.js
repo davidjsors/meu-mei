@@ -412,7 +412,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                     {/* Saudação */}
                     <div style={{ padding: "0 16px 8px", display: 'flex', flexDirection: 'column' }}>
                         <div style={{ color: "var(--text-secondary)", fontSize: 13, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <span><strong>{profile.name?.trim().split(' ')[0]}</strong>!</span>
+                            <span><strong style={{ color: "var(--red-primary)" }}>{profile.name?.trim().split(' ')[0]}</strong>!</span>
                             <Fingerprint size={14} style={{ color: "var(--green)" }} />
                         </div>
 
