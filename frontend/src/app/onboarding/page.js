@@ -296,7 +296,7 @@ export default function OnboardingPage() {
                 className={`onboarding-btn ${!isValidProfile ? 'is-inactive' : ''}`}
                 disabled={loading}
             >
-                {loading ? "Processando..." : "Tudo pronto! Vamos para o quiz →"}
+                {loading ? "Processando..." : "Tudo pronto! Vamos continuar →"}
             </button>
         </div>
     );
@@ -336,7 +336,7 @@ export default function OnboardingPage() {
                             >
                                 <span className="tf-option-key">{opt.value}</span>
                                 <span className="tf-option-label">{opt.label}</span>
-                                {answers[currentQuestion] === opt.value && <CheckCircle2 size={18} style={{ color: 'var(--green)', marginLeft: 'auto' }} />}
+                                {answers[currentQuestion] === opt.value && <CheckCircle2 size={18} style={{ color: 'var(--red-primary)', marginLeft: 'auto' }} />}
                             </button>
                         ))}
                     </div>

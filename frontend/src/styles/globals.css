@@ -2286,7 +2286,7 @@ body {
 
 .tf-progress-inner {
   height: 100%;
-  background: var(--green);
+  background: var(--red-primary);
   transition: width 0.4s ease;
 }
 
@@ -2301,11 +2301,11 @@ body {
   align-items: flex-start;
 }
 
-.tf-number {
+.tf-question-number {
   display: flex;
   align-items: center;
   gap: 4px;
-  color: var(--green);
+  color: var(--red-primary);
   font-weight: 700;
   padding-top: 6px;
 }
@@ -2340,13 +2340,19 @@ body {
 }
 
 .tf-btn:hover {
-  border-color: var(--green);
+  border-color: var(--red-primary);
   background: var(--bg-hover);
 }
 
 .tf-btn.selected {
-  background: rgba(0, 210, 106, 0.1);
-  border-color: var(--green);
+  background: var(--red-glow);
+  border-color: var(--red-primary);
+}
+
+.tf-btn:hover .tf-option-key,
+.tf-btn.selected .tf-option-key {
+  border-color: var(--red-primary);
+  color: var(--red-primary);
 }
 
 .tf-option-key {
@@ -2359,6 +2365,7 @@ body {
   align-items: center;
   justify-content: center;
   font-size: 12px;
+  transition: all 0.2s;
 }
 
 .tf-option-label {
