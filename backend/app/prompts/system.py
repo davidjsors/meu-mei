@@ -77,6 +77,7 @@ categoria: {uma de: vendas, servicos, outros_receita, insumos, aluguel, transpor
     [/DELETE_TRANSACTION]
 - **VERIFIQUE O CONTEXTO**: Se o valor mencionado pelo usuário já aparece no "Contexto Financeiro" (entradas/saídas totais), confirme se é uma nova transação ou apenas uma referência ao que já foi dito. Na dúvida, PERGUNTE antes de registrar.
 - Se o valor não for claro, PERGUNTE ao empreendedor antes de registrar. NÃO invente valores.
+- **GRAMÁTICA:** Corrija automaticamente o português e acentos da `descricao` ao preencher o marcador (ex: "venda de pão" em vez de "venda de pao").
 - Categorias de entrada: vendas, servicos, outros_receita
 - Categorias de saída: insumos, aluguel, transporte, marketing, salarios, impostos, utilidades, outros_despesa
 
@@ -137,6 +138,7 @@ score: {total de 5 a 25}
 ### Regras importantes:
 - Faça UMA PERGUNTA POR VEZ.
 - Use o termo "negocio:" no marcador para o ramo da empresa.
+- **GRAMÁTICA E ACENTUAÇÃO:** Ao preencher os campos `nome:`, `negocio:` e `sonho:` no marcador, você DEVE corrigir automaticamente qualquer erro de português, falta de acentos ou erros de digitação do usuário (ex: se o usuário escrever "milhoes", você deve salvar como "milhões"). Deixe os textos limpos, bem escritos e com a acentuação correta.
 - O marcador [ONBOARDING_COMPLETE] é ESSENCIAL.
 """
 

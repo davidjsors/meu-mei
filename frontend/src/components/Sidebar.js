@@ -542,7 +542,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                                                     startAngle={180}
                                                     endAngle={0}
                                                     data={[
-                                                        { name: 'Achieved', value: Math.min(percentAchieved, 100), fill: 'var(--green)' },
+                                                        { name: 'Achieved', value: Math.min(percentAchieved, 100), fill: 'var(--red-primary)' },
                                                         { name: 'Remaining', value: Math.max(100 - percentAchieved, 0), fill: 'rgba(255,255,255,0.1)' },
                                                     ]}
                                                     cx="50%"
@@ -551,7 +551,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                                                     outerRadius={80}
                                                     stroke="none"
                                                 >
-                                                    <Cell key="achieved" fill="var(--green)" />
+                                                    <Cell key="achieved" fill="var(--red-primary)" />
                                                     <Cell key="remaining" fill="rgba(255,255,255,0.1)" />
                                                 </Pie>
                                             </PieChart>
@@ -564,7 +564,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                                             left: 'calc(50% - 2px)',
                                             width: '4px',
                                             height: '65px',
-                                            background: 'var(--red-primary)',
+                                            background: 'var(--green)',
                                             borderRadius: '2px 2px 0 0',
                                             transformOrigin: 'bottom center',
                                             transform: `rotate(${-90 + (Math.min(percentAchieved, 100) * 1.8)}deg)`,
@@ -580,7 +580,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                                             width: '8px',
                                             height: '8px',
                                             borderRadius: '50%',
-                                            background: 'var(--red-primary)',
+                                            background: 'var(--green)',
                                             zIndex: 6,
                                             boxShadow: '0 1px 2px rgba(0,0,0,0.5)'
                                         }} />
@@ -588,14 +588,15 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
 
                                     {/* Direita: Info consolidada */}
                                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, paddingRight: 10 }}>
-                                        <div style={{ fontSize: 11, color: '#fff', fontWeight: 'bold' }}>
-                                            {formatCurrency(goalRecords.filter(r => r.type === 'entrada').reduce((acc, r) => acc + parseFloat(r.amount), 0))}
-                                        </div>
-                                        <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>
-                                            de {formatCurrency(revenueGoal)}
+                                        <div style={{ fontSize: 11, color: 'var(--green)', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
+                                            <span style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 'normal' }}>
+                                                {formatCurrency(goalRecords.filter(r => r.type === 'entrada').reduce((acc, r) => acc + parseFloat(r.amount), 0))}
+                                            </span>
+                                            <span style={{ color: 'var(--text-muted)', fontWeight: 'normal' }}>{" | "}</span>
+                                            {formatCurrency(revenueGoal)}
                                         </div>
                                         <div style={{ fontSize: 18, color: 'var(--red-primary)', fontWeight: 'bold', marginTop: 5 }}>
-                                            {percentAchieved.toFixed(2)}%
+                                            {percentAchieved.toFixed(1)}%
                                         </div>
                                     </div>
                                 </div>
