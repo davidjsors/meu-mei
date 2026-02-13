@@ -77,12 +77,15 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
     };
     const [description, setDescription] = useState("");
 
-    // Finance detail state
+    // Finance detail state (filtered)
     const [records, setRecords] = useState([]);
     const [loading, setLoading] = useState(false);
     const [monthOffset, setMonthOffset] = useState(0);
     const [category, setCategory] = useState("todas");
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+
+    // Goal/Chart state (always current month, unfiltered)
+    const [goalRecords, setGoalRecords] = useState([]);
 
     // Delete account state
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -130,9 +133,32 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
         fetchProfile();
     }, [phoneNumber]);
 
-    // Buscar registros detalhados (quando na view "finance" OU "home" para o gráfico)
+    // Sincronizar registros para a META (Sempre mês atual, todas categorias)
     useEffect(() => {
-        if ((view !== "finance" && view !== "home") || !phoneNumber) return;
+        if (!phoneNumber) return;
+        const fetchGoalData = async () => {
+            try {
+                const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
+                const current = getMonthRange(0);
+                const params = new URLSearchParams({
+                    start_date: current.start,
+                    end_date: current.end,
+                });
+                const resp = await fetch(`${API_BASE}/api/user/finance/${phoneNumber}/records?${params}`);
+                if (resp.ok) {
+                    const data = await resp.json();
+                    setGoalRecords(data.records || []);
+                }
+            } catch (err) {
+                console.error("Erro ao buscar dados da meta:", err);
+            }
+        };
+        fetchGoalData();
+    }, [phoneNumber, refreshKey]);
+
+    // Buscar registros detalhados (FILTRADOS - para a view "finance")
+    useEffect(() => {
+        if (view !== "finance" || !phoneNumber) return;
 
         let active = true;
         setLoading(true);
@@ -163,7 +189,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
 
         fetchRecords();
         return () => { active = false; };
-    }, [view, phoneNumber, monthRange.start, monthRange.end, category]);
+    }, [view, phoneNumber, monthRange.start, monthRange.end, category, refreshKey]);
 
     const formatCurrency = (value) =>
         new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value || 0);
@@ -291,10 +317,10 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
     };
 
     const chartData = useMemo(() => {
-        if (!records.length) return [];
+        if (!goalRecords || !goalRecords.length) return [];
 
         // Filter for income only and sort by date
-        const incomeRecords = records
+        const incomeRecords = goalRecords
             .filter(r => r.type === "entrada")
             .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
@@ -325,7 +351,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
         // Or just let it be.
 
         return data;
-    }, [records]);
+    }, [goalRecords]);
 
     const percentAchieved = revenueGoal ? Math.min(100, (chartData.length > 0 ? chartData[chartData.length - 1].value : 0) / revenueGoal * 100) : 0;
 
@@ -492,7 +518,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                                     {percentAchieved.toFixed(0)}%
                                 </div>
                                 <div style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
-                                    {formatCurrency(records.filter(r => r.type === 'entrada').reduce((acc, r) => acc + parseFloat(r.amount), 0))} / <span style={{ color: '#fff' }}>{formatCurrency(revenueGoal)}</span>
+                                    {formatCurrency(goalRecords.filter(r => r.type === 'entrada').reduce((acc, r) => acc + parseFloat(r.amount), 0))} / <span style={{ color: '#fff' }}>{formatCurrency(revenueGoal)}</span>
                                 </div>
 
                             </div>
