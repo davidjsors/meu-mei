@@ -77,6 +77,15 @@ TRANSACTION_PATTERN = re.compile(
 # Ex: [RESET_FINANCE: ALL] ou [RESET_FINANCE: 2023-01-01]
 RESET_PATTERN = re.compile(r"\[RESET_FINANCE(?::\s*(ALL|[\d-]+))?\]", re.IGNORECASE)
 
+# Regex para deletar uma transação específica (estorno)
+DELETE_TRANSACTION_PATTERN = re.compile(
+    r"\[DELETE_TRANSACTION\]\s*"
+    r"valor:\s*([\d.]+)\s*\n"
+    r"descricao:\s*(.+?)\s*"
+    r"\[/DELETE_TRANSACTION\]",
+    re.IGNORECASE | re.DOTALL,
+)
+
 
 def _parse_onboarding(text: str) -> dict | None:
     """
@@ -149,6 +158,25 @@ def _get_reset_arg(text: str) -> str | None:
 def _clean_reset_marker(text: str) -> str:
     """Remove marcador [RESET_FINANCE...]."""
     return RESET_PATTERN.sub("", text).strip()
+
+
+def _parse_deletions(text: str) -> list[dict]:
+    """Extrai transações para deletar."""
+    deletions = []
+    for match in DELETE_TRANSACTION_PATTERN.finditer(text):
+        try:
+            deletions.append({
+                "amount": float(match.group(1).strip()),
+                "description": match.group(2).strip(),
+            })
+        except (ValueError, IndexError):
+            continue
+    return deletions
+
+
+def _clean_delete_markers(text: str) -> str:
+    """Remove [DELETE_TRANSACTION] da resposta."""
+    return DELETE_TRANSACTION_PATTERN.sub("", text).strip()
 
 
 def _is_onboarding_mode(profile: dict) -> bool:
@@ -379,6 +407,21 @@ async def send_message(
                 yield {
                     "event": "finance_updated",
                     "data": json.dumps({"reset": True, "arg": reset_arg}),
+                }
+
+            # Verificar e excluir transações (Estorno)
+            deletions = _parse_deletions(assistant_content)
+            if deletions:
+                for dln in deletions:
+                    # Tenta deletar pelo valor e descrição (match parcial na descrição)
+                    db.table("financial_records").delete().eq(
+                        "phone_number", phone_number
+                    ).eq("amount", dln["amount"]).ilike("description", f"%{dln['description']}%").execute()
+                
+                assistant_content = _clean_delete_markers(assistant_content)
+                yield {
+                    "event": "finance_updated",
+                    "data": json.dumps({"deleted": len(deletions)}),
                 }
 
             # Salvar resposta no banco (já limpa de marcadores)
