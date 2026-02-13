@@ -441,11 +441,11 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                     </div>
 
                     {/* META DE FATURAMENTO */}
-                    <div className="finance-card" style={{ marginTop: 16 }}>
+                    <div className="finance-card goal-bg" style={{ marginTop: 16 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <Target size={18} color="var(--text-secondary)" />
-                                <h3 style={{ margin: 0 }}>Meta de Vendas</h3>
+                                <Target size={18} color="#FFD700" />
+                                <h3 style={{ margin: 0, color: '#FFD700' }}>Meta de Vendas</h3>
                             </div>
                             {revenueGoal && !isEditingGoal && (
                                 <button onClick={() => {

@@ -1,11 +1,11 @@
 /* ═══════════════════════════════════════════════════════
    MeuMEI Design System — WhatsApp-like Chat Interface
    Cores: Vermelho MeuMEI (#E32636), cinzas, brancos
-   Tipografia: Inter (Google Fonts)
+   Tipografia: Google Sans Flex (Variable Font)
    Mobile-first, responsivo
    ═══════════════════════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@8..144,100..1000&display=swap');
 
 /* ─── Reset & Variables ─── */
 :root {
@@ -62,7 +62,7 @@
 html,
 body {
   height: 100%;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: var(--bg-app);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
@@ -166,6 +166,11 @@ body {
 .finance-card.negative-bg {
   background: linear-gradient(135deg, rgba(227, 38, 54, 0.1), rgba(227, 38, 54, 0.05));
   border-color: rgba(227, 38, 54, 0.2);
+}
+
+.finance-card.goal-bg {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.05));
+  border-color: rgba(255, 215, 0, 0.2);
 }
 
 .finance-card h3 {
