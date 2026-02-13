@@ -406,9 +406,13 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                     )}
 
                     {/* Resumo Financeiro — clicável */}
-                    <div className="finance-card" onClick={() => setView("finance")} style={{ cursor: 'pointer' }}>
+                    <div
+                        className={`finance-card ${finance.saldo >= 0 ? 'positive-bg' : 'negative-bg'}`}
+                        onClick={() => setView("finance")}
+                        style={{ cursor: 'pointer' }}
+                    >
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                            <BarChart3 size={18} color="var(--red-light)" />
+                            <BarChart3 size={18} color={finance.saldo >= 0 ? "var(--green)" : "var(--red-light)"} />
                             <h3 style={{ margin: 0 }}>Resumo Financeiro</h3>
                         </div>
                         <div className="finance-row positive">
@@ -440,7 +444,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                     <div className="finance-card" style={{ marginTop: 16 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <Target size={18} color="var(--red-light)" />
+                                <Target size={18} color="var(--text-secondary)" />
                                 <h3 style={{ margin: 0 }}>Meta Mensal</h3>
                             </div>
                             {revenueGoal && !isEditingGoal && (

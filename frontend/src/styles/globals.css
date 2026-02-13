@@ -128,20 +128,41 @@ body {
 
 /* Financial Summary Card */
 .finance-card {
-  background: linear-gradient(135deg, rgba(227, 38, 54, 0.1), rgba(227, 38, 54, 0.05));
-  border: 1px solid rgba(227, 38, 54, 0.2);
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   padding: 16px;
   margin-bottom: 16px;
+  transition: all var(--transition-normal);
+}
+
+.finance-card.positive-bg {
+  background: linear-gradient(135deg, rgba(0, 210, 106, 0.1), rgba(0, 210, 106, 0.05));
+  border-color: rgba(0, 210, 106, 0.2);
+}
+
+.finance-card.negative-bg {
+  background: linear-gradient(135deg, rgba(227, 38, 54, 0.1), rgba(227, 38, 54, 0.05));
+  border-color: rgba(227, 38, 54, 0.2);
 }
 
 .finance-card h3 {
   font-size: 13px;
   font-weight: 600;
-  color: var(--red-light);
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.finance-card.positive-bg h3 {
+  color: #00D26A;
+}
+
+.finance-card.negative-bg h3 {
+  color: var(--red-light);
 }
 
 .finance-row {
