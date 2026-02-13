@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
+import { Paperclip, Mic, SendHorizontal, X } from "lucide-react";
 import FilePreview from "./FilePreview";
 
 /**
@@ -166,7 +167,7 @@ export default function ChatInput({ onSend, disabled = false }) {
                             onClick={cancelRecording}
                             title="Cancelar"
                         >
-                            ✕
+                            <X size={20} />
                         </button>
                         <div className="recording-indicator">
                             <span className="recording-dot"></span>
@@ -179,7 +180,7 @@ export default function ChatInput({ onSend, disabled = false }) {
                             onClick={stopRecording}
                             title="Enviar áudio"
                         >
-                            ➤
+                            <SendHorizontal size={20} />
                         </button>
                     </div>
                 ) : (
@@ -191,7 +192,7 @@ export default function ChatInput({ onSend, disabled = false }) {
                                 onClick={() => fileInputRef.current?.click()}
                                 title="Anexar arquivo"
                             >
-                                📎
+                                <Paperclip size={22} />
                                 <input
                                     ref={fileInputRef}
                                     type="file"
@@ -219,7 +220,7 @@ export default function ChatInput({ onSend, disabled = false }) {
                                 disabled={disabled}
                                 title="Enviar"
                             >
-                                ➤
+                                <SendHorizontal size={20} />
                             </button>
                         ) : (
                             <button
@@ -228,7 +229,7 @@ export default function ChatInput({ onSend, disabled = false }) {
                                 disabled={disabled}
                                 title="Gravar áudio"
                             >
-                                🎤
+                                <Mic size={20} />
                             </button>
                         )}
                     </>

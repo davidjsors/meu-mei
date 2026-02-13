@@ -1,4 +1,4 @@
-"use client";
+import { Image, Music, FileText, Paperclip, X } from "lucide-react";
 
 /**
  * FilePreview — Preview de arquivo antes de enviar.
@@ -8,10 +8,10 @@ export default function FilePreview({ file, onRemove }) {
     if (!file) return null;
 
     const getIcon = (type) => {
-        if (type.startsWith("image/")) return "🖼️";
-        if (type.startsWith("audio/")) return "🎵";
-        if (type === "application/pdf") return "📄";
-        return "📎";
+        if (type.startsWith("image/")) return <Image size={24} />;
+        if (type.startsWith("audio/")) return <Music size={24} />;
+        if (type === "application/pdf") return <FileText size={24} />;
+        return <Paperclip size={24} />;
     };
 
     const formatSize = (bytes) => {
@@ -28,7 +28,7 @@ export default function FilePreview({ file, onRemove }) {
                 <div className="file-size">{formatSize(file.size)}</div>
             </div>
             <button className="remove-file" onClick={onRemove} title="Remover arquivo">
-                ✕
+                <X size={18} />
             </button>
         </div>
     );

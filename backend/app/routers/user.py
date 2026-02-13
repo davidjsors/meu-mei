@@ -163,11 +163,29 @@ async def delete_account(request: dict):
 
 @router.get("/finance/{phone_number}")
 async def get_finance_summary(phone_number: str):
-    """Retorna resumo financeiro (entradas, saídas, saldo) do usuário."""
+    """
+    Retorna resumo financeiro (entradas, saídas, saldo) do mês vigente.
+    O saldo retornado é (entradas_mes - saidas_mes).
+    """
+    from datetime import date
+    
     db = _get_db()
+
+    today = date.today()
+    start_date = today.replace(day=1).isoformat()
+    # End date calculation logic is simpler if we just filter >= start_date for current month
+    # But to be precise for "month", we usually do >= start AND <= end. 
+    # Here, for "current month", just >= start_date (1st of month) is enough as future dates likely don't exist yet, 
+    # or if they do (scheduled), they are part of "this month's view" if within this month.
+    # Let's strictly filter for the current month range to avoid future month data if any.
+    import calendar
+    last_day = calendar.monthrange(today.year, today.month)[1]
+    end_date = today.replace(day=last_day).isoformat()
 
     resp = db.table("financial_records").select("*").eq(
         "phone_number", phone_number
+    ).gte("created_at", f"{start_date}T00:00:00").lte(
+        "created_at", f"{end_date}T23:59:59"
     ).execute()
 
     records = resp.data or []

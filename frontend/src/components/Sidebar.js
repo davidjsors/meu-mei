@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
-import { TrendingUp, TrendingDown } from 'lucide-react';
+import { TrendingUp, TrendingDown, ShieldCheck, LogOut } from 'lucide-react';
 
 const CATEGORY_LABELS = {
     vendas: "Vendas",
@@ -326,7 +326,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
         <aside className="sidebar">
             {/* Header */}
             <div className="sidebar-header">
-                <img src="/logo.svg" alt="MeuMEI" width={48} height={48} style={{ objectFit: 'contain' }} />
+                <img src="/logo.svg" alt="MeuMEI" width={32} height={32} style={{ objectFit: 'contain' }} />
                 <div className="sidebar-title">
                     <h1>Meu MEI</h1>
                     <p>finanças em dia, dinheiro no bolso</p>
@@ -818,10 +818,10 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
             {/* ═══ SIDEBAR FOOTER ═══ */}
             <div className="sidebar-footer">
                 <button className="sidebar-footer-btn" onClick={() => setView(view === "terms" ? "home" : "terms")}>
-                    📜 Termos
+                    <ShieldCheck size={18} /> Termos
                 </button>
                 <button className="sidebar-footer-btn sidebar-logout-btn" onClick={handleLogout}>
-                    🚪 Sair
+                    <LogOut size={18} /> Sair
                 </button>
             </div>
         </aside>
