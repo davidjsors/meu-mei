@@ -6,6 +6,7 @@ import { sendMessage, streamResponse, getHistory, getProfile } from "../../lib/a
 import MessageList from "../../components/MessageList";
 import ChatInput from "../../components/ChatInput";
 import Sidebar from "../../components/Sidebar";
+import GuidanceTour from "../../components/GuidanceTour";
 
 /**
  * Regex para limpar marcadores internos da resposta exibida.
@@ -33,6 +34,7 @@ export default function ChatPage() {
     const [loading, setLoading] = useState(true);
     const [phone, setPhone] = useState("");
     const [financeKey, setFinanceKey] = useState(0);
+    const [showTour, setShowTour] = useState(false);
 
     // Load user data on mount
     useEffect(() => {
@@ -68,6 +70,17 @@ export default function ChatPage() {
                 }));
 
                 setMessages(cleanedMessages);
+
+                if (cleanedMessages.length === 0 && profileData && profileData.maturity_score) {
+                    const tourCompleted = localStorage.getItem(`meumei_tour_completed_${savedPhone}`);
+                    if (!tourCompleted) {
+                        setShowTour(true);
+                    } else {
+                        setTimeout(() => {
+                            handleSend("Olá! Acabei de chegar e quero começar minha mentoria. Me explique como você pode me ajudar?");
+                        }, 1000);
+                    }
+                }
             } catch (err) {
                 console.error("Erro ao carregar dados:", err);
             } finally {
@@ -275,6 +288,19 @@ export default function ChatPage() {
                     disabled={isTyping || !!streamingText}
                 />
             </main>
+
+            {showTour && (
+                <GuidanceTour
+                    phoneNumber={phone}
+                    onClose={() => {
+                        setShowTour(false);
+                        // Dispara a mensagem de boas-vindas após o tour
+                        setTimeout(() => {
+                            handleSend("Olá! Acabei de chegar e quero começar minha mentoria. Me explique como você pode me ajudar?");
+                        }, 500);
+                    }}
+                />
+            )}
         </div>
     );
 }

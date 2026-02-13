@@ -56,6 +56,7 @@ def _normalize_mime(mime: str) -> str:
 ONBOARDING_PATTERN = re.compile(
     r"\[ONBOARDING_COMPLETE\]\s*"
     r"nome:\s*(.+?)\s*\n"
+    r"negocio:\s*(.+?)\s*\n"
     r"sonho:\s*(.+?)\s*\n"
     r"score:\s*(\d+)\s*"
     r"\[/ONBOARDING_COMPLETE\]",
@@ -90,14 +91,15 @@ DELETE_TRANSACTION_PATTERN = re.compile(
 def _parse_onboarding(text: str) -> dict | None:
     """
     Verifica se a resposta da IA contém o marcador de onboarding completo.
-    Retorna dict com nome, sonho e score, ou None.
+    Retorna dict com nome, negocio, sonho e score, ou None.
     """
     match = ONBOARDING_PATTERN.search(text)
     if match:
         return {
             "name": match.group(1).strip(),
-            "dream": match.group(2).strip(),
-            "score": int(match.group(3).strip()),
+            "business_type": match.group(2).strip(),
+            "dream": match.group(3).strip(),
+            "score": int(match.group(4).strip()),
         }
     return None
 
@@ -346,6 +348,7 @@ async def send_message(
                     level = get_maturity_level(onboarding_data["score"])
                     db.table("profiles").update({
                         "name": onboarding_data["name"],
+                        "business_type": onboarding_data["business_type"],
                         "dream": onboarding_data["dream"],
                         "maturity_score": onboarding_data["score"],
                         "maturity_level": level,

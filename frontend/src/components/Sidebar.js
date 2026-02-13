@@ -437,6 +437,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                     <div
                         className={`finance-card ${finance.saldo >= 0 ? 'positive-bg' : 'negative-bg'}`}
                         onClick={() => setView("finance")}
+                        id="tour-sidebar-balance"
                         style={{ cursor: 'pointer' }}
                     >
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
@@ -469,7 +470,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                     </div>
 
                     {/* META DE FATURAMENTO */}
-                    <div className="finance-card goal-bg" style={{ marginTop: 16 }}>
+                    <div className="finance-card goal-bg" id="tour-sidebar-goal" style={{ marginTop: 16 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                 <Target size={18} color="#FFD700" />
@@ -595,7 +596,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                     </div>
 
                     {/* Quick Actions */}
-                    <div className="sidebar-quick-actions" style={{ marginTop: 16, display: 'flex', gap: 10 }}>
+                    <div className="sidebar-quick-actions" id="tour-sidebar-actions" style={{ marginTop: 16, display: 'flex', gap: 10 }}>
                         <button
                             className="btn-quick-entry"
                             onClick={() => toggleTransaction("entry")}
@@ -984,7 +985,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
             )}
 
             {/* 3) Motive-se — Fixed at bottom */}
-            <div className="quote-card">
+            <div className="quote-card" id="tour-sidebar-quote">
                 <div className="quote-header">
                     <Trophy size={14} color="currentColor" />
                     <h3>

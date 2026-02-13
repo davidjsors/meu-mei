@@ -155,7 +155,7 @@ export default function ChatInput({ onSend, disabled = false }) {
     };
 
     return (
-        <div className="chat-input-area">
+        <div className="chat-input-area" id="tour-chat-input">
             <FilePreview file={file} onRemove={() => setFile(null)} />
 
             <div className="chat-input-wrapper">

@@ -242,7 +242,7 @@ export default function OnboardingPage() {
                         />
                     </div>
                     <div>
-                        <label className="onboarding-label"><Briefcase size={12} /> RAMO</label>
+                        <label className="onboarding-label"><Briefcase size={12} /> RAMO DO NEGÓCIO</label>
                         <input
                             className={`onboarding-input ${invalidField === 'businessType' ? 'input-error-blink' : ''}`}
                             placeholder="Ex: Confeitaria..."
@@ -306,7 +306,7 @@ export default function OnboardingPage() {
             <div style={{ marginBottom: '24px' }}>
                 <BarChart3 size={72} color="var(--red-primary)" style={{ margin: '0 auto', filter: 'drop-shadow(0 0 10px rgba(227, 38, 54, 0.3))' }} />
             </div>
-            <h2 className="onboarding-title">Quase lá! Vamos falar de números?</h2>
+            <h2 className="onboarding-title">Quase lá! Vamos falar da gestão do seu negócio?</h2>
             <p className="onboarding-subtitle" style={{ fontSize: '18px', lineHeight: '1.6', marginBottom: '32px' }}>
                 Agora que conhecemos seu sonho, precisamos entender como você gerencia as finanças da sua empresa. <br /><br />
                 O objetivo é termos um <strong>diagnóstico inicial</strong> para que possamos te ajudar a conquistar o seu sonho com segurança!
