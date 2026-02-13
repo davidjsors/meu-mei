@@ -3,7 +3,17 @@
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
-import { TrendingUp, TrendingDown, ShieldCheck, LogOut, Quote, Hand, BarChart3, Target, PencilLine, Trash2, ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
+import {
+    TrendingUp, TrendingDown, ShieldCheck, LogOut, Quote, Hand, BarChart3, Target, PencilLine, Trash2, CheckCircle2,
+    ArrowRight,
+    ArrowLeft,
+    Smartphone,
+    Sparkles,
+    Rocket,
+    Smile,
+    Fingerprint,
+    ChevronLeft, ChevronRight, ChevronDown, ChevronUp
+} from "lucide-react";
 import { MOTIVATIONAL_QUOTES } from "../data/quotes";
 
 const CATEGORY_LABELS = {
@@ -399,18 +409,28 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                 /* ═══ HOME VIEW ═══ */
                 <div className="sidebar-content">
                     {/* Saudação */}
-                    {profile?.name && (
-                        <div style={{ padding: "0 16px 8px", display: 'flex', flexDirection: 'column' }}>
-                            <div style={{ color: "var(--text-secondary)", fontSize: 13, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                Olá, <strong>{profile.name}</strong>! <Hand size={14} style={{ color: "var(--red-light)" }} />
-                            </div>
-                            {profile.business_type && (
-                                <div style={{ color: "var(--text-muted)", fontSize: 11, marginTop: 2 }}>
-                                    {profile.business_type}
-                                </div>
-                            )}
+                    <div style={{ padding: "0 16px 8px", display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ color: "var(--text-secondary)", fontSize: 13, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span><strong>{profile.name?.trim().split(' ')[0]}</strong>!</span>
+                            <Fingerprint size={14} style={{ color: "var(--red-light)" }} />
                         </div>
-                    )}
+
+                        {profile.business_type && (
+                            <div style={{ color: "var(--text-secondary)", fontSize: 11, marginTop: 4, lineHeight: '1.4' }}>
+                                <span>
+                                    Eu sou {profile.business_type}
+                                    {profile.dream ? (
+                                        <> e meu sonho é <strong>{(() => {
+                                            let d = profile.dream.trim();
+                                            d = d.charAt(0).toLowerCase() + d.slice(1);
+                                            if (!/[.!?]$/.test(d)) d += '.';
+                                            return d;
+                                        })()}</strong></>
+                                    ) : '.'}
+                                </span>
+                            </div>
+                        )}
+                    </div>
 
                     {/* Resumo Financeiro — clicável */}
                     <div
@@ -965,8 +985,10 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
             {/* 3) Motive-se — Fixed at bottom */}
             <div className="quote-card">
                 <div className="quote-header">
-                    <Quote size={14} color="var(--red-light)" />
-                    <h3>Motive-se</h3>
+                    <Rocket size={14} color="var(--red-light)" />
+                    <h3 style={{ color: 'var(--text-primary)' }}>
+                        Motive-se para alcançar o seu sonho
+                    </h3>
                 </div>
                 <p>{currentQuote.text}</p>
                 {currentQuote.author && <span className="quote-author">— {currentQuote.author}</span>}
