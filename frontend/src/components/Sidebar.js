@@ -441,7 +441,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                         style={{ cursor: 'pointer' }}
                     >
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                            <BarChart3 size={18} color={finance.saldo >= 0 ? "var(--green)" : "var(--red-light)"} />
+                            <BarChart3 size={18} color={finance.saldo >= 0 ? "var(--green)" : "var(--outflow-light)"} />
                             <h3 style={{ margin: 0 }}>Resumo Financeiro</h3>
                         </div>
                         <div className="finance-row positive">
@@ -450,7 +450,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                         </div>
                         <div className="finance-row negative">
                             <span>Saídas</span>
-                            <span>{formatCurrency(finance.saidas)}</span>
+                            <span style={{ color: "var(--outflow-light)" }}>{formatCurrency(finance.saidas)}</span>
                         </div>
                         <div className="finance-row" style={{
                             borderTop: "1px solid var(--border-color)",
@@ -459,7 +459,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                             <span>Saldo</span>
                             <span style={{
                                 fontSize: 16,
-                                color: finance.saldo >= 0 ? "var(--green)" : "var(--red-light)",
+                                color: finance.saldo >= 0 ? "var(--green)" : "var(--outflow-light)",
                             }}>
                                 {formatCurrency(finance.saldo)}
                             </span>
@@ -473,8 +473,8 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                     <div className="finance-card goal-bg" id="tour-sidebar-goal" style={{ marginTop: 16 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <Target size={18} color="#FFD700" />
-                                <h3 style={{ margin: 0, color: '#FFD700' }}>Meta de Vendas</h3>
+                                <Target size={18} color="var(--green)" />
+                                <h3 style={{ margin: 0, color: 'var(--green)' }}>Meta de Vendas</h3>
                             </div>
                             {revenueGoal && !isEditingGoal && (
                                 <button onClick={() => {
@@ -532,63 +532,72 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                             <div>
 
 
-                                <div style={{ height: 100, width: '100%', marginLeft: -20, position: 'relative' }}>
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <PieChart>
-                                            <Pie
-                                                dataKey="value"
-                                                startAngle={180}
-                                                endAngle={0}
-                                                data={[
-                                                    { name: 'Achieved', value: Math.min(percentAchieved, 100), fill: 'var(--green)' },
-                                                    { name: 'Remaining', value: Math.max(100 - percentAchieved, 0), fill: 'rgba(255,255,255,0.1)' },
-                                                ]}
-                                                cx="50%"
-                                                cy="85%"
-                                                innerRadius={60}
-                                                outerRadius={80}
-                                                stroke="none"
-                                            >
-                                                <Cell key="achieved" fill="var(--green)" />
-                                                <Cell key="remaining" fill="rgba(255,255,255,0.1)" />
-                                            </Pie>
-                                        </PieChart>
-                                    </ResponsiveContainer>
+                                <div style={{ display: 'flex', alignItems: 'center', marginTop: -10 }}>
+                                    {/* Esquerda: Velocímetro */}
+                                    <div style={{ height: 110, width: '60%', position: 'relative', marginLeft: -15 }}>
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <PieChart>
+                                                <Pie
+                                                    dataKey="value"
+                                                    startAngle={180}
+                                                    endAngle={0}
+                                                    data={[
+                                                        { name: 'Achieved', value: Math.min(percentAchieved, 100), fill: 'var(--green)' },
+                                                        { name: 'Remaining', value: Math.max(100 - percentAchieved, 0), fill: 'rgba(255,255,255,0.1)' },
+                                                    ]}
+                                                    cx="50%"
+                                                    cy="85%"
+                                                    innerRadius={60}
+                                                    outerRadius={80}
+                                                    stroke="none"
+                                                >
+                                                    <Cell key="achieved" fill="var(--green)" />
+                                                    <Cell key="remaining" fill="rgba(255,255,255,0.1)" />
+                                                </Pie>
+                                            </PieChart>
+                                        </ResponsiveContainer>
 
-                                    {/* Needle */}
-                                    <div style={{
-                                        position: 'absolute',
-                                        bottom: '15%', // Matches cy=85%
-                                        left: 'calc(50% - 2px)',
-                                        width: '4px',
-                                        height: '65px',
-                                        background: '#fff',
-                                        borderRadius: '2px 2px 0 0',
-                                        transformOrigin: 'bottom center',
-                                        transform: `rotate(${-90 + (Math.min(percentAchieved, 100) * 1.8)}deg)`,
-                                        transition: 'transform 0.5s ease-out',
-                                        zIndex: 5,
-                                        boxShadow: '0 0 4px rgba(0,0,0,0.5)'
-                                    }} />
-                                    {/* Needle Pivot */}
-                                    <div style={{
-                                        position: 'absolute',
-                                        bottom: 'calc(15% - 4px)',
-                                        left: 'calc(50% - 4px)',
-                                        width: '8px',
-                                        height: '8px',
-                                        borderRadius: '50%',
-                                        background: '#fff',
-                                        zIndex: 6,
-                                        boxShadow: '0 1px 2px rgba(0,0,0,0.5)'
-                                    }} />
-                                </div>
+                                        {/* Needle */}
+                                        <div style={{
+                                            position: 'absolute',
+                                            bottom: '15%',
+                                            left: 'calc(50% - 2px)',
+                                            width: '4px',
+                                            height: '65px',
+                                            background: 'var(--red-primary)',
+                                            borderRadius: '2px 2px 0 0',
+                                            transformOrigin: 'bottom center',
+                                            transform: `rotate(${-90 + (Math.min(percentAchieved, 100) * 1.8)}deg)`,
+                                            transition: 'transform 0.5s ease-out',
+                                            zIndex: 5,
+                                            boxShadow: '0 0 4px rgba(0,0,0,0.5)'
+                                        }} />
+                                        {/* Needle Pivot */}
+                                        <div style={{
+                                            position: 'absolute',
+                                            bottom: 'calc(15% - 4px)',
+                                            left: 'calc(50% - 4px)',
+                                            width: '8px',
+                                            height: '8px',
+                                            borderRadius: '50%',
+                                            background: 'var(--red-primary)',
+                                            zIndex: 6,
+                                            boxShadow: '0 1px 2px rgba(0,0,0,0.5)'
+                                        }} />
+                                    </div>
 
-                                <div style={{ textAlign: 'center', fontSize: 12, color: '#fff', fontWeight: 'bold', marginTop: -20, position: 'relative', zIndex: 10 }}>
-                                    {percentAchieved.toFixed(0)}%
-                                </div>
-                                <div style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
-                                    {formatCurrency(goalRecords.filter(r => r.type === 'entrada').reduce((acc, r) => acc + parseFloat(r.amount), 0))} / <span style={{ color: '#fff' }}>{formatCurrency(revenueGoal)}</span>
+                                    {/* Direita: Info consolidada */}
+                                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, paddingRight: 10 }}>
+                                        <div style={{ fontSize: 11, color: '#fff', fontWeight: 'bold' }}>
+                                            {formatCurrency(goalRecords.filter(r => r.type === 'entrada').reduce((acc, r) => acc + parseFloat(r.amount), 0))}
+                                        </div>
+                                        <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>
+                                            de {formatCurrency(revenueGoal)}
+                                        </div>
+                                        <div style={{ fontSize: 18, color: 'var(--red-primary)', fontWeight: 'bold', marginTop: 5 }}>
+                                            {percentAchieved.toFixed(2)}%
+                                        </div>
+                                    </div>
                                 </div>
 
                             </div>
@@ -622,9 +631,9 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                                 flex: 1,
                                 padding: "12px",
                                 borderRadius: "8px",
-                                background: activeTransaction === "exit" ? "rgba(239, 68, 68, 0.2)" : "rgba(239, 68, 68, 0.1)",
-                                border: `1px solid ${activeTransaction === "exit" ? "#f87171" : "rgba(239, 68, 68, 0.3)"}`,
-                                color: "#f87171",
+                                background: activeTransaction === "exit" ? "rgba(217, 119, 6, 0.2)" : "rgba(217, 119, 6, 0.1)",
+                                border: `1px solid ${activeTransaction === "exit" ? "var(--outflow-primary)" : "rgba(217, 119, 6, 0.3)"}`,
+                                color: "var(--outflow-primary)",
                                 cursor: "pointer",
                                 display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "6px",
                                 transition: "all 0.2s"
@@ -740,7 +749,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                                     disabled={!amount || !shortcutCategory}
                                     style={{
                                         flex: 2, padding: "10px",
-                                        background: activeTransaction === "entry" ? "var(--green)" : "#ef4444",
+                                        background: activeTransaction === "entry" ? "var(--green)" : "var(--outflow-primary)",
                                         border: "none",
                                         color: "#fff",
                                         borderRadius: 6,
@@ -809,7 +818,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                         </div>
                         <div className="finance-detail-summary-item negative">
                             <span>Saídas</span>
-                            <span>{formatCurrency(totals.saidas)}</span>
+                            <span style={{ color: "var(--outflow-light)" }}>{formatCurrency(totals.saidas)}</span>
                         </div>
                         <div className="finance-detail-summary-item balance">
                             <span>Saldo</span>
@@ -839,7 +848,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                                             {r.created_at && ` · ${formatDate(r.created_at)}`}
                                         </span>
                                     </div>
-                                    <div className={`finance-record-amount ${r.type}`}>
+                                    <div className={`finance-record-amount ${r.type}`} style={{ color: r.type === "saida" ? "var(--outflow-light)" : "var(--green)" }}>
                                         {r.type === "saida" ? "- " : "+ "}
                                         {formatCurrency(r.amount)}
                                         <button

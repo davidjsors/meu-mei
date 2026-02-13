@@ -44,6 +44,9 @@
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
   --shadow-glow: 0 0 20px rgba(227, 38, 54, 0.2);
   --green: #00D26A;
+  --outflow-primary: #D97706;
+  --outflow-light: #F59E0B;
+  --outflow-glow: rgba(217, 119, 6, 0.15);
 
   /* Transitions */
   --transition-fast: 150ms ease;
@@ -171,13 +174,13 @@ body {
 }
 
 .finance-card.negative-bg {
-  background: linear-gradient(135deg, rgba(227, 38, 54, 0.1), rgba(227, 38, 54, 0.05));
-  border-color: rgba(227, 38, 54, 0.2);
+  background: linear-gradient(135deg, rgba(217, 119, 6, 0.1), rgba(217, 119, 6, 0.05));
+  border-color: rgba(217, 119, 6, 0.2);
 }
 
 .finance-card.goal-bg {
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.05));
-  border-color: rgba(255, 215, 0, 0.2);
+  background: linear-gradient(135deg, rgba(0, 210, 106, 0.1), rgba(0, 210, 106, 0.05));
+  border-color: rgba(0, 210, 106, 0.2);
 }
 
 .finance-card h3 {
@@ -196,7 +199,7 @@ body {
 }
 
 .finance-card.negative-bg h3 {
-  color: var(--red-light);
+  color: var(--outflow-light);
 }
 
 .finance-row {
@@ -222,7 +225,7 @@ body {
 }
 
 .finance-row.negative span:last-child {
-  color: var(--red-light);
+  color: var(--outflow-light);
 }
 
 /* Dream Card */
@@ -1351,8 +1354,8 @@ body {
 }
 
 .dropdown-item.active {
-  background: rgba(255, 77, 94, 0.1);
-  color: var(--red-light);
+  background: rgba(217, 119, 6, 0.1);
+  color: var(--outflow-light);
   font-weight: 600;
 }
 
@@ -1395,7 +1398,7 @@ body {
 }
 
 .finance-detail-summary-item.negative span:last-child {
-  color: var(--red-light);
+  color: var(--outflow-light);
   font-weight: 600;
   font-size: 12px;
 }
@@ -1448,8 +1451,8 @@ body {
 }
 
 .finance-record.saida .finance-record-icon {
-  background: rgba(255, 77, 94, 0.15);
-  color: var(--red-light);
+  background: rgba(217, 119, 6, 0.15);
+  color: var(--outflow-light);
 }
 
 .finance-record-info {
@@ -1487,7 +1490,7 @@ body {
 }
 
 .finance-record-amount.saida {
-  color: var(--red-light);
+  color: var(--outflow-light);
 }
 
 .finance-record-delete-btn {
