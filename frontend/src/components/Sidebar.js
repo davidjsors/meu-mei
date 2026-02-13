@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
-import { TrendingUp, TrendingDown, ShieldCheck, LogOut, Quote, Hand, BarChart3, Target, PencilLine, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { TrendingUp, TrendingDown, ShieldCheck, LogOut, Quote, Hand, BarChart3, Target, PencilLine, Trash2, ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
 import { MOTIVATIONAL_QUOTES } from "../data/quotes";
 
 const CATEGORY_LABELS = {
@@ -82,6 +82,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
     const [loading, setLoading] = useState(false);
     const [monthOffset, setMonthOffset] = useState(0);
     const [category, setCategory] = useState("todas");
+    const [isCategoryOpen, setIsCategoryOpen] = useState(false);
 
     // Delete account state
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -642,15 +643,32 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                                 <ChevronRight size={16} />
                             </button>
                         </div>
-                        <select
-                            value={category}
-                            onChange={(e) => setCategory(e.target.value)}
-                            className="finance-category-select"
-                        >
-                            {ALL_CATEGORIES.map((c) => (
-                                <option key={c.value} value={c.value}>{c.label}</option>
-                            ))}
-                        </select>
+                        <div className="custom-dropdown">
+                            <button
+                                className="dropdown-trigger"
+                                onClick={() => setIsCategoryOpen(!isCategoryOpen)}
+                            >
+                                <span>{ALL_CATEGORIES.find(c => c.value === category)?.label}</span>
+                                {isCategoryOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                            </button>
+
+                            {isCategoryOpen && (
+                                <div className="dropdown-menu">
+                                    {ALL_CATEGORIES.map((c) => (
+                                        <div
+                                            key={c.value}
+                                            className={`dropdown-item ${category === c.value ? 'active' : ''}`}
+                                            onClick={() => {
+                                                setCategory(c.value);
+                                                setIsCategoryOpen(false);
+                                            }}
+                                        >
+                                            {c.label}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     <div className="finance-detail-summary">
