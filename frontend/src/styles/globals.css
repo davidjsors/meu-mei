@@ -217,6 +217,61 @@ body {
   color: #00D26A;
 }
 
+/* Quote Card */
+.quote-card {
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-top: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.quote-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: var(--red-light);
+}
+
+.quote-header h3 {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.quote-card p {
+  font-size: 14px;
+  font-style: italic;
+  color: var(--text-primary);
+  line-height: 1.5;
+  position: relative;
+  z-index: 1;
+  margin-bottom: 8px;
+}
+
+.quote-author {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: right;
+  font-weight: 500;
+}
+
+.quote-card::before {
+  content: '"';
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 60px;
+  color: rgba(255, 255, 255, 0.03);
+  font-family: serif;
+  line-height: 1;
+}
+
 /* ─── Chat Area ─── */
 .chat-area {
   flex: 1;

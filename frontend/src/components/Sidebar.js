@@ -3,7 +3,8 @@
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
-import { TrendingUp, TrendingDown, ShieldCheck, LogOut } from 'lucide-react';
+import { TrendingUp, TrendingDown, ShieldCheck, LogOut, Quote } from 'lucide-react';
+import { MOTIVATIONAL_QUOTES } from "../data/quotes";
 
 const CATEGORY_LABELS = {
     vendas: "Vendas",
@@ -322,6 +323,11 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
 
     const percentAchieved = revenueGoal ? Math.min(100, (chartData.length > 0 ? chartData[chartData.length - 1].value : 0) / revenueGoal * 100) : 0;
 
+    const currentQuote = useMemo(() => {
+        const hour = new Date().getHours();
+        return MOTIVATIONAL_QUOTES[hour % MOTIVATIONAL_QUOTES.length];
+    }, []);
+
     return (
         <aside className="sidebar">
             {/* Header */}
@@ -605,6 +611,16 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                             </div>
                         </form>
                     )}
+
+                    {/* 3) Motive-se */}
+                    <div className="quote-card">
+                        <div className="quote-header">
+                            <Quote size={18} color="var(--red-light)" />
+                            <h3>Motive-se</h3>
+                        </div>
+                        <p>{currentQuote.text}</p>
+                        {currentQuote.author && <span className="quote-author">— {currentQuote.author}</span>}
+                    </div>
 
                     {/* REMOVED DREAM CARD */}
                 </div>
