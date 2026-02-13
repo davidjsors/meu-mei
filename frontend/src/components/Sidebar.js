@@ -12,6 +12,7 @@ import {
     Rocket,
     Smile,
     Fingerprint,
+    Trophy,
     ChevronLeft, ChevronRight, ChevronDown, ChevronUp
 } from "lucide-react";
 import { MOTIVATIONAL_QUOTES } from "../data/quotes";
@@ -412,7 +413,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                     <div style={{ padding: "0 16px 8px", display: 'flex', flexDirection: 'column' }}>
                         <div style={{ color: "var(--text-secondary)", fontSize: 13, display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <span><strong>{profile.name?.trim().split(' ')[0]}</strong>!</span>
-                            <Fingerprint size={14} style={{ color: "var(--red-light)" }} />
+                            <Fingerprint size={14} style={{ color: "var(--green)" }} />
                         </div>
 
                         {profile.business_type && (
@@ -985,8 +986,8 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
             {/* 3) Motive-se — Fixed at bottom */}
             <div className="quote-card">
                 <div className="quote-header">
-                    <Rocket size={14} color="var(--red-light)" />
-                    <h3 style={{ color: 'var(--text-primary)' }}>
+                    <Trophy size={14} color="currentColor" />
+                    <h3>
                         Motive-se para alcançar o seu sonho
                     </h3>
                 </div>

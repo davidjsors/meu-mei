@@ -282,6 +282,15 @@ body {
   position: relative;
   overflow: hidden;
   flex-shrink: 0;
+  transition: all var(--transition-normal);
+  cursor: default;
+}
+
+.quote-card:hover {
+  background: rgba(0, 210, 106, 0.15);
+  border-color: rgba(0, 210, 106, 0.4);
+  transform: translateY(-2px);
+  box-shadow: none;
 }
 
 .quote-header {
@@ -289,23 +298,34 @@ body {
   align-items: center;
   gap: 6px;
   margin-bottom: 4px;
-  color: var(--red-light);
+  color: var(--green);
+  transition: color var(--transition-normal);
+}
+
+.quote-card:hover .quote-header {
+  color: #fff;
 }
 
 .quote-header h3 {
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: 0.5px;
+  color: inherit;
 }
 
 .quote-card p {
-  font-size: 12px;
-  font-style: italic;
+  font-size: 13px;
+  font-weight: 600;
   color: var(--text-primary);
   line-height: 1.4;
   position: relative;
   z-index: 1;
   margin-bottom: 4px;
+  transition: color var(--transition-normal);
+}
+
+.quote-card:hover p {
+  color: #fff;
 }
 
 .quote-author {
@@ -314,17 +334,30 @@ body {
   color: var(--text-muted);
   text-align: right;
   font-weight: 500;
+  transition: color var(--transition-normal);
+}
+
+.quote-card:hover .quote-author {
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .quote-card::before {
   content: '"';
   position: absolute;
-  top: 4px;
-  right: 10px;
-  font-size: 40px;
-  color: rgba(255, 255, 255, 0.03);
-  font-family: serif;
+  top: -10px;
+  right: 5px;
+  font-size: 60px;
+  color: rgba(255, 255, 255, 0.02);
+  font-family: 'serif';
   line-height: 1;
+  transition: all var(--transition-normal);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.quote-card:hover::before {
+  color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
 }
 
 /* ─── Chat Area ─── */
