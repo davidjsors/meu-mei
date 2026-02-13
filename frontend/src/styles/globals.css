@@ -1327,9 +1327,12 @@ body {
 }
 
 .finance-record-amount {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .finance-record-amount.entrada {
@@ -1338,6 +1341,51 @@ body {
 
 .finance-record-amount.saida {
   color: var(--red-light);
+}
+
+.finance-record-delete-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  opacity: 0.5;
+}
+
+.finance-record-delete-btn:hover {
+  opacity: 1;
+  background: rgba(255, 77, 94, 0.1);
+  color: var(--red-light);
+}
+
+.finance-month-nav button {
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+}
+
+.finance-month-nav button:hover:not(:disabled) {
+  background: var(--red-primary);
+  color: white;
+  border-color: var(--red-primary);
+}
+
+.finance-month-nav button:disabled {
+  opacity: 0.2;
+  cursor: default;
 }
 
 /* ─── Terms Modal ─── */

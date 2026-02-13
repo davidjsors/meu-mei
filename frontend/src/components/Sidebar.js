@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
-import { TrendingUp, TrendingDown, ShieldCheck, LogOut, Quote, Hand, BarChart3, Target, PencilLine } from 'lucide-react';
+import { TrendingUp, TrendingDown, ShieldCheck, LogOut, Quote, Hand, BarChart3, Target, PencilLine, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { MOTIVATIONAL_QUOTES } from "../data/quotes";
 
 const CATEGORY_LABELS = {
@@ -31,10 +31,15 @@ function getMonthRange(offset = 0) {
     const month = now.getMonth() + offset;
     const start = new Date(year, month, 1);
     const end = new Date(year, month + 1, 0);
+
+    const label = start.toLocaleDateString("pt-BR", { month: "short", year: "numeric" })
+        .replace(" de ", "/")
+        .replace(".", "");
+
     return {
         start: start.toISOString().slice(0, 10),
         end: end.toISOString().slice(0, 10),
-        label: start.toLocaleDateString("pt-BR", { month: "long", year: "numeric" }),
+        label: label.charAt(0).toUpperCase() + label.slice(1),
     };
 }
 
@@ -629,9 +634,13 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
 
                     <div className="finance-detail-filters">
                         <div className="finance-month-nav">
-                            <button onClick={() => setMonthOffset((o) => o - 1)}>◀</button>
+                            <button onClick={() => setMonthOffset((o) => o - 1)}>
+                                <ChevronLeft size={16} />
+                            </button>
                             <span className="finance-month-label">{monthRange.label}</span>
-                            <button onClick={() => setMonthOffset((o) => o + 1)} disabled={monthOffset >= 0}>▶</button>
+                            <button onClick={() => setMonthOffset((o) => o + 1)} disabled={monthOffset >= 0}>
+                                <ChevronRight size={16} />
+                            </button>
                         </div>
                         <select
                             value={category}
@@ -673,7 +682,9 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                                         {r.type === "entrada" ? "↑" : "↓"}
                                     </div>
                                     <div className="finance-record-info">
-                                        <span className="finance-record-desc">{r.description}</span>
+                                        <span className="finance-record-desc">
+                                            {r.description.charAt(0).toUpperCase() + r.description.slice(1)}
+                                        </span>
                                         <span className="finance-record-meta">
                                             {CATEGORY_LABELS[r.category] || r.category}
                                             {r.created_at && ` · ${formatDate(r.created_at)}`}
@@ -687,13 +698,10 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                                                 e.stopPropagation();
                                                 handleDeleteRecord(r.id);
                                             }}
-                                            style={{
-                                                background: "none", border: "none", cursor: "pointer",
-                                                marginLeft: "8px", fontSize: "14px", opacity: 0.7
-                                            }}
+                                            className="finance-record-delete-btn"
                                             title="Excluir"
                                         >
-                                            🗑️
+                                            <Trash2 size={14} />
                                         </button>
                                     </div>
                                 </div>
