@@ -12,7 +12,8 @@ import {
     ArrowLeft,
     ShieldCheck,
     Smartphone,
-    Sparkles
+    Sparkles,
+    BarChart3
 } from "lucide-react";
 
 /**
@@ -133,7 +134,7 @@ export default function OnboardingPage() {
         if (currentQuestion < MATURITY_QUESTIONS.length - 1) {
             setTimeout(() => setCurrentQuestion(prev => prev + 1), 300);
         } else {
-            setStep(4);
+            setStep(5);
         }
     };
 
@@ -297,6 +298,26 @@ export default function OnboardingPage() {
                 disabled={loading}
             >
                 {loading ? "Processando..." : "Tudo pronto! Vamos continuar →"}
+            </button>
+        </div>
+    );
+    const renderMaturityIntro = () => (
+        <div className="onboarding-card" style={{ textAlign: 'center', maxWidth: '640px' }}>
+            <div style={{ marginBottom: '24px' }}>
+                <BarChart3 size={72} color="var(--red-primary)" style={{ margin: '0 auto', filter: 'drop-shadow(0 0 10px rgba(227, 38, 54, 0.3))' }} />
+            </div>
+            <h2 className="onboarding-title">Quase lá! Vamos falar de números?</h2>
+            <p className="onboarding-subtitle" style={{ fontSize: '18px', lineHeight: '1.6', marginBottom: '32px' }}>
+                Agora que conhecemos seu sonho, precisamos entender como você gerencia as finanças da sua empresa. <br /><br />
+                O objetivo é termos um <strong>diagnóstico inicial</strong> para que possamos te ajudar a conquistar o seu sonho com segurança!
+            </p>
+
+            <button
+                className="onboarding-btn"
+                onClick={() => setStep(4)}
+                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+            >
+                Começar Diagnóstico <ArrowRight size={20} />
             </button>
         </div>
     );
@@ -487,8 +508,9 @@ export default function OnboardingPage() {
 
                 {step === 1 && renderPhone()}
                 {step === 2 && renderProfile()}
-                {step === 3 && renderMaturity()}
-                {step === 4 && renderTerms()}
+                {step === 3 && renderMaturityIntro()}
+                {step === 4 && renderMaturity()}
+                {step === 5 && renderTerms()}
             </div>
         </main>
     );
