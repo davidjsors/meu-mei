@@ -606,42 +606,20 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                     </div>
 
                     {/* Quick Actions */}
-                    <div className="sidebar-quick-actions" id="tour-sidebar-actions" style={{ marginTop: 16, display: 'flex', gap: 10 }}>
+                    <div className="sidebar-quick-actions" id="tour-sidebar-actions">
                         <button
-                            className="btn-quick-entry"
+                            className={`btn-quick-action entry ${activeTransaction === "entry" ? "active" : ""}`}
                             onClick={() => toggleTransaction("entry")}
-                            style={{
-                                flex: 1,
-                                padding: "12px",
-                                borderRadius: "8px",
-                                background: activeTransaction === "entry" ? "rgba(34, 197, 94, 0.2)" : "rgba(34, 197, 94, 0.1)",
-                                border: `1px solid ${activeTransaction === "entry" ? "#4ade80" : "rgba(34, 197, 94, 0.3)"}`,
-                                color: "#4ade80",
-                                cursor: "pointer",
-                                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "6px",
-                                transition: "all 0.2s"
-                            }}
                         >
                             <TrendingUp size={24} />
-                            <span style={{ color: '#fff', fontWeight: 500 }}>Entrou Dindin</span>
+                            <span>Entrou Dindin</span>
                         </button>
                         <button
-                            className="btn-quick-exit"
+                            className={`btn-quick-action exit ${activeTransaction === "exit" ? "active" : ""}`}
                             onClick={() => toggleTransaction("exit")}
-                            style={{
-                                flex: 1,
-                                padding: "12px",
-                                borderRadius: "8px",
-                                background: activeTransaction === "exit" ? "rgba(217, 119, 6, 0.2)" : "rgba(217, 119, 6, 0.1)",
-                                border: `1px solid ${activeTransaction === "exit" ? "var(--outflow-primary)" : "rgba(217, 119, 6, 0.3)"}`,
-                                color: "var(--outflow-primary)",
-                                cursor: "pointer",
-                                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "6px",
-                                transition: "all 0.2s"
-                            }}
                         >
                             <TrendingDown size={24} />
-                            <span style={{ color: '#fff', fontWeight: 500 }}>Saiu Dindin</span>
+                            <span>Saiu Dindin</span>
                         </button>
                     </div>
 

@@ -15,34 +15,36 @@
   --red-light: #FF4D5E;
   --red-glow: rgba(227, 38, 54, 0.15);
 
-  /* Background — Dark theme (WhatsApp-like) */
-  --bg-app: #111B21;
-  --bg-sidebar: #1F2C33;
-  --bg-chat: #0B141A;
-  --bg-input: #1F2C33;
-  --bg-bubble-user: #C62828;
-  --bg-bubble-ai: #1F2C33;
+  /* Background — Deep Neutral theme */
+  --bg-app: #0D1117;
+  /* Tom mais leve e elegante */
+  --bg-sidebar: #0D1117;
+  --bg-chat: transparent;
+  /* Permite ver o gradiente do fundo */
+  --bg-input: #1C2128;
+  --bg-bubble-user: var(--red-primary);
+  --bg-bubble-ai: #22272E;
   --bg-hover: rgba(255, 255, 255, 0.05);
 
   /* Text */
   --text-primary: #E9EDEF;
-  --text-secondary: #8696A0;
+  --text-secondary: rgba(233, 237, 239, 0.75);
   --text-bubble-user: #FFFFFF;
   --text-bubble-ai: #E9EDEF;
-  --text-muted: #667781;
+  --text-muted: rgba(134, 150, 160, 0.6);
 
   /* Borders */
-  --border-color: rgba(134, 150, 160, 0.15);
-  --border-active: rgba(227, 38, 54, 0.5);
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-active: var(--red-primary);
 
   /* Misc */
   --radius-sm: 6px;
   --radius-md: 12px;
   --radius-lg: 20px;
   --radius-full: 99px;
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --shadow-glow: 0 0 20px rgba(227, 38, 54, 0.2);
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-glow: none;
   --green: #00D26A;
   --outflow-primary: #D97706;
   --outflow-light: #F59E0B;
@@ -86,7 +88,10 @@ body {
   height: 100vh;
   max-width: 1600px;
   margin: 0 auto;
-  background: var(--bg-app);
+  background-color: var(--bg-app);
+  background-image:
+    radial-gradient(at 0% 0%, rgba(227, 38, 54, 0.18) 0px, transparent 60%),
+    radial-gradient(at 0% 100%, rgba(0, 210, 106, 0.18) 0px, transparent 60%);
   overflow: hidden;
 }
 
@@ -94,7 +99,7 @@ body {
 .sidebar {
   width: 380px;
   min-width: 380px;
-  background: var(--bg-sidebar);
+  background: transparent;
   border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
@@ -106,7 +111,7 @@ body {
   align-items: center;
   gap: 14px;
   padding: 0 20px;
-  background: var(--bg-sidebar);
+  background: transparent;
   border-bottom: 1px solid var(--border-color);
   height: 62px;
 }
@@ -160,27 +165,29 @@ body {
 
 /* Financial Summary Card */
 .finance-card {
-  background: var(--bg-hover);
-  border: 1px solid var(--border-color);
+  background: var(--bg-bubble-ai);
+  /* Combinando com a cor de resposta da IA */
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-md);
   padding: 16px;
   margin-bottom: 16px;
-  transition: all var(--transition-normal);
+  box-shadow: none !important;
 }
 
 .finance-card.positive-bg {
-  background: linear-gradient(135deg, rgba(0, 210, 106, 0.1), rgba(0, 210, 106, 0.05));
-  border-color: rgba(0, 210, 106, 0.2);
+  background: var(--bg-bubble-ai);
+  box-shadow: none !important;
 }
 
 .finance-card.negative-bg {
-  background: linear-gradient(135deg, rgba(217, 119, 6, 0.1), rgba(217, 119, 6, 0.05));
-  border-color: rgba(217, 119, 6, 0.2);
+  background: var(--bg-bubble-ai);
+  box-shadow: none !important;
 }
 
 .finance-card.goal-bg {
-  background: linear-gradient(135deg, rgba(0, 210, 106, 0.1), rgba(0, 210, 106, 0.05));
-  border-color: rgba(0, 210, 106, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-bubble-ai);
+  box-shadow: none !important;
 }
 
 .finance-card h3 {
@@ -230,8 +237,8 @@ body {
 
 /* Dream Card */
 .dream-card {
-  background: var(--bg-hover);
-  border: 1px solid var(--border-color);
+  background: var(--bg-bubble-ai);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: var(--radius-md);
   padding: 16px;
 }
@@ -363,12 +370,103 @@ body {
   transform: scale(1.1);
 }
 
+/* Quick Action Buttons */
+.sidebar-quick-actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 10px;
+}
+
+.btn-quick-action {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all var(--transition-normal);
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.btn-quick-action span {
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-quick-action.entry {
+  color: var(--green);
+}
+
+.btn-quick-action.entry:hover,
+.btn-quick-action.entry.active {
+  background: rgba(0, 210, 106, 0.1);
+  border-color: var(--green);
+  box-shadow: none !important;
+}
+
+.btn-quick-action.exit {
+  color: var(--outflow-primary);
+}
+
+.btn-quick-action.exit:hover,
+.btn-quick-action.exit.active {
+  background: rgba(217, 119, 6, 0.1);
+  border-color: var(--outflow-primary);
+  box-shadow: none;
+}
+
+/* Sidebar Footer */
+.sidebar-footer {
+  padding: 16px;
+  padding-bottom: 24px;
+  display: flex;
+  gap: 12px;
+  margin-top: auto;
+  background: transparent !important;
+  border-top: none !important;
+}
+
+.sidebar-footer-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  background: var(--bg-bubble-ai);
+  /* Mesmo fundo do Resumo Financeiro */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  /* Mesma borda do Resumo Financeiro */
+  border-radius: 12px;
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.sidebar-footer-btn:hover {
+  background: rgba(0, 210, 106, 0.1);
+  border-color: var(--green);
+}
+
+.sidebar-footer-btn.sidebar-logout-btn {
+  /* Reutilizando o mesmo estilo verde para sair */
+}
+
 /* ─── Chat Area ─── */
 .chat-area {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: var(--bg-chat);
+  background: transparent;
   position: relative;
   min-width: 0;
 }
@@ -388,7 +486,9 @@ body {
   align-items: center;
   gap: 12px;
   padding: 0 20px;
-  background: var(--bg-sidebar);
+  background: rgba(5, 20, 16, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border-color);
   z-index: 2;
   height: 62px;
@@ -482,16 +582,18 @@ body {
 }
 
 .message-wrapper.user .message-bubble {
-  background: var(--bg-bubble-user);
+  background: linear-gradient(135deg, var(--red-primary), var(--red-dark));
   color: var(--text-bubble-user);
   border-bottom-right-radius: 4px;
+  box-shadow: none;
 }
 
 .message-wrapper.assistant .message-bubble {
   background: var(--bg-bubble-ai);
+  border: 1px solid rgba(0, 210, 106, 0.1);
   color: var(--text-bubble-ai);
   border-bottom-left-radius: 4px;
-  border: 1px solid var(--border-color);
+  box-shadow: none;
 }
 
 .message-time {
@@ -1354,8 +1456,9 @@ body {
 }
 
 .dropdown-item.active {
-  background: rgba(217, 119, 6, 0.1);
-  color: var(--outflow-light);
+  background: var(--red-primary);
+  /* Nosso Vermelho Oficial */
+  color: #fff;
   font-weight: 600;
 }
 
@@ -2219,7 +2322,7 @@ body {
   padding: 48px;
   width: 100%;
   max-width: 440px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+  box-shadow: none;
   position: relative;
   z-index: 1;
 }
