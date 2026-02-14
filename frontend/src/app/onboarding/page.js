@@ -218,7 +218,9 @@ export default function OnboardingPage() {
             >
                 {loading ? "Verificando..." : "Continuar →"}
             </button>
-            <p className="onboarding-footer-note">Sua conta é vinculada ao seu número. 🔒</p>
+            <p className="onboarding-footer-note">
+                Sua conta é vinculada ao seu número. <ShieldCheck size={14} style={{ color: 'var(--green)' }} />
+            </p>
         </div>
     );
 
@@ -499,19 +501,46 @@ export default function OnboardingPage() {
 
     return (
         <main className="onboarding-screen">
-            <div className="onboarding-content">
-                {step === 1 && (
-                    <div className="onboarding-logo-hero-container">
-                        <img src="/logo2.svg" alt="Meu MEI" className="onboarding-logo-hero" />
+            {step === 1 ? (
+                <div className="onboarding-split-container">
+                    {/* Esquerda: Apresentação */}
+                    <div className="onboarding-presentation">
+                        <div className="presentation-content">
+                            <img src="/logo2.svg" alt="Meu MEI" className="presentation-logo" />
+                            <h1 className="presentation-title">
+                                Seu negócio voando com o <span>Meu MEI</span>
+                            </h1>
+                            <p className="presentation-text">
+                                Desenhado exclusivamente para transformar a realidade do(a) microempreendedor(a).
+                                Gestão simples, mentoria proativa e o controle total das suas finanças.
+                            </p>
+                            <div style={{ display: 'flex', gap: '20px', marginTop: '40px', justifyContent: 'center' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                    <span style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--green)' }}>100%</span>
+                                    <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Focado em MEIs</span>
+                                </div>
+                                <div style={{ width: '1px', background: 'rgba(255,255,255,0.1)' }} />
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                    <span style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--red-primary)' }}>24/7</span>
+                                    <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Mentoria Ativa</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                )}
 
-                {step === 1 && renderPhone()}
-                {step === 2 && renderProfile()}
-                {step === 3 && renderMaturityIntro()}
-                {step === 4 && renderMaturity()}
-                {step === 5 && renderTerms()}
-            </div>
+                    {/* Direita: Login */}
+                    <div className="onboarding-login-side">
+                        {renderPhone()}
+                    </div>
+                </div>
+            ) : (
+                <div className="onboarding-content">
+                    {step === 2 && renderProfile()}
+                    {step === 3 && renderMaturityIntro()}
+                    {step === 4 && renderMaturity()}
+                    {step === 5 && renderTerms()}
+                </div>
+            )}
         </main>
     );
 }
