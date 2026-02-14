@@ -115,7 +115,10 @@ body {
   /* Começa exatamente onde termina o header */
   bottom: 0;
   width: 1px;
-  background: linear-gradient(to bottom, var(--red-primary), var(--green));
+  background: linear-gradient(to bottom,
+      rgba(227, 38, 54, 0.2),
+      rgba(0, 210, 106, 0.2));
+  /* Versão no ápice do minimalismo, quase imperceptível */
   z-index: 1;
 }
 
@@ -499,6 +502,8 @@ body {
 .chat-header {
   display: flex;
   align-items: center;
+  justify-content: center;
+  /* Centralizando o conteúdo conforme pedido */
   gap: 12px;
   padding: 0 20px;
   background: rgba(5, 20, 16, 0.9);
@@ -607,7 +612,8 @@ body {
 
 .message-wrapper.assistant .message-bubble {
   background: var(--bg-bubble-ai);
-  border: 1px solid rgba(0, 210, 106, 0.1);
+  border: none;
+  /* Borda removida conforme pedido */
   color: var(--text-bubble-ai);
   border-bottom-left-radius: 4px;
   box-shadow: none;
