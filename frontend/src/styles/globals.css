@@ -90,8 +90,8 @@ body {
   margin: 0 auto;
   background-color: var(--bg-app);
   background-image:
-    radial-gradient(at 10% 10%, rgba(227, 38, 54, 0.11) 0px, transparent 80%),
-    radial-gradient(at 90% 90%, rgba(0, 210, 106, 0.08) 0px, transparent 80%);
+    radial-gradient(at 10% 10%, rgba(227, 38, 54, 0.09) 0px, transparent 80%),
+    radial-gradient(at 90% 90%, rgba(0, 210, 106, 0.06) 0px, transparent 80%);
   overflow: hidden;
 }
 
