@@ -113,7 +113,7 @@ body {
   content: '';
   position: absolute;
   right: 0;
-  top: 62px;
+  top: 53px;
   /* Começa exatamente onde termina o header */
   bottom: 0;
   width: 1px;
@@ -129,13 +129,14 @@ body {
   align-items: center;
   gap: 14px;
   padding: 0 20px;
-  background: rgba(5, 20, 16, 0.98);
+  background: var(--bg-bubble-ai);
+  /* Mesma cor das bolhas da IA */
   /* Mais sólido para que a quebra no topo seja finalmente perceptível */
   /* Levemente mais sólido para marcar a quebra no topo */
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: none;
-  height: 62px;
+  height: 53px;
 }
 
 
@@ -510,14 +511,15 @@ body {
   /* Centralizando o conteúdo conforme pedido */
   gap: 12px;
   padding: 0 20px;
-  background: rgba(5, 20, 16, 0.9);
+  background: var(--bg-bubble-ai);
+  /* Mesma cor das bolhas da IA */
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: none;
   border-left: none;
   /* Garantindo que não haja linha vertical */
   z-index: 2;
-  height: 62px;
+  height: 53px;
 }
 
 .chat-header-avatar {
