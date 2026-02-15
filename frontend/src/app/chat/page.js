@@ -68,10 +68,11 @@ export default function ChatPage() {
 
         const init = async () => {
             try {
-                // Load profile and history in parallel
+                // Load profile and history in parallel, with a minimum wait for animation
                 const [profileData, historyData] = await Promise.all([
                     getProfile(savedPhone),
                     getHistory(savedPhone),
+                    new Promise(resolve => setTimeout(resolve, 5000)) // Garante 5s de animação
                 ]);
 
                 setProfile(profileData);
@@ -274,11 +275,22 @@ export default function ChatPage() {
     if (loading) {
         return (
             <div className="loading-overlay">
-                <div className="loading-spinner"></div>
+                <img src="/logo3.svg" alt="Meu MEI" className="loading-app-logo" />
+                <div className="success-animation">
+                    <svg className="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                        <circle className="checkmark-circle" cx="26" cy="26" r="25" fill="none" />
+                        <path className="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+                    </svg>
+                    <div className="confetti-container">
+                        {[...Array(12)].map((_, i) => (
+                            <span key={i} className={`confetti-piece c-${i}`}></span>
+                        ))}
+                    </div>
+                </div>
                 <p className="loading-text">
-                    Conectando ao Meu MEI...<br />
+                    Tudo pronto para o seu sucesso!<br />
                     <small style={{ color: "var(--text-muted)" }}>
-                        A primeira conexão pode levar até 30 segundos.
+                        Carregando o Meu MEI...
                     </small>
                 </p>
             </div>

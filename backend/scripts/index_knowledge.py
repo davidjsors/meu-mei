@@ -40,8 +40,13 @@ def index_all():
         print(f"[ERRO] Pasta {knowledge_dir} não encontrada.")
         return
 
-    # Limpa indexação anterior (opcional, dependendo do seu fluxo)
-    # db.table("knowledge_embeddings").delete().neq("id", "00000000-0000-0000-0000-000000000000").execute()
+    # Limpa indexação anterior para garantir que tudo esteja fresco e sem duplicatas
+    try:
+        print("[INFO] Limpando base antiga...")
+        # Deleta tudo que não seja o registro de placeholder (se houver)
+        db.table("knowledge_embeddings").delete().neq("id", 0).execute() 
+    except Exception as e:
+        print(f"[WARN] Erro ao limpar base (pode estar vazia): {e}")
 
     for filename in os.listdir(knowledge_dir):
         if filename.endswith((".txt", ".md")):
