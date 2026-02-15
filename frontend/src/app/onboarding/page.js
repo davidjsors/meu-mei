@@ -12,14 +12,13 @@ import {
     ArrowLeft,
     ShieldCheck,
     Smartphone,
-    Sparkles,
-    BarChart3
+    Lock,
+    BarChart3,
+    Eye,
+    EyeOff,
+    AlertCircle
 } from "lucide-react";
-
-/**
- * Onboarding Meu MEI - Fluxo Consolidado
- * Estilo Centered Card + Typeform
- */
+import { setPin, loginPin, getProfile } from "../../lib/api";
 
 const SESSION_DURATION_MS = 24 * 60 * 60 * 1000;
 
@@ -41,28 +40,40 @@ const MATURITY_OPTIONS = [
 
 export default function OnboardingPage() {
     const router = useRouter();
-    const [step, setStep] = useState(1);
+
+    // 0: Phone, 
+    // 1: Login PIN (if existing user)
+    // 2: Profile + Create PIN (if new user)
+    // 3: Maturity Intro
+    // 4: Maturity Questions
+    // 4: Maturity Questions
+    // 5: Revenue Goal
+    // 6: Terms
+    const [step, setStep] = useState(0);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
     // Form State
     const [phone, setPhone] = useState("");
+    const [pin, setPinValue] = useState("");
+    const [confirmPin, setConfirmPin] = useState("");
+    const [existingName, setExistingName] = useState(""); // For greeting returning users
+
     const [name, setName] = useState("");
     const [businessType, setBusinessType] = useState("");
     const [revenueGoal, setRevenueGoal] = useState("");
     const [dream, setDream] = useState("");
     const [answers, setAnswers] = useState(new Array(5).fill(null));
     const [currentQuestion, setCurrentQuestion] = useState(0);
-    const [invalidField, setInvalidField] = useState(""); // Rastreia qual campo falhou na validação
-    const [acceptedTerms, setAcceptedTerms] = useState(false); // Aceite dos termos
+    const [invalidField, setInvalidField] = useState("");
+    const [acceptedTerms, setAcceptedTerms] = useState(false);
+    const [showPin, setShowPin] = useState(false);
+    const [showConfirmPin, setShowConfirmPin] = useState(false);
 
     useEffect(() => {
-        const savedPhone = localStorage.getItem("meumei_phone");
-        const loginAt = localStorage.getItem("meumei_login_at");
-        if (savedPhone && loginAt && (Date.now() - Number(loginAt)) < SESSION_DURATION_MS) {
-            router.replace("/chat");
-        }
-    }, [router]);
+        // Clearing session on onboarding load to avoid loops
+        // localStorage.removeItem("meumei_phone");
+    }, []);
 
     const formatPhone = (value) => {
         const digits = value.replace(/\D/g, "").slice(0, 11);
@@ -71,66 +82,264 @@ export default function OnboardingPage() {
         return `${digits.slice(0, 2)}-${digits.slice(2, 7)}-${digits.slice(7)}`;
     };
 
+    // --- STEP 0: PHONE ---
     const handlePhoneSubmit = async () => {
-        if (phone.length !== 13) return;
+        if (phone.replace(/\D/g, "").length !== 11) {
+            return; // inactive button handles UI
+        }
         setLoading(true);
         setError("");
 
         try {
-            const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
-            const resp = await fetch(`${API_BASE}/api/user/profile/${phone}`);
-
-            if (resp.ok) {
-                const profile = await resp.json();
-                if (profile && profile.maturity_score && profile.terms_accepted) {
-                    localStorage.setItem("meumei_phone", phone);
-                    localStorage.setItem("meumei_login_at", String(Date.now()));
-                    router.push("/chat");
-                    return;
-                }
+            // Check if user exists
+            const profile = await getProfile(phone);
+            if (profile && profile.has_pin) {
+                // User exists AND has PIN -> Go to Login Mode
+                setExistingName(profile.name ? profile.name.split(" ")[0] : "");
+                setStep(1); // Login PIN
+            } else {
+                // User does not exist OR has no PIN -> Go to Create PIN
+                setStep(2); // Profile + Create PIN
             }
-            setStep(2);
         } catch (err) {
-            console.error("Erro no login:", err);
+            // If error fetching profile (e.g. 404), assume new user
             setStep(2);
         } finally {
             setLoading(false);
         }
     };
 
-    const handleProfileNext = () => {
-        setInvalidField(""); // Reseta antes de validar novamente
-
-        if (!name.trim()) {
-            setError("Opa! Como podemos te chamar? Informe seu nome.");
-            setInvalidField("name");
-            return;
+    // --- STEP 1: Login PIN ---
+    const handleLoginPin = async () => {
+        setLoading(true);
+        try {
+            const resp = await loginPin(phone, pin);
+            if (resp.success) {
+                localStorage.setItem("meumei_phone", phone);
+                localStorage.setItem("meumei_login_at", String(Date.now()));
+                router.push("/chat");
+            }
+        } catch (err) {
+            setError(err.message || "PIN incorreto");
+            setPinValue("");
+        } finally {
+            setLoading(false);
         }
-        if (!businessType.trim()) {
-            setError("Qual o ramo do seu negócio? (ex: Confeitaria)");
-            setInvalidField("businessType");
-            return;
-        }
-        if (!revenueGoal.trim()) {
-            setError("Informe sua meta de vendas para este mês.");
-            setInvalidField("revenueGoal");
-            return;
-        }
-        if (!dream.trim()) {
-            setError("Conte para a gente qual o seu maior sonho!");
-            setInvalidField("dream");
-            return;
-        }
-        setError("");
-        setInvalidField("");
-        setStep(3);
     };
 
+    // --- STEP 2: Profile + Create PIN ---
+    const handleProfileNext = async () => {
+        setInvalidField("");
+        setError("");
+
+        // Profile Validations
+        if (!name.trim()) { setError("Opa! Como podemos te chamar? Informe seu nome."); setInvalidField("name"); return; }
+        if (!businessType.trim()) { setError("Qual a sua profissão? (ex: Eletricista)"); setInvalidField("businessType"); return; }
+        if (!businessType.trim()) { setError("Qual a sua profissão? (ex: Eletricista)"); setInvalidField("businessType"); return; }
+        if (!dream.trim()) { setError("Conte para a gente qual o seu maior sonho!"); setInvalidField("dream"); return; }
+
+        // PIN Validations
+        if (pin.length < 4) { setError("Crie um PIN de pelo menos 4 números."); setInvalidField("pin"); return; }
+        if (pin !== confirmPin) { setError("Os PINs informados não são iguais."); setInvalidField("confirmPin"); return; }
+
+        setLoading(true);
+        try {
+            // Create User & PIN (Upsert)
+            await setPin(phone, pin);
+            // Success -> Move to Maturity Intro
+            setStep(3);
+        } catch (err) {
+            setError(err.message || "Erro ao salvar PIN. Tente novamente.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // --- RENDERERS ---
+
+    const renderPhoneInput = () => {
+        const isValid = phone.replace(/\D/g, "").length === 11;
+        return (
+            <div className="onboarding-card">
+                <p className="onboarding-subtitle">
+                    Digite seu telefone para começar sua jornada rumo à independência financeira.
+                </p>
+
+                <div className="onboarding-form-group">
+                    <label className="onboarding-label"><Smartphone size={16} /> Seu telefone</label>
+                    <input
+                        className="onboarding-input"
+                        style={{ textAlign: 'center', fontSize: '20px', letterSpacing: '2px', fontWeight: 'bold' }}
+                        placeholder="11-98765-4321"
+                        value={phone}
+                        onChange={(e) => {
+                            setPhone(formatPhone(e.target.value));
+                            setError("");
+                        }}
+                        onKeyDown={(e) => e.key === 'Enter' && isValid && handlePhoneSubmit()}
+                        maxLength={13}
+                        autoFocus
+                    />
+                </div>
+
+                {error && <p className="onboarding-error">{error}</p>}
+
+                <button
+                    className={`onboarding-btn ${!isValid ? 'is-inactive' : ''}`}
+                    onClick={handlePhoneSubmit}
+                    disabled={!isValid || loading}
+                >
+                    {loading ? "Verificando..." : "Continuar →"}
+                </button>
+
+                <p className="onboarding-footer-note">
+                    Sua conta é vinculada ao seu número. <ShieldCheck size={14} style={{ color: 'var(--green)' }} />
+                </p>
+            </div>
+        );
+    };
+
+    const renderLoginPin = () => (
+        <div className="onboarding-card">
+            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                <Lock size={48} color="var(--blue-primary)" />
+            </div>
+            <h2 className="onboarding-title">Bem-vindo de volta, {existingName || "Empreendedor"}!</h2>
+            <p className="onboarding-subtitle">
+                Digite seu PIN para acessar.
+            </p>
+
+            <div className="onboarding-form-group">
+                <input
+                    type="password"
+                    inputMode="numeric"
+                    className="onboarding-input"
+                    style={{ textAlign: 'center', fontSize: '24px', letterSpacing: '8px' }}
+                    placeholder="PIN"
+                    value={pin}
+                    onChange={(e) => {
+                        setPinValue(e.target.value.replace(/\D/g, "").slice(0, 6));
+                        setError("");
+                    }}
+                    onKeyDown={(e) => e.key === 'Enter' && pin.length >= 4 && handleLoginPin()}
+                    autoFocus
+                />
+            </div>
+
+            {error && <p className="onboarding-error">{error}</p>}
+
+            <button
+                className={`onboarding-btn ${pin.length < 4 ? 'is-inactive' : ''}`}
+                onClick={handleLoginPin}
+                disabled={loading || pin.length < 4}
+            >
+                {loading ? "Entrando..." : "Acessar →"}
+            </button>
+
+            <button
+                className="link-btn"
+                style={{ marginTop: '20px', background: 'none', border: 'none', color: 'var(--text-secondary)', textDecoration: 'underline', cursor: 'pointer' }}
+                onClick={() => { alert("Envie email para david.sors@gmail.com para recuperar acesso."); }}
+            >
+                Esqueci meu PIN
+            </button>
+        </div>
+    );
+
+    const isValidProfile = name.trim() && businessType.trim() && dream.trim() && pin.length >= 4 && pin === confirmPin;
+
+    const renderProfile = () => (
+        <div className="onboarding-card" style={{ maxWidth: '580px' }}>
+            <h2 className="onboarding-title">Bem-vindo(a) ao Meu MEI!</h2>
+            <p className="onboarding-subtitle">Conte um pouco sobre você e o seu negócio, e defina sua senha de acesso.</p>
+
+            <div className="onboarding-form-group">
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div>
+                        <label className="onboarding-label"><User size={16} /> Nome</label>
+                        <input className={`onboarding-input ${invalidField === 'name' ? 'input-error-blink' : ''}`} placeholder="Seu nome" value={name} onChange={e => { setName(e.target.value); if (invalidField === 'name') setInvalidField(""); }} />
+                    </div>
+                    <div>
+                        <label className="onboarding-label"><Briefcase size={16} /> Profissão</label>
+                        <input className={`onboarding-input ${invalidField === 'businessType' ? 'input-error-blink' : ''}`} placeholder="Ex: Eletricista..." value={businessType} onChange={e => { setBusinessType(e.target.value); if (invalidField === 'businessType') setInvalidField(""); }} />
+                    </div>
+                </div>
+            </div>
+            <div className="onboarding-form-group">
+                <label className="onboarding-label"><Rocket size={16} /> Qual o seu maior sonho relacionado ao seu negócio?</label>
+                <textarea className={`onboarding-input ${invalidField === 'dream' ? 'input-error-blink' : ''}`} style={{ minHeight: '80px', resize: 'none' }} placeholder="Ex: Abrir minha loja física..." value={dream} onChange={e => { setDream(e.target.value); if (invalidField === 'dream') setInvalidField(""); }} />
+            </div>
+
+            <div className="onboarding-form-group" style={{ marginTop: '24px', borderTop: '1px solid var(--border-color)', paddingTop: '24px' }}>
+                <label className="onboarding-label" style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '6px' }}><Lock size={16} /> Crie seu PIN de acesso</label>
+
+                <div style={{ background: 'rgba(55, 65, 81, 0.5)', padding: '12px', borderRadius: '8px', marginBottom: '16px', display: 'flex', gap: '10px', alignItems: 'start', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                    <AlertCircle size={18} color="var(--red-primary)" style={{ marginTop: '2px', flexShrink: 0 }} />
+                    <p style={{ fontSize: '13px', color: 'var(--text-primary)', margin: 0, lineHeight: '1.4', textShadow: 'none !important' }}>
+                        <span style={{ color: 'var(--red-primary)', fontWeight: '600', textShadow: 'none !important' }}>Atenção:</span> Guarde bem este número! Ele será sua senha para entrar no aplicativo sempre que precisar.
+                    </p>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div style={{ position: 'relative' }}>
+                        <input
+                            className={`onboarding-input ${invalidField === 'pin' ? 'input-error-blink' : ''}`}
+                            type={showPin ? "text" : "password"}
+                            inputMode="numeric"
+                            placeholder="PIN (4-6 dígitos)"
+                            value={pin}
+                            onChange={e => { setPinValue(e.target.value.replace(/\D/g, "").slice(0, 6)); if (invalidField === 'pin') setInvalidField(""); }}
+                            style={{ paddingRight: '40px' }}
+                        />
+                        <button
+                            onClick={() => setShowPin(!showPin)}
+                            style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
+                        >
+                            {showPin ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                    </div>
+                    <div style={{ position: 'relative' }}>
+                        <input
+                            className={`onboarding-input ${invalidField === 'confirmPin' ? 'input-error-blink' : ''}`}
+                            type={showConfirmPin ? "text" : "password"}
+                            inputMode="numeric"
+                            placeholder="Confirme o PIN"
+                            value={confirmPin}
+                            onChange={e => { setConfirmPin(e.target.value.replace(/\D/g, "").slice(0, 6)); if (invalidField === 'confirmPin') setInvalidField(""); }}
+                            style={{ paddingRight: '40px' }}
+                        />
+                        <button
+                            onClick={() => setShowConfirmPin(!showConfirmPin)}
+                            style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
+                        >
+                            {showConfirmPin ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                    </div>
+                </div>
+
+                {pin && confirmPin && pin !== confirmPin && (
+                    <p style={{ color: 'var(--red-primary)', fontSize: '12px', marginTop: '12px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', textShadow: 'none !important' }}>
+                        <AlertCircle size={14} /> Os códigos informados não coincidem
+                    </p>
+                )}
+            </div>
+
+            {error && <p className="onboarding-error">{error}</p>}
+            <button
+                onClick={handleProfileNext}
+                className={`onboarding-btn ${!isValidProfile ? 'is-inactive' : ''}`}
+                disabled={loading || !isValidProfile}
+            >
+                {loading ? "Salvando..." : "Tudo pronto! Vamos continuar →"}
+            </button>
+        </div >
+    );
+
+    // Reuse existing components logic for Maturity, Terms
     const handleAnswer = (value) => {
         const newAnswers = [...answers];
         newAnswers[currentQuestion] = value;
         setAnswers(newAnswers);
-
         if (currentQuestion < MATURITY_QUESTIONS.length - 1) {
             setTimeout(() => setCurrentQuestion(prev => prev + 1), 300);
         } else {
@@ -138,187 +347,51 @@ export default function OnboardingPage() {
         }
     };
 
+    const handleRevenueGoalNext = () => {
+        if (!revenueGoal.trim()) { setError("Informe sua meta de vendas para este mês."); setInvalidField("revenueGoal"); return; }
+        setStep(6);
+    };
+
     const handleFinalSubmit = async () => {
-        setInvalidField("");
         if (!acceptedTerms) {
-            setInvalidField("terms");
             setError("Opa! Você precisa aceitar os termos para começarmos.");
+            setInvalidField("terms");
             return;
         }
-
         setLoading(true);
-        setError("");
-
         try {
             const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
             const goalValue = parseFloat(revenueGoal.replace(/\./g, '').replace(',', '.')) || 0;
-
-            // 1. Salvar perfil e maturidade
-            const matResp = await fetch(`${API_BASE}/api/user/maturity`, {
+            // Save Maturity
+            await fetch(`${API_BASE}/api/user/maturity`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    phone_number: phone,
-                    name,
-                    business_type: businessType,
-                    dream,
-                    revenue_goal: goalValue,
-                    answers
-                }),
+                body: JSON.stringify({ phone_number: phone, name, business_type: businessType, dream, revenue_goal: goalValue, answers }),
             });
-
-            if (!matResp.ok) throw new Error("Erro ao salvar perfil");
-
-            // 2. Aceitar termos
+            // Accept Terms
             await fetch(`${API_BASE}/api/user/accept-terms`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ phone_number: phone }),
             });
-
             localStorage.setItem("meumei_phone", phone);
             localStorage.setItem("meumei_login_at", String(Date.now()));
             router.push("/chat");
-        } catch (err) {
-            setError("Erro ao finalizar cadastro. Tente novamente.");
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
+        } catch (e) { setError("Erro ao finalizar cadastro. Tente novamente."); }
+        finally { setLoading(false); }
     };
 
-    const isValidProfile = name.trim() && businessType.trim() && revenueGoal.trim() && dream.trim();
-
-    // --- RENDERERS ---
-
-    const renderPhone = () => (
-        <div className="onboarding-card">
-            <p className="onboarding-subtitle">
-                Digite seu telefone para começar sua jornada rumo à independência financeira.
-            </p>
-
-            <div className="onboarding-form-group">
-                <label className="onboarding-label"><Smartphone size={12} /> SEU TELEFONE</label>
-                <input
-                    className="onboarding-input"
-                    style={{ textAlign: 'center', fontSize: '20px', letterSpacing: '2px', fontWeight: 'bold' }}
-                    placeholder="11-98765-4321"
-                    value={phone}
-                    onChange={(e) => setPhone(formatPhone(e.target.value))}
-                    onKeyDown={(e) => e.key === 'Enter' && handlePhoneSubmit()}
-                    maxLength={13}
-                    autoFocus
-                />
-            </div>
-
-            <button
-                className={`onboarding-btn ${phone.length !== 13 ? 'is-inactive' : ''}`}
-                onClick={handlePhoneSubmit}
-                disabled={loading}
-            >
-                {loading ? "Verificando..." : "Continuar →"}
-            </button>
-            <p className="onboarding-footer-note">
-                Sua conta é vinculada ao seu número. <ShieldCheck size={14} style={{ color: 'var(--green)' }} />
-            </p>
-        </div>
-    );
-
-    const renderProfile = () => (
-        <div className="onboarding-card" style={{ maxWidth: '580px' }}>
-            <h2 className="onboarding-title">Queremos te conhecer!</h2>
-            <p className="onboarding-subtitle">Conte um pouco sobre você e o seu negócio.</p>
-
-            <div className="onboarding-form-group">
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                    <div>
-                        <label className="onboarding-label"><User size={12} /> NOME</label>
-                        <input
-                            className={`onboarding-input ${invalidField === 'name' ? 'input-error-blink' : ''}`}
-                            placeholder="Seu nome"
-                            value={name}
-                            onChange={(e) => {
-                                setName(e.target.value);
-                                if (invalidField === 'name') setInvalidField("");
-                            }}
-                        />
-                    </div>
-                    <div>
-                        <label className="onboarding-label"><Briefcase size={12} /> RAMO DO NEGÓCIO</label>
-                        <input
-                            className={`onboarding-input ${invalidField === 'businessType' ? 'input-error-blink' : ''}`}
-                            placeholder="Ex: Confeitaria..."
-                            value={businessType}
-                            onChange={(e) => {
-                                setBusinessType(e.target.value);
-                                if (invalidField === 'businessType') setInvalidField("");
-                            }}
-                        />
-                    </div>
-                </div>
-            </div>
-
-            <div className="onboarding-form-group">
-                <label className="onboarding-label"><Target size={12} /> META DE VENDAS (MENSAL)</label>
-                <div style={{ position: 'relative' }}>
-                    <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', fontWeight: '600', color: 'var(--text-muted)' }}>R$</span>
-                    <input
-                        className={`onboarding-input ${invalidField === 'revenueGoal' ? 'input-error-blink' : ''}`}
-                        style={{ paddingLeft: '48px' }}
-                        placeholder="0,00"
-                        value={revenueGoal}
-                        onChange={(e) => {
-                            if (invalidField === 'revenueGoal') setInvalidField("");
-                            let v = e.target.value.replace(/\D/g, "");
-                            if (!v) { setRevenueGoal(""); return; }
-                            const floatValue = parseInt(v) / 100;
-                            setRevenueGoal(floatValue.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-                        }}
-                    />
-                </div>
-            </div>
-
-            <div className="onboarding-form-group">
-                <label className="onboarding-label"><Rocket size={12} /> SEU MAIOR SONHO</label>
-                <textarea
-                    className={`onboarding-input ${invalidField === 'dream' ? 'input-error-blink' : ''}`}
-                    style={{ minHeight: '100px', resize: 'none' }}
-                    placeholder="Ex: Abrir minha loja física..."
-                    value={dream}
-                    onChange={(e) => {
-                        setDream(e.target.value);
-                        if (invalidField === 'dream') setInvalidField("");
-                    }}
-                />
-            </div>
-
-            {error && <p className="onboarding-error">{error}</p>}
-
-            <button
-                onClick={handleProfileNext}
-                className={`onboarding-btn ${!isValidProfile ? 'is-inactive' : ''}`}
-                disabled={loading}
-            >
-                {loading ? "Processando..." : "Tudo pronto! Vamos continuar →"}
-            </button>
-        </div>
-    );
     const renderMaturityIntro = () => (
         <div className="onboarding-card" style={{ textAlign: 'center', maxWidth: '640px' }}>
             <div style={{ marginBottom: '24px' }}>
-                <BarChart3 size={72} color="var(--red-primary)" style={{ margin: '0 auto', filter: 'drop-shadow(0 0 10px rgba(227, 38, 54, 0.3))' }} />
+                <BarChart3 size={72} color="var(--red-primary)" style={{ margin: '0 auto' }} />
             </div>
             <h2 className="onboarding-title">Quase lá! Vamos falar da gestão do seu negócio?</h2>
             <p className="onboarding-subtitle" style={{ fontSize: '18px', lineHeight: '1.6', marginBottom: '32px' }}>
                 Agora que conhecemos seu sonho, precisamos entender como você gerencia as finanças da sua empresa. <br /><br />
                 O objetivo é termos um <strong>diagnóstico inicial</strong> para que possamos te ajudar a conquistar o seu sonho com segurança!
             </p>
-
-            <button
-                className="onboarding-btn"
-                onClick={() => setStep(4)}
-                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-            >
+            <button className="onboarding-btn" onClick={() => setStep(4)} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                 Começar Diagnóstico <ArrowRight size={20} />
             </button>
         </div>
@@ -326,171 +399,148 @@ export default function OnboardingPage() {
 
     const renderMaturity = () => {
         const progress = ((currentQuestion + 1) / MATURITY_QUESTIONS.length) * 100;
-
         return (
             <div className="tf-view">
-                <div className="tf-progress-bar">
-                    <div className="tf-progress-inner" style={{ width: `${progress}%` }} />
-                </div>
-
+                <div className="tf-progress-bar"><div className="tf-progress-inner" style={{ width: `${progress}%` }} /></div>
                 <div className="tf-container">
                     <div className="tf-question-header">
-                        <div className="tf-question-number">
-                            <span>{currentQuestion + 1}</span>
-                            <ArrowRight size={14} />
-                        </div>
-                        <h2 className="tf-question-text">
-                            {MATURITY_QUESTIONS[currentQuestion]}
-                        </h2>
+                        <div className="tf-question-number"><span>{currentQuestion + 1}</span><ArrowRight size={14} /></div>
+                        <h2 className="tf-question-text">{MATURITY_QUESTIONS[currentQuestion]}</h2>
                     </div>
-
                     <div className="tf-options-list">
-                        {(currentQuestion === 1 ? [
-                            { label: "Minha conta pessoal e profissional é uma só", value: 1 },
-                            { label: "Tudo na mesma conta, mas controlo no papel/excel", value: 2 },
-                            { label: "Tudo na mesma conta, mas uso bancos diferentes para organizar", value: 3 },
-                            { label: "Contas separadas, mas ainda transfiro entre elas sem muito critério", value: 4 },
-                            { label: "Tenho uma conta pessoal e outra da empresa", value: 5 },
-                        ] : MATURITY_OPTIONS).map((opt) => (
-                            <button
-                                key={opt.value}
-                                className={`tf-btn ${answers[currentQuestion] === opt.value ? 'selected' : ''}`}
-                                onClick={() => handleAnswer(opt.value)}
-                            >
+                        {MATURITY_OPTIONS.map((opt) => (
+                            <button key={opt.value} className={`tf-btn ${answers[currentQuestion] === opt.value ? 'selected' : ''}`} onClick={() => handleAnswer(opt.value)}>
                                 <span className="tf-option-key">{opt.value}</span>
                                 <span className="tf-option-label">{opt.label}</span>
                                 {answers[currentQuestion] === opt.value && <CheckCircle2 size={18} style={{ color: 'var(--red-primary)', marginLeft: 'auto' }} />}
                             </button>
                         ))}
                     </div>
-
                     <div className="tf-actions">
-                        <button
-                            className="tf-back-btn"
-                            disabled={currentQuestion === 0}
-                            onClick={() => setCurrentQuestion(prev => prev - 1)}
-                        >
-                            <ArrowLeft size={16} /> Voltar
-                        </button>
-                        <div className="tf-counter">
-                            Questão {currentQuestion + 1} de {MATURITY_QUESTIONS.length}
-                        </div>
+                        <button className="tf-back-btn" disabled={currentQuestion === 0} onClick={() => setCurrentQuestion(prev => prev - 1)}><ArrowLeft size={16} /> Voltar</button>
+                        <div className="tf-counter">Questão {currentQuestion + 1} de {MATURITY_QUESTIONS.length}</div>
                     </div>
                 </div>
             </div>
         );
     };
 
+    const renderRevenueGoal = () => (
+        <div className="onboarding-card" style={{ maxWidth: '580px' }}>
+            <h2 className="onboarding-title">Defina sua Meta</h2>
+            <p className="onboarding-subtitle">Para que o Meu MEI possa te ajudar a alcançar seus objetivos, precisamos saber onde você quer chegar financeiramente.</p>
+
+            <div className="onboarding-form-group">
+                <label className="onboarding-label">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Target size={16} /> Qual é a sua meta mensal de vendas ou o valor que você gostaria de faturar?
+                    </div>
+                </label>
+                <div style={{ position: 'relative' }}>
+                    <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', fontWeight: '600', color: 'var(--text-muted)' }}>R$</span>
+                    <input autoFocus className={`onboarding-input ${invalidField === 'revenueGoal' ? 'input-error-blink' : ''}`} style={{ paddingLeft: '48px', fontSize: '24px' }} placeholder="0,00" value={revenueGoal} onChange={e => {
+                        let v = e.target.value.replace(/\D/g, "");
+                        if (!v) { setRevenueGoal(""); return; }
+                        const floatValue = parseInt(v) / 100;
+                        setRevenueGoal(floatValue.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+                        if (invalidField === 'revenueGoal') setInvalidField("");
+                    }} />
+                </div>
+            </div>
+            {error && <p className="onboarding-error">{error}</p>}
+            <button className="onboarding-btn" onClick={handleRevenueGoalNext}>
+                Continuar →
+            </button>
+        </div>
+    );
+
     const renderTerms = () => (
         <div className="onboarding-card" style={{ textAlign: 'center', maxWidth: '640px' }}>
-            <div style={{ marginBottom: '24px' }}>
-                <CheckCircle2 size={72} color="var(--green)" style={{ margin: '0 auto' }} />
-            </div>
+            <div style={{ marginBottom: '24px' }}><CheckCircle2 size={72} color="var(--green)" style={{ margin: '0 auto' }} /></div>
             <h2 className="onboarding-title">Está quase tudo pronto!</h2>
-            <p className="onboarding-subtitle">
-                Para sua segurança, leia e aceite nossos termos de uso para começar.
-            </p>
-
-            {/* Texto Completo dos Termos com Scroll */}
+            <p className="onboarding-subtitle">Para sua segurança, leia e aceite nossos termos de uso para começar.</p>
             <div className="onboarding-terms-scroller">
-                <div className="terms-body" style={{ color: 'var(--text-secondary)', textAlign: 'left', padding: '0' }}>
-                    <p style={{ color: 'var(--text-secondary)' }}>
+                <div className="terms-body" style={{ color: '#FFFFFF', textAlign: 'left', padding: '0', textShadow: 'none !important' }}>
+                    <p style={{ color: '#FFFFFF', textShadow: 'none !important' }}>
                         Bem-vindo ao <strong>Meu MEI</strong>. Ao utilizar nossa plataforma, você confia a nós a gestão de dados importantes para o seu crescimento. Este documento explica como protegemos seus dados, quais são seus direitos e as regras para o uso da nossa tecnologia de mentoria financeira.
                     </p>
 
-                    <h2 style={{ color: 'var(--text-primary)', fontSize: '18px', marginTop: '24px', marginBottom: '12px' }}>1. Termos de Uso (Regras de Convivência)</h2>
+                    <h2 style={{ color: '#FFFFFF', fontSize: '18px', marginTop: '24px', marginBottom: '12px', textShadow: 'none !important' }}>1. Termos de Uso (Regras de Convivência)</h2>
 
-                    <h3 style={{ color: 'var(--text-primary)', fontSize: '15px', marginTop: '16px', marginBottom: '8px' }}>1.1. Objeto e Aceite</h3>
-                    <p style={{ color: 'var(--text-secondary)' }}>
+                    <h3 style={{ color: '#FFFFFF', fontSize: '15px', marginTop: '16px', marginBottom: '8px', textShadow: 'none !important' }}>1.1. Objeto e Aceite</h3>
+                    <p style={{ color: '#FFFFFF', textShadow: 'none !important' }}>
                         O Meu MEI é uma ferramenta de auxílio à gestão financeira e educação para Microempreendedores Individuais. Ao clicar em "Aceito os Termos", você declara ter lido e concordado com estas regras.
                     </p>
 
-                    <h3 style={{ color: 'var(--text-primary)', fontSize: '15px', marginTop: '16px', marginBottom: '8px' }}>1.2. Elegibilidade e Cadastro</h3>
-                    <p style={{ color: 'var(--text-secondary)' }}>
+                    <h3 style={{ color: '#FFFFFF', fontSize: '15px', marginTop: '16px', marginBottom: '8px', textShadow: 'none !important' }}>1.2. Elegibilidade e Cadastro</h3>
+                    <p style={{ color: '#FFFFFF', textShadow: 'none !important' }}>
                         A plataforma é destinada exclusivamente a MEIs devidamente registrados no território brasileiro. O usuário é responsável pela veracidade dos dados inseridos (CNPJ, faturamento, despesas).
                     </p>
 
-                    <h3 style={{ color: 'var(--text-primary)', fontSize: '15px', marginTop: '16px', marginBottom: '8px' }}>1.3. Limitações da Inteligência Artificial</h3>
-                    <p style={{ color: 'var(--text-secondary)' }}>
+                    <h3 style={{ color: '#FFFFFF', fontSize: '15px', marginTop: '16px', marginBottom: '8px', textShadow: 'none !important' }}>1.3. Limitações da Inteligência Artificial</h3>
+                    <p style={{ color: '#FFFFFF', textShadow: 'none !important' }}>
                         O Meu MEI atua como um mentor educativo. Você declara estar ciente de que:
                     </p>
-                    <ul style={{ paddingLeft: '20px', color: 'var(--text-secondary)' }}>
-                        <li>As recomendações da IA são baseadas em dados inseridos por você e em modelos estatísticos.</li>
-                        <li>O agente não substitui o aconselhamento profissional de um contador ou advogado.</li>
-                        <li>O sistema não realiza transações bancárias nem investimentos em seu nome.</li>
+                    <ul style={{ paddingLeft: '20px', color: '#FFFFFF', textShadow: 'none !important' }}>
+                        <li style={{ color: '#FFFFFF', textShadow: 'none !important' }}>As recomendações da IA são baseadas em dados inseridos por você e em modelos estatísticos.</li>
+                        <li style={{ color: '#FFFFFF', textShadow: 'none !important' }}>O agente não substitui o aconselhamento profissional de um contador ou advogado.</li>
+                        <li style={{ color: '#FFFFFF', textShadow: 'none !important' }}>O sistema não realiza transações bancárias nem investimentos em seu nome.</li>
                     </ul>
 
-                    <h3 style={{ color: 'var(--text-primary)', fontSize: '15px', marginTop: '16px', marginBottom: '8px' }}>1.4. Uso Proibido</h3>
-                    <p style={{ color: 'var(--text-secondary)' }}>
+                    <h3 style={{ color: '#FFFFFF', fontSize: '15px', marginTop: '16px', marginBottom: '8px', textShadow: 'none !important' }}>1.4. Uso Proibido</h3>
+                    <p style={{ color: '#FFFFFF', textShadow: 'none !important' }}>
                         É terminantemente proibido utilizar a plataforma para registrar atividades ilícitas, sonegação fiscal ou práticas que configurem lavagem de dinheiro ou fraude.
                     </p>
 
-                    <h2 style={{ color: 'var(--text-primary)', fontSize: '18px', marginTop: '24px', marginBottom: '12px' }}>2. Política de Privacidade (LGPD)</h2>
+                    <h2 style={{ color: '#FFFFFF', fontSize: '18px', marginTop: '24px', marginBottom: '12px', textShadow: 'none !important' }}>2. Política de Privacidade (LGPD)</h2>
 
-                    <h3 style={{ color: 'var(--text-primary)', fontSize: '15px', marginTop: '16px', marginBottom: '8px' }}>2.1. Quais dados coletamos?</h3>
-                    <ul style={{ paddingLeft: '20px', color: 'var(--text-secondary)' }}>
-                        <li><strong>Dados Cadastrais:</strong> Nome, e-mail, CPF e CNPJ.</li>
-                        <li><strong>Dados Financeiros:</strong> Registros de entradas, saídas, boletos e fluxo de caixa.</li>
-                        <li><strong>Dados Multimodais:</strong> Textos, áudios enviados para registro de voz, arquivos e imagens/PDFs de recibos.</li>
-                        <li><strong>Dados de Diagnóstico:</strong> Respostas ao instrumento IAMF-MEI.</li>
+                    <h3 style={{ color: '#FFFFFF', fontSize: '15px', marginTop: '16px', marginBottom: '8px', textShadow: 'none !important' }}>2.1. Quais dados coletamos?</h3>
+                    <ul style={{ paddingLeft: '20px', color: '#FFFFFF', textShadow: 'none !important' }}>
+                        <li style={{ color: '#FFFFFF', textShadow: 'none !important' }}><strong>Dados Cadastrais:</strong> Nome, e-mail, CPF e CNPJ.</li>
+                        <li style={{ color: '#FFFFFF', textShadow: 'none !important' }}><strong>Dados Financeiros:</strong> Registros de entradas, saídas, boletos e fluxo de caixa.</li>
+                        <li style={{ color: '#FFFFFF', textShadow: 'none !important' }}><strong>Dados Multimodais:</strong> Textos, áudios enviados para registro de voz, arquivos e imagens/PDFs de recibos.</li>
+                        <li style={{ color: '#FFFFFF', textShadow: 'none !important' }}><strong>Dados de Diagnóstico:</strong> Respostas ao instrumento IAMF-MEI.</li>
                     </ul>
 
-                    <h3 style={{ color: 'var(--text-primary)', fontSize: '15px', marginTop: '16px', marginBottom: '8px' }}>2.2. Para que usamos seus dados?</h3>
-                    <p style={{ color: 'var(--text-secondary)' }}>
+                    <h3 style={{ color: '#FFFFFF', fontSize: '15px', marginTop: '16px', marginBottom: '8px', textShadow: 'none !important' }}>2.2. Para que usamos seus dados?</h3>
+                    <p style={{ color: '#FFFFFF', textShadow: 'none !important' }}>
                         As finalidades incluem a personalização da linguagem conforme sua maturidade financeira, processamento automatizado de recibos e análise de progresso rumo ao seu "Caminho para o Sonho".
                     </p>
 
-                    <h3 style={{ color: 'var(--text-primary)', fontSize: '15px', marginTop: '16px', marginBottom: '8px' }}>2.3. Compartilhamento de Dados</h3>
-                    <p style={{ color: 'var(--text-secondary)' }}>
+                    <h3 style={{ color: '#FFFFFF', fontSize: '15px', marginTop: '16px', marginBottom: '8px', textShadow: 'none !important' }}>2.3. Compartilhamento de Dados</h3>
+                    <p style={{ color: '#FFFFFF', textShadow: 'none !important' }}>
                         Seus dados financeiros não são vendidos. Compartilhamos apenas com parceiros essenciais (Google Cloud/Vertex AI) ou com o ecossistema Bradesco mediante sua autorização prévia.
                     </p>
 
-                    <h2 style={{ color: 'var(--text-primary)', fontSize: '18px', marginTop: '24px', marginBottom: '12px' }}>3. Segurança da Informação</h2>
-                    <p style={{ color: 'var(--text-secondary)' }}>
+                    <h2 style={{ color: '#FFFFFF', fontSize: '18px', marginTop: '24px', marginBottom: '12px', textShadow: 'none !important' }}>3. Segurança da Informação</h2>
+                    <p style={{ color: '#FFFFFF', textShadow: 'none !important' }}>
                         Adotamos criptografia rigorosa em trânsito e em repouso, isolamento de domínio e monitoramento constante de logs para garantir a integridade do sistema.
                     </p>
 
-                    <h2 style={{ color: 'var(--text-primary)', fontSize: '18px', marginTop: '24px', marginBottom: '12px' }}>4. Atualizações</h2>
-                    <p style={{ color: 'var(--text-secondary)' }}>
+                    <h2 style={{ color: '#FFFFFF', fontSize: '18px', marginTop: '24px', marginBottom: '12px', textShadow: 'none !important' }}>4. Atualizações</h2>
+                    <p style={{ color: '#FFFFFF', textShadow: 'none !important' }}>
                         Este documento pode ser atualizado para refletir melhorias técnicas. Notificaremos você sobre alterações importantes.
                     </p>
                 </div>
             </div>
-
-            <div
-                className={invalidField === 'terms' ? 'input-error-blink' : ''}
-                style={{ margin: '24px 0', textAlign: 'left', borderRadius: '12px', transition: 'all 0.3s ease' }}
-            >
-                <div
-                    className="custom-checkbox-container"
-                    onClick={() => {
-                        setAcceptedTerms(!acceptedTerms);
-                        if (invalidField === 'terms') setInvalidField("");
-                    }}
-                    style={{ padding: '4px' }}
-                >
-                    <div className={`custom-checkbox-circle ${acceptedTerms ? 'checked' : ''}`}>
-                        <div className="custom-checkbox-dot" />
-                    </div>
-                    <span style={{ lineHeight: '1.4', fontSize: '14px', color: 'var(--text-primary)' }}>
-                        Li e compreendo que o <strong>Meu MEI</strong> processará meus áudios e imagens para fins de gestão financeira. Autorizo o tratamento dos meus dados conforme a LGPD.
-                    </span>
+            <div className={invalidField === 'terms' ? 'input-error-blink' : ''} style={{ margin: '24px 0', textAlign: 'left', borderRadius: '12px', transition: 'all 0.3s ease' }}>
+                <div className="custom-checkbox-container" onClick={() => { setAcceptedTerms(!acceptedTerms); if (invalidField === 'terms') setInvalidField(""); }} style={{ padding: '4px' }}>
+                    <div className={`custom-checkbox-circle ${acceptedTerms ? 'checked' : ''}`}><div className="custom-checkbox-dot" /></div>
+                    <span style={{ lineHeight: '1.4', fontSize: '14px', color: '#FFFFFF', textShadow: 'none !important' }}>Li e compreendo que o <strong>Meu MEI</strong> processará meus áudios e imagens para fins de gestão financeira. Autorizo o tratamento dos meus dados conforme a LGPD.</span>
                 </div>
             </div>
-
-            <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '4fr 1fr', gap: '12px', marginTop: '16px' }}>
                 <button
                     className={`onboarding-btn ${!acceptedTerms ? 'is-inactive' : ''}`}
-                    style={{ flex: 3, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                    style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                     onClick={handleFinalSubmit}
                     disabled={loading}
                 >
-                    {loading ? "Finalizando..." : "Aceitar e Começar"}
-                    {!loading && <ArrowRight size={20} />}
+                    {loading ? "Finalizando..." : "Aceitar e Começar"} {!loading && <ArrowRight size={20} />}
                 </button>
                 <button
                     className="onboarding-btn"
-                    style={{ flex: 1, background: 'var(--bg-app)', color: 'var(--text-muted) !important', border: '1px solid var(--border-color)' }}
+                    style={{ background: 'transparent', border: '1px solid var(--border-color)', color: 'rgba(255, 255, 255, 0.6)', textShadow: 'none', boxShadow: 'none' }}
                     onClick={() => router.push("/")}
                 >
                     Sair
@@ -501,9 +551,8 @@ export default function OnboardingPage() {
 
     return (
         <main className="onboarding-screen">
-            {step === 1 ? (
+            {(step === 0 || step === 1) && (
                 <div className="onboarding-split-container">
-                    {/* Esquerda: Apresentação */}
                     <div className="onboarding-presentation">
                         <div className="presentation-content">
                             <img src="/logo2.svg" alt="Meu MEI" className="presentation-logo" />
@@ -527,20 +576,17 @@ export default function OnboardingPage() {
                             </div>
                         </div>
                     </div>
-
-                    {/* Direita: Login */}
                     <div className="onboarding-login-side">
-                        {renderPhone()}
+                        {step === 0 && renderPhoneInput()}
+                        {step === 1 && renderLoginPin()}
                     </div>
                 </div>
-            ) : (
-                <div className="onboarding-content">
-                    {step === 2 && renderProfile()}
-                    {step === 3 && renderMaturityIntro()}
-                    {step === 4 && renderMaturity()}
-                    {step === 5 && renderTerms()}
-                </div>
             )}
+            {step === 2 && <div className="onboarding-content">{renderProfile()}</div>}
+            {step === 3 && <div className="onboarding-content">{renderMaturityIntro()}</div>}
+            {step === 4 && <div className="onboarding-content">{renderMaturity()}</div>}
+            {step === 5 && <div className="onboarding-content">{renderRevenueGoal()}</div>}
+            {step === 6 && <div className="onboarding-content">{renderTerms()}</div>}
         </main>
     );
 }

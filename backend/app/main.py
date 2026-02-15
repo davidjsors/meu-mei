@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from supabase import create_client
 
 from app.config import settings
-from app.routers import chat, user
+from app.routers import chat, user, auth
 
 # ─── App ───
 app = FastAPI(
@@ -35,10 +35,12 @@ if settings.SUPABASE_URL and settings.SUPABASE_KEY:
     supabase = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
     chat.init_supabase(supabase)
     user.init_supabase(supabase)
+    # Auth uses user._get_db, which is initialized via user.init_supabase
 
 # ─── Routes ───
 app.include_router(chat.router)
 app.include_router(user.router)
+app.include_router(auth.router)
 
 
 @app.get("/api/health")

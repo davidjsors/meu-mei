@@ -34,12 +34,6 @@ export async function sendMessage(phoneNumber, message, file = null) {
 /**
  * Lê SSE stream e chama callbacks para cada evento.
  * Agora parseia tanto o 'event:' quanto o 'data:' lines do SSE.
- *
- * Callbacks:
- *  - onChunk(text): texto parcial recebido
- *  - onDone(): streaming terminado
- *  - onError(msg): erro ocorreu
- *  - onOnboardingComplete(level): onboarding finalizado, pode recarregar perfil
  */
 export async function streamResponse(response, onChunk, onDone, onError, onOnboardingComplete, onFinanceUpdated) {
     const reader = response.body.getReader();
@@ -120,5 +114,59 @@ export async function getHistory(phoneNumber, limit = 50) {
 export async function getProfile(phoneNumber) {
     const resp = await fetch(`${API_BASE}/api/user/profile/${phoneNumber}`);
     if (!resp.ok) return null;
+    return resp.json();
+}
+
+// --- Authentication ---
+
+export async function socialLogin(phoneNumber, provider, token, socialId, name) {
+    const resp = await fetch(`${API_BASE}/api/auth/social-login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone_number: phoneNumber, provider, token, social_id: socialId, name })
+    });
+    if (!resp.ok) {
+        const err = await resp.json();
+        throw new Error(err.detail || "Erro no login social");
+    }
+    return resp.json();
+}
+
+export async function setPin(phoneNumber, pin) {
+    const resp = await fetch(`${API_BASE}/api/auth/set-pin`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone_number: phoneNumber, pin })
+    });
+    if (!resp.ok) {
+        const err = await resp.json();
+        throw new Error(err.detail || "Erro ao definir PIN");
+    }
+    return resp.json();
+}
+
+export async function loginPin(phoneNumber, pin) {
+    const resp = await fetch(`${API_BASE}/api/auth/login-pin`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone_number: phoneNumber, pin })
+    });
+    if (!resp.ok) {
+        const err = await resp.json();
+        throw new Error(err.detail || "PIN incorreto ou erro de login");
+    }
+    return resp.json();
+}
+
+export async function checkRecovery(phoneNumber, socialId, provider, token) {
+    const resp = await fetch(`${API_BASE}/api/auth/recover-pin-check`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone_number: phoneNumber, provider, token, social_id: socialId })
+    });
+    if (!resp.ok) {
+        const err = await resp.json();
+        throw new Error(err.detail || "Conta social não corresponde");
+    }
     return resp.json();
 }

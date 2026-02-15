@@ -62,6 +62,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  text-shadow: none !important;
 }
 
 input,
@@ -480,9 +481,7 @@ body {
   border-color: var(--green);
 }
 
-.sidebar-footer-btn.sidebar-logout-btn {
-  /* Reutilizando o mesmo estilo verde para sair */
-}
+
 
 /* ─── Chat Area ─── */
 .chat-area {
@@ -2450,12 +2449,13 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--text-muted);
+  font-size: 13px;
+  /* Increased size slightly for readability since it's not uppercase */
+  font-weight: 600;
+  color: var(--text-secondary);
+  /* Adjusted color for better visibility */
   margin-bottom: 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: normal;
 }
 
 @keyframes inputBlink {

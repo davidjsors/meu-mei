@@ -39,7 +39,14 @@ O tom de comunicação segue o padrão culto, porém de forma acessível e dinâ
 
 A estrutura do agente é composta por uma plataforma de chat multimodal com suporte a texto, áudio e imagem. O sistema utiliza um modelo de linguagem avançado com capacidade de análise contextual.
 
-### 📚 Base de Conhecimento (Knowledge Base)
+### � Autenticação e Recuperação de Conta
+Para equilibrar **segurança** e **agilidade** no dia a dia do MEI, o sistema adota uma estratégia de autenticação em duas camadas:
+
+1.  **Acesso Rápido (Dia a Dia):** O login cotidiano é realizado exclusivamente via **PIN numérico** (4 a 6 dígitos) ou **biometria** (se disponível no dispositivo), eliminando a fricção de senhas complexas.
+2.  **Identidade Mestra (Recuperação):** No onboarding, é **obrigatória** a vinculação de uma conta social (**Google** ou **Gov.br**). Esta conta atua como uma "chave mestra" de segurança.
+    *   *Caso o usuário esqueça o PIN:* A recuperação é feita autenticando-se novamente na conta social vinculada, permitindo a redefinição segura do PIN sem custos de envio de SMS ou e-mail.
+
+### �📚 Base de Conhecimento (Knowledge Base)
 O agente fundamenta suas respostas em uma biblioteca curada de documentos oficiais, convertidos e padronizados para garantir precisão técnica. As principais fontes incluem:
 
 *   **Governo Federal:** Lista oficial de Ocupações Permitidas (Anexo XI), Portal do Empreendedor, FAQ MEI.

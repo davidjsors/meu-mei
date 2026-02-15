@@ -12,14 +12,15 @@ export default function Home() {
     const router = useRouter();
 
     useEffect(() => {
+        const now = Date.now();
         const phone = localStorage.getItem("meumei_phone");
         const loginAt = localStorage.getItem("meumei_login_at");
         const SESSION_DURATION_MS = 24 * 60 * 60 * 1000; // 24h
 
-        if (phone && loginAt && (Date.now() - Number(loginAt)) < SESSION_DURATION_MS) {
+        if (phone && loginAt && (now - Number(loginAt) < SESSION_DURATION_MS)) {
             router.replace("/chat");
         } else {
-            localStorage.removeItem("meumei_phone");
+            // Se expirou ou não tem login, vai pro onboarding (que agora tem o login unificado)
             localStorage.removeItem("meumei_login_at");
             router.replace("/onboarding");
         }

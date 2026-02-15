@@ -28,6 +28,27 @@ class ProfileResponse(BaseModel):
     maturity_level: Optional[str] = None
     revenue_goal: Optional[float] = None
     created_at: Optional[datetime] = None
+    social_provider: Optional[str] = None
+    has_pin: bool = False
+
+
+class PinRequest(BaseModel):
+    phone_number: str = Field(..., pattern=r"^\d{2}-\d{5}-\d{4}$")
+    pin: str = Field(..., min_length=4, max_length=6, description="PIN numérico de 4 a 6 dígitos")
+
+
+class VerifyPinRequest(BaseModel):
+    phone_number: str = Field(..., pattern=r"^\d{2}-\d{5}-\d{4}$")
+    pin: str = Field(..., min_length=4, max_length=6)
+
+
+class SocialLoginRequest(BaseModel):
+    phone_number: str = Field(..., pattern=r"^\d{2}-\d{5}-\d{4}$")
+    provider: str = Field(..., pattern=r"^(google|govbr)$")
+    token: str
+    social_id: str
+    email: Optional[str] = None
+    name: Optional[str] = None
 
 
 class GoalUpdateRequest(BaseModel):
