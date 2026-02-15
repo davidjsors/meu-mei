@@ -310,6 +310,14 @@ async def send_message(
         # Uses BACKEND_URL from settings (default http://localhost:8000)
         file_url = f"{settings.BACKEND_URL}/uploads/{safe_filename}"
 
+    # Validar se parent_id é um UUID válido
+    if parent_id:
+        try:
+            uuid.UUID(str(parent_id))
+        except ValueError:
+            # Se não for UUID válido (ex: ID temporário do frontend), ignorar
+            parent_id = None
+
     # 3. Salvar mensagem do usuário
     user_message_data = {
         "phone_number": phone_number,
