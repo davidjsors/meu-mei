@@ -1,6 +1,6 @@
 # Gestão Financeira Descomplicada para Microempreendedores Individuais
 
-> Fonte Original: Gestão Financeira Descomplicada para Microempreendedores Individuais.pdf
+> **Fonte:** BANCO DO NORDESTE. **Gestão Financeira Descomplicada para Microempreendedores Individuais**. Disponível em: <https://www.bnb.gov.br/documents/45847/5219984/Gest%C3%A3o+Financeira+Descomplicada+para+Microempreendedores+Individuais.pdf/6d0c2f90-d5de-1f4f-700e-b228a112d2b0?version=1.0&t=1696355574820&download=true>. Acesso em: 15 fev. 2026.
 
 Gestão Financeira Descomplicada para Microempreendedores Individuais (MEIs)
 Gestão Financeira
