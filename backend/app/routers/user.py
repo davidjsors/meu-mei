@@ -71,7 +71,9 @@ async def get_profile(phone_number: str):
     if not resp.data:
         return None
 
-    return resp.data[0]
+    user = resp.data[0]
+    user["has_pin"] = bool(user.get("pin_hash"))
+    return user
 
 
 @router.put("/profile/goal")

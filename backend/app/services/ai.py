@@ -14,27 +14,46 @@ from app.prompts.system import build_system_prompt, build_onboarding_prompt
 client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
 
-def _load_knowledge_context() -> str:
-    """
-    Carrega arquivos .txt e .md da pasta knowledge/ como contexto adicional.
-    PDFs são referenciados mas não parseados aqui (Gemini aceita PDF direto).
-    """
-    context_parts = []
-    knowledge_dir = settings.KNOWLEDGE_DIR
+def get_embedding(text: str) -> list[float]:
+    """Gera embedding usando o modelo do Gemini."""
+    response = client.models.embed_content(
+        model="models/gemini-embedding-001",
+        contents=text
+    )
+    return response.embeddings[0].values
 
-    if not os.path.exists(knowledge_dir):
+
+async def search_knowledge(query: str, limit: int = 5) -> str:
+    """Busca conhecimento relevante no Supabase usando busca vetorial."""
+    from app.routers.chat import _get_db
+    
+    try:
+        embedding = get_embedding(query)
+        db = _get_db()
+        
+        # Chama a função RPC personalizada do Supabase (precisa estar criada no DB)
+        # O nome da função no SQL seria 'match_knowledge'
+        rpc_params = {
+            "query_embedding": embedding,
+            "match_threshold": 0.5,
+            "match_count": limit,
+        }
+        
+        resp = db.rpc("match_knowledge", rpc_params).execute()
+        
+        if not resp.data:
+            return ""
+            
+        context_parts = []
+        for match in resp.data:
+            content = match.get("content", "")
+            source = match.get("metadata", {}).get("filename", "desconhecido")
+            context_parts.append(f"--- Fonte: {source} ---\n{content}")
+            
+        return "\n\n".join(context_parts)
+    except Exception as e:
+        print(f"Erro na busca vetorial: {e}")
         return ""
-
-    for filename in os.listdir(knowledge_dir):
-        filepath = os.path.join(knowledge_dir, filename)
-        if filename.endswith((".txt", ".md")) and os.path.isfile(filepath):
-            with open(filepath, "r", encoding="utf-8") as f:
-                content = f.read()
-                context_parts.append(
-                    f"\n--- Documento de Referência: {filename} ---\n{content}\n"
-                )
-
-    return "\n".join(context_parts)
 
 
 def _build_chat_history(messages: list[dict]) -> list[types.Content]:
@@ -81,11 +100,12 @@ async def generate_response_stream(
             user_summary
         )
 
-    knowledge_context = _load_knowledge_context()
+    # RAG: Busca conhecimento relevante
+    knowledge_context = await search_knowledge(message)
     if knowledge_context:
         system_prompt += (
-            "\n\n## Base de Conhecimento (Grounding)\n"
-            "Use as informações abaixo como referência para fundamentar suas respostas:\n"
+            "\n\n## Conhecimento Extraído da Base (Referência Técnica)\n"
+            "Utilize as informações oficiais abaixo para fundamentar sua resposta técnica:\n"
             + knowledge_context
         )
 

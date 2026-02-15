@@ -52,24 +52,24 @@ def _normalize_mime(mime: str) -> str:
     """Remove parâmetros do MIME type (ex: audio/webm;codecs=opus → audio/webm)."""
     return mime.split(";")[0].strip().lower()
 
-# Regex para extrair dados do onboarding
+# Regex para extrair dados do onboarding (Flexibilizado)
 ONBOARDING_PATTERN = re.compile(
     r"\[ONBOARDING_COMPLETE\]\s*"
-    r"nome:\s*(.+?)\s*\n"
-    r"negocio:\s*(.+?)\s*\n"
-    r"sonho:\s*(.+?)\s*\n"
-    r"score:\s*(\d+)\s*"
+    r"(?:\*\*)?nome:(?:\*\*)?\s*(.+?)\s*\n"
+    r"(?:\*\*)?negocio:(?:\*\*)?\s*(.+?)\s*\n"
+    r"(?:\*\*)?sonho:(?:\*\*)?\s*(.+?)\s*\n"
+    r"(?:\*\*)?score:(?:\*\*)?\s*(\d+)\s*"
     r"\[/ONBOARDING_COMPLETE\]",
     re.IGNORECASE | re.DOTALL,
 )
 
-# Regex para extrair transações financeiras
+# Regex para extrair transações financeiras (Altamente Flexível)
 TRANSACTION_PATTERN = re.compile(
-    r"\[TRANSACTION\]\s*"
-    r"tipo:\s*(entrada|saida).*?\n"
-    r"valor:\s*([\d,.]+).*?\n"
-    r"descricao:\s*(.*?)\n"
-    r"categoria:\s*(.*?)\n?\s*"
+    r"\[TRANSACTION\]\s*(?:\n|\r\n)?"
+    r"(?:\*+)?tipo:(?:\*+)?\s*(entrada|saída|saida).*?\n"
+    r"(?:\*+)?valor:(?:\*+)?\s*([\d,.]+).*?\n"
+    r"(?:\*+)?descricao:(?:\*+)?\s*(.*?)\n"
+    r"(?:\*+)?categoria:(?:\*+)?\s*(.*?)\n?\s*"
     r"\[/TRANSACTION\]",
     re.IGNORECASE | re.DOTALL,
 )
@@ -78,11 +78,11 @@ TRANSACTION_PATTERN = re.compile(
 # Ex: [RESET_FINANCE: ALL] ou [RESET_FINANCE: 2023-01-01]
 RESET_PATTERN = re.compile(r"\[RESET_FINANCE(?::\s*(ALL|[\d-]+))?\]", re.IGNORECASE)
 
-# Regex para deletar uma transação específica (estorno)
+# Regex para deletar uma transação específica (Flexibilizado)
 DELETE_TRANSACTION_PATTERN = re.compile(
     r"\[DELETE_TRANSACTION\]\s*"
-    r"valor:\s*([\d.]+)\s*\n"
-    r"descricao:\s*(.+?)\s*"
+    r"(?:\*+)?valor:(?:\*+)?\s*([\d.]+)\s*\n"
+    r"(?:\*+)?descricao:(?:\*+)?\s*(.+?)\s*"
     r"\[/DELETE_TRANSACTION\]",
     re.IGNORECASE | re.DOTALL,
 )
