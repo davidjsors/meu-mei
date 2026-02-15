@@ -382,7 +382,7 @@ export default function ChatPage() {
                         <div className="reply-preview-card">
                             <div className="reply-preview-sidebar" />
                             <div className="reply-preview-content">
-                                <div className="reply-preview-author">
+                                <div className="reply-preview-author" style={{ color: replyingTo.role === "assistant" ? "var(--red-primary)" : "var(--green)" }}>
                                     {replyingTo.role === "assistant" ? "Meu MEI" : "Você"}
                                 </div>
                                 <div className="reply-preview-text">

@@ -58,7 +58,7 @@ export default function ChatBubble({ message, onReply, messagesMap = {} }) {
                         <div className="message-quote">
                             <div className="quote-sidebar" />
                             <div className="quote-content">
-                                <div className="quote-author">
+                                <div className="quote-author" style={{ color: parentMsg.role === "assistant" ? "var(--red-primary)" : "inherit" }}>
                                     {parentMsg.role === "assistant" ? "Meu MEI" : "Você"}
                                 </div>
                                 <div className="quote-text">
