@@ -31,15 +31,25 @@ O tom de comunicação segue o padrão culto, porém de forma acessível e dinâ
 > ### 💬 Exemplos de Linguagem:
 > * **Saudação:** olá! como está a caminhada para realizar o seu sonho de [_meta do usuário_] hoje? vamos dar uma olhada nas contas do negócio?
 > * **Confirmação:** anotado! registrei o gasto de R$ 50,00 como 'insumos'. com isso, seu fluxo de caixa desta semana apresenta R$ [_valor_] de entradas e R$ [_valor_] de saídas. deseja uma visão mais ampla do mês agora?
-> * **sugestão proativa:** percebi que as contas da sua casa ainda estão se misturando com as do trabalho. uma boa prática de gestão é separar esses valores para saber exatamente quanto o seu negócio rende de verdade. que tal começarmos essa organização esta semana?
+> * **Sugestão proativa:** percebi que as contas da sua casa ainda estão se misturando com as do trabalho. Uma boa prática de gestão é separar esses valores para saber exatamente quanto o seu negócio rende de verdade. Que tal começarmos essa organização esta semana?
 
 ---
 
 ## 🏗️ 3. Arquitetura e Segurança
 
-A estrutura do agente é composta por uma plataforma de chat multimodal com suporte a texto, áudio e imagem. O sistema utiliza um modelo de linguagem avançado com capacidade de análise contextual e uma base de conhecimento fundamentada em materiais oficiais do **Sebrae**, **Banco Central** e **Banco do Nordeste**.
+A estrutura do agente é composta por uma plataforma de chat multimodal com suporte a texto, áudio e imagem. O sistema utiliza um modelo de linguagem avançado com capacidade de análise contextual.
 
-No que tange à segurança e estratégias anti-alucinação, o agente baseia suas orientações técnicas estritamente nas fontes oficiais fornecidas. A **saúde financeira** é a prioridade absoluta: recomendações de produtos ocorrem apenas como alternativa viável de organização e nunca devem incentivar o endividamento. Em caso de dados imprecisos em imagens ou áudios, o agente solicita nova confirmação em vez de deduzir valores.
+### 📚 Base de Conhecimento (Knowledge Base)
+O agente fundamenta suas respostas em uma biblioteca curada de documentos oficiais, convertidos e padronizados para garantir precisão técnica. As principais fontes incluem:
+
+*   **Governo Federal:** Lista oficial de Ocupações Permitidas (Anexo XI), Portal do Empreendedor, FAQ MEI.
+*   **Sebrae:** Guias de fluxo de caixa, diagnóstico empresarial, planejamento financeiro e gestão para MEI.
+*   **Bradesco (Unibrad):** Cartilhas de educação financeira para adultos e fornecedores, manuais de tarifas bancárias (Cestas MEI/PJ), infográficos para autônomos.
+*   **Banco do Nordeste:** Cadernos de gestão financeira para microempreendedores.
+
+> **Nota:** Todas as citações fornecidas pelo agente seguem o padrão **ABNT** para garantir credibilidade e rastreabilidade da informação.
+
+No que tange à segurança e estratégias anti-alucinação, o agente baseia suas orientações técnicas estritamente nas fontes oficiais fornecidas. A **saúde financeira** é a prioridade absoluta: recomendações de produtos ocorrem apenas como alternativa viável de organização e nunca devem incentivar o endividamento.
 
 ---
 
