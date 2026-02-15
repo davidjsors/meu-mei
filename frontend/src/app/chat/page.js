@@ -185,13 +185,10 @@ export default function ChatPage() {
                     () => {
                         setFinanceKey((k) => k + 1);
                     },
-                    // onAgentAudio — tocar o áudio do mentor E adicionar bolha
+                    // onAgentAudio — apenas adicionar a bolha (Estilo WhatsApp)
                     (audioBase64) => {
                         try {
-                            const audio = new Audio(audioBase64);
-                            audio.play().catch(e => console.error("Erro ao tocar áudio:", e));
-
-                            // Adiciona a bolha de áudio na lista de mensagens (Estilo WhatsApp)
+                            // Adiciona a bolha de áudio na lista de mensagens
                             setMessages((prev) => [
                                 ...prev,
                                 {
