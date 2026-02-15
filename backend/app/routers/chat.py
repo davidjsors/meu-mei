@@ -66,10 +66,10 @@ ONBOARDING_PATTERN = re.compile(
 # Regex para extrair transações financeiras
 TRANSACTION_PATTERN = re.compile(
     r"\[TRANSACTION\]\s*"
-    r"tipo:\s*(entrada|saida)\s*\n"
-    r"valor:\s*([\d.]+)\s*\n"
-    r"descricao:\s*(.+?)\s*\n"
-    r"categoria:\s*(.+?)\s*"
+    r"tipo:\s*(entrada|saida).*?\n"
+    r"valor:\s*([\d,.]+).*?\n"
+    r"descricao:\s*(.*?)\n"
+    r"categoria:\s*(.*?)\n?\s*"
     r"\[/TRANSACTION\]",
     re.IGNORECASE | re.DOTALL,
 )
@@ -112,19 +112,34 @@ def _clean_onboarding_markers(text: str) -> str:
 def _parse_transactions(text: str) -> list[dict]:
     """
     Extrai todas as transações financeiras marcadas pela IA.
-    Retorna lista de dicts com tipo, valor, descricao, categoria.
-    Deduplica transações idênticas na mesma resposta da IA.
     """
     transactions = []
     seen = set()
     for match in TRANSACTION_PATTERN.finditer(text):
         try:
             tipo = match.group(1).strip().lower()
-            valor = float(match.group(2).strip())
+            # Trata formatos brasileiros (1.234,56) e gírias (1k, 2k)
+            v_clean = match.group(2).strip().lower()
+            
+            # Reconhece "k" como milhar
+            multiplier = 1
+            if v_clean.endswith("k"):
+                multiplier = 1000
+                v_clean = v_clean.replace("k", "").strip()
+            
+            if "," in v_clean and "." in v_clean:
+                # Se tem ambos, o último é o decimal
+                if v_clean.rfind(",") > v_clean.rfind("."):
+                    v_clean = v_clean.replace(".", "").replace(",", ".")
+                else:
+                    v_clean = v_clean.replace(",", "")
+            elif "," in v_clean:
+                v_clean = v_clean.replace(",", ".")
+            
+            valor = float(v_clean) * multiplier
             desc = match.group(3).strip()
             cat = match.group(4).strip().lower()
             
-            # Chave única para evitar duplicados na mesma resposta
             tx_key = (tipo, valor, desc, cat)
             if tx_key not in seen:
                 transactions.append({
@@ -140,8 +155,10 @@ def _parse_transactions(text: str) -> list[dict]:
 
 
 def _clean_transaction_markers(text: str) -> str:
-    """Remove marcadores [TRANSACTION] da resposta visível ao usuário."""
-    return TRANSACTION_PATTERN.sub("", text).strip()
+    """Remove marcadores [TRANSACTION] e limpa espaços extras."""
+    cleaned = TRANSACTION_PATTERN.sub("", text)
+    # Remove excesso de quebras de linha (colapsa 3+ em 2)
+    return re.sub(r"\n{3,}", "\n\n", cleaned).strip()
 
 
 def _has_reset_marker(text: str) -> bool:

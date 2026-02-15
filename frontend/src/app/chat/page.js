@@ -17,12 +17,15 @@ const DELETE_MARKER_RE = /\[DELETE_TRANSACTION\][\s\S]*?\[\/DELETE_TRANSACTION\]
 const RESET_MARKER_RE = /\[RESET_FINANCE.*?\]/gi;
 
 function cleanMarkers(text) {
-    return text
+    if (!text) return "";
+    const cleaned = text
         .replace(ONBOARDING_MARKER_RE, "")
         .replace(TRANSACTION_MARKER_RE, "")
         .replace(DELETE_MARKER_RE, "")
-        .replace(RESET_MARKER_RE, "")
-        .trim();
+        .replace(RESET_MARKER_RE, "");
+
+    // Colapsar múltiplas quebras de linha (evita grandes buracos no texto)
+    return cleaned.replace(/\n{3,}/g, "\n\n").trim();
 }
 
 export default function ChatPage() {
