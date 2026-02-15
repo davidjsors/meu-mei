@@ -2,15 +2,6 @@
 
 > **Fonte:** SEBRAE PERNAMBUCO. **Como fazer a Demonstração do Resultado do Exercício (DRE): o guia completo**. Recife: Sebrae/PE, [s.d.]. PDF. Disponível em: <https://sebrae.com.br/Sebrae/Portal%20Sebrae/UFs/PE/Anexos/Como%20fazer%20a%20Demonstra%C3%A7%C3%A3o%20do%20Resultado%20do%20Exerc%C3%ADcio%20(DRE)%20o%20guia%20completo.pdf>. Acesso em: 15 fev. 2026.
 
-## Sumário
-* **Introdução** ................................................................................... 3
-* **O que é a Demonstração de Resultado do Exercício?** ........................ 4
-* **Qual é a importância da DRE para o negócio?** .................................. 5
-* **Quais são as vantagens de utilizar o DRE?** ....................................... 6
-* **Qual é a estrutura e como fazer a DRE?** ........................................... 9
-* **Conclusão** ................................................................................... 16
-* **Sobre o SEBRAE PE** ..................................................................... 17
-
 ## Introdução
 A Demonstração do Resultado do Exercício ou DRE é um documento relevante para administração da empresa. Afinal, ele contém informações sobre as receitas e despesas de forma que é possível avaliar se os esforços empregados durante o ano, trouxeram mais lucros ou prejuízos.
 
@@ -93,17 +84,17 @@ Impostos cobrados diretamente sobre os lucros do negócio. Para empresas no Simp
 O saldo final do DRE, calculando todas as receitas e despesas, incluindo financeiros e tributos. Se positivo, lucro; se negativo, prejuízo.
 
 **Estrutura resumida da DRE:**
-1. Receita operacional bruta
-2. (-) Deduções da receita bruta (impostos, devoluções, etc.)
-3. (=) Receita operacional líquida
-4. (-) Custo dos produtos vendidos e/ou serviços prestados
-5. (=) Lucro bruto
-6. (-) Despesas operacionais (administrativas, comerciais, etc.)
-7. (=) Resultado antes das despesas financeiras e dos impostos (EBIT)
-8. (-) Despesas financeiras
-9. (=) Resultado antes dos impostos (EBT)
-10. (-) Imposto de renda e contribuição social
-11. (=) Resultado líquido do período
+Receita operacional bruta
+(-) Deduções da receita bruta (impostos, devoluções, etc.)
+(=) Receita operacional líquida
+(-) Custo dos produtos vendidos e/ou serviços prestados
+(=) Lucro bruto
+(-) Despesas operacionais (administrativas, comerciais, etc.)
+(=) Resultado antes das despesas financeiras e dos impostos (EBIT)
+(-) Despesas financeiras
+(=) Resultado antes dos impostos (EBT)
+(-) Imposto de renda e contribuição social
+(=) Resultado líquido do período
 
 ## Conclusão
 A Demonstração do Resultado do Exercício ou DRE é uma ferramenta essencial para a administração e a gestão financeira correta do negócio. Ele permite
