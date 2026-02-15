@@ -85,16 +85,16 @@ O saldo final do DRE, calculando todas as receitas e despesas, incluindo finance
 
 **Estrutura resumida da DRE:**
 Receita operacional bruta
-> Deduções da receita bruta (impostos, devoluções, etc.)
-> Receita operacional líquida
-> Custo dos produtos vendidos e/ou serviços prestados
-> Lucro bruto
-> Despesas operacionais (administrativas, comerciais, etc.)
-> Resultado antes das despesas financeiras e dos impostos (EBIT)
-> Despesas financeiras
-> Resultado antes dos impostos (EBT)
-> Imposto de renda e contribuição social
-> Resultado líquido do período
+1. (-) Deduções da receita bruta (impostos, devoluções, etc.)
+2. (=) Receita operacional líquida
+3. (-) Custo dos produtos vendidos e/ou serviços prestados
+4. (=) Lucro bruto
+5. (-) Despesas operacionais (administrativas, comerciais, etc.)
+6. (=) Resultado antes das despesas financeiras e dos impostos (EBIT)
+7. (-) Despesas financeiras
+8. (=) Resultado antes dos impostos (EBT)
+9. (-) Imposto de renda e contribuição social
+10. (=) Resultado líquido do período
 
 ## Conclusão
 A Demonstração do Resultado do Exercício ou DRE é uma ferramenta essencial para a administração e a gestão financeira correta do negócio. Ele permite
