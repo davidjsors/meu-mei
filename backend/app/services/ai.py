@@ -80,6 +80,8 @@ async def generate_response_stream(
     file_bytes: bytes | None = None,
     file_mime: str | None = None,
     user_summary: str | None = None,
+    pending_messages: list[str] | None = None, # Recebe as mensagens que ficaram sem resposta
+    replied_to_content: str | None = None, # Conteúdo da mensagem citada (Reply)
 ):
     """
     Gera resposta da IA via streaming.
@@ -98,6 +100,25 @@ async def generate_response_stream(
             dream or "crescer o negócio", 
             business_type or "empreendedor",
             user_summary
+        )
+
+    # Se o usuário está respondendo a uma mensagem específica (Reply)
+    if replied_to_content:
+        system_prompt += (
+            f"\n\n## CONTEXTO DE RESPOSTA (REPLY)\n"
+            f"O usuário está respondendo especificamente à seguinte mensagem anterior:\n"
+            f"{replied_to_content}\n"
+            f"Leve isso em conta para dar uma resposta direta e contextualizada."
+        )
+
+    # Se houver mensagens pendentes de erros passados, avisa a IA
+    if pending_messages:
+        pending_context = "\n".join([f"- {m}" for m in pending_messages])
+        system_prompt += (
+            f"\n\n## ATENÇÃO: MENSAGENS PENDENTES\n"
+            f"As seguintes mensagens do usuário foram enviadas anteriormente mas não foram processadas por erro técnico.\n"
+            f"Por favor, responda a elas agora antes de prosseguir com o assunto atual:\n"
+            f"{pending_context}"
         )
 
     # RAG: Busca conhecimento relevante

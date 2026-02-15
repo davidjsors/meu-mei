@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { sendMessage, streamResponse, getHistory, getProfile } from "../../lib/api";
 import MessageList from "../../components/MessageList";
@@ -40,6 +40,16 @@ export default function ChatPage() {
     const [phone, setPhone] = useState("");
     const [financeKey, setFinanceKey] = useState(0);
     const [showTour, setShowTour] = useState(false);
+    const [replyingTo, setReplyingTo] = useState(null); // Mensagem sendo respondida (Estilo Zap)
+
+    // Mapa de mensagens por ID para lookup rápido de citações
+    const messagesMap = useMemo(() => {
+        const map = {};
+        messages.forEach(msg => {
+            if (msg.id) map[msg.id] = msg;
+        });
+        return map;
+    }, [messages]);
 
     // Load user data on mount
     useEffect(() => {
@@ -116,6 +126,7 @@ export default function ChatPage() {
                     : "text",
                 file_name: file?.name || null,
                 file_url: file ? URL.createObjectURL(file) : null,
+                parent_id: replyingTo?.id || null, // Vínculo com a mensagem pai
                 created_at: new Date().toISOString(),
             };
 
@@ -124,7 +135,8 @@ export default function ChatPage() {
             setStreamingText("");
 
             try {
-                const response = await sendMessage(phone, text, file);
+                const response = await sendMessage(phone, text, file, replyingTo?.id);
+                setReplyingTo(null); // Limpar citação após envio
 
                 // Stream the response
                 let accumulated = "";
@@ -164,7 +176,7 @@ export default function ChatPage() {
                                 id: `error-${Date.now()}`,
                                 phone_number: phone,
                                 role: "assistant",
-                                content: "Desculpe, tive um problema ao processar sua mensagem. Pode tentar novamente? 😊",
+                                content: "Tive um probleminha técnico aqui, mas não se preocupe: recebi sua mensagem e vou processá-la assim que meu sistema estabilizar! 😊",
                                 content_type: "text",
                                 created_at: new Date().toISOString(),
                             },
@@ -239,7 +251,7 @@ export default function ChatPage() {
                 setIsTyping(false);
             }
         },
-        [phone]
+        [phone, replyingTo]
     );
 
     // Handle Sidebar Quick Transactions
@@ -305,7 +317,32 @@ export default function ChatPage() {
                     messages={messages}
                     isTyping={isTyping}
                     streamingText={streamingText}
+                    onReply={setReplyingTo}
+                    messagesMap={messagesMap}
                 />
+
+                {/* Preview de Resposta (Estilo Zap) */}
+                {replyingTo && (
+                    <div className="reply-preview-container">
+                        <div className="reply-preview-card">
+                            <div className="reply-preview-sidebar" />
+                            <div className="reply-preview-content">
+                                <div className="reply-preview-author">
+                                    {replyingTo.role === "assistant" ? "Meu MEI" : "Você"}
+                                </div>
+                                <div className="reply-preview-text">
+                                    {replyingTo.content_type === "audio" ? "🎤 Áudio" :
+                                        replyingTo.content_type === "image" ? "📷 Imagem" :
+                                            replyingTo.content_type === "pdf" ? "📄 Documento" :
+                                                replyingTo.content}
+                                </div>
+                            </div>
+                            <button className="reply-preview-close" onClick={() => setReplyingTo(null)}>
+                                ✕
+                            </button>
+                        </div>
+                    </div>
+                )}
 
                 {/* Input */}
                 <ChatInput

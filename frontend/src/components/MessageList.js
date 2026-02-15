@@ -7,7 +7,7 @@ import ChatBubble from "./ChatBubble";
  * MessageList — Lista de mensagens com scroll automático.
  * Renderiza bolhas de chat e indicador de digitação.
  */
-export default function MessageList({ messages, isTyping = false, streamingText = "" }) {
+export default function MessageList({ messages, isTyping = false, streamingText = "", onReply, messagesMap }) {
     const endRef = useRef(null);
 
     useEffect(() => {
@@ -34,7 +34,12 @@ export default function MessageList({ messages, isTyping = false, streamingText 
             )}
 
             {messages.map((msg, i) => (
-                <ChatBubble key={msg.id || i} message={msg} />
+                <ChatBubble
+                    key={msg.id || i}
+                    message={msg}
+                    onReply={onReply}
+                    messagesMap={messagesMap}
+                />
             ))}
 
             {/* Streaming response (being typed) */}

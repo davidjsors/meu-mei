@@ -36,8 +36,8 @@ function formatMarkdown(text) {
     return html;
 }
 
-export default function ChatBubble({ message }) {
-    const { role, content, content_type, file_url, file_name, created_at } = message;
+export default function ChatBubble({ message, onReply, messagesMap = {} }) {
+    const { id, role, content, content_type, file_url, file_name, created_at, parent_id } = message;
 
     const time = created_at
         ? new Date(created_at).toLocaleTimeString("pt-BR", {
@@ -46,49 +46,83 @@ export default function ChatBubble({ message }) {
         })
         : "";
 
+    // Busca o conteúdo da mensagem pai (citação)
+    const parentMsg = parent_id ? messagesMap[parent_id] : null;
+
     return (
         <div className={`message-wrapper ${role}`}>
-            <div className="message-bubble">
-                {/* Imagem */}
-                {content_type === "image" && file_url && (
-                    <a href={file_url} target="_blank" rel="noopener noreferrer">
-                        <img src={file_url} alt={file_name || "Imagem"} className="message-image" />
-                    </a>
-                )}
-
-                {/* Áudio */}
-                {content_type === "audio" && (
-                    file_url ? (
-                        <div className="audio-container" style={{ minWidth: "250px" }}>
-                            <audio controls className="message-audio" src={file_url} style={{ width: "100%", display: "block" }}>
-                                Seu navegador não suporta áudio.
-                            </audio>
+            <div className="message-container">
+                <div className="message-bubble">
+                    {/* Citação (Reply) */}
+                    {parentMsg && (
+                        <div className="message-quote">
+                            <div className="quote-sidebar" />
+                            <div className="quote-content">
+                                <div className="quote-author">
+                                    {parentMsg.role === "assistant" ? "Meu MEI" : "Você"}
+                                </div>
+                                <div className="quote-text">
+                                    {parentMsg.content_type === "audio" ? "🎤 Áudio" :
+                                        parentMsg.content_type === "image" ? "📷 Imagem" :
+                                            parentMsg.content_type === "pdf" ? "📄 Documento" :
+                                                parentMsg.content}
+                                </div>
+                            </div>
                         </div>
-                    ) : (
-                        <div className="audio-container">
-                            <span className="message-text">🎤 Áudio enviado</span>
-                        </div>
-                    )
-                )}
+                    )}
 
-                {/* PDF / Arquivo */}
-                {content_type === "pdf" && file_url && (
-                    <a href={file_url} target="_blank" rel="noopener noreferrer" className="message-file">
-                        <span className="message-file-icon">📄</span>
-                        <div className="message-file-info">
-                            <div className="message-file-name">{file_name || "Documento"}</div>
-                            <div className="message-file-type">PDF</div>
-                        </div>
-                    </a>
-                )}
+                    {/* Imagem */}
+                    {content_type === "image" && file_url && (
+                        <a href={file_url} target="_blank" rel="noopener noreferrer">
+                            <img src={file_url} alt={file_name || "Imagem"} className="message-image" />
+                        </a>
+                    )}
 
-                {/* Texto com formatação — esconder placeholders de arquivo */}
-                {content && content_type === "text" && (
-                    <span
-                        className="message-text"
-                        dangerouslySetInnerHTML={{ __html: formatMarkdown(content) }}
-                    />
-                )}
+                    {/* Áudio */}
+                    {content_type === "audio" && (
+                        file_url ? (
+                            <div className="audio-container" style={{ minWidth: "250px" }}>
+                                <audio controls className="message-audio" src={file_url} style={{ width: "100%", display: "block" }}>
+                                    Seu navegador não suporta áudio.
+                                </audio>
+                            </div>
+                        ) : (
+                            <div className="audio-container">
+                                <span className="message-text">🎤 Áudio enviado</span>
+                            </div>
+                        )
+                    )}
+
+                    {/* PDF / Arquivo */}
+                    {content_type === "pdf" && file_url && (
+                        <a href={file_url} target="_blank" rel="noopener noreferrer" className="message-file">
+                            <span className="message-file-icon">📄</span>
+                            <div className="message-file-info">
+                                <div className="message-file-name">{file_name || "Documento"}</div>
+                                <div className="message-file-type">PDF</div>
+                            </div>
+                        </a>
+                    )}
+
+                    {/* Texto com formatação */}
+                    {content && content_type === "text" && (
+                        <span
+                            className="message-text"
+                            dangerouslySetInnerHTML={{ __html: formatMarkdown(content) }}
+                        />
+                    )}
+                </div>
+
+                {/* Botão de Resposta (Aparece ao passar o mouse ou foco) */}
+                <button
+                    className="message-reply-btn"
+                    onClick={() => onReply?.(message)}
+                    title="Responder"
+                >
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                        <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z" />
+                    </svg>
+                </button>
             </div>
             {time && <span className="message-time">{time}</span>}
         </div>

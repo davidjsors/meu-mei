@@ -17,21 +17,19 @@
 
   /* Background — Deep Neutral theme */
   --bg-app: #0D1117;
-  /* Tom mais leve e elegante */
   --bg-sidebar: #0D1117;
   --bg-chat: transparent;
-  /* Permite ver o gradiente do fundo */
   --bg-input: #1C2128;
-  --bg-bubble-user: var(--red-primary);
+  --bg-bubble-user: linear-gradient(135deg, #2d3e50 0%, #3a506b 100%);
   --bg-bubble-ai: #22272E;
   --bg-hover: rgba(255, 255, 255, 0.05);
 
   /* Text */
   --text-primary: #E9EDEF;
-  --text-secondary: rgba(233, 237, 239, 0.75);
+  --text-secondary: #D1D7DB;
   --text-bubble-user: #FFFFFF;
   --text-bubble-ai: #E9EDEF;
-  --text-muted: rgba(134, 150, 160, 0.6);
+  --text-muted: #8696A0;
 
   /* Borders */
   --border-color: rgba(255, 255, 255, 0.08);
@@ -601,27 +599,26 @@ body {
 
 .message-bubble {
   padding: 8px 12px;
-  border-radius: var(--radius-md);
-  font-size: 14.5px;
-  line-height: 1.55;
+  border-radius: 12px;
+  font-size: 14.2px;
+  line-height: 1.5;
   word-wrap: break-word;
   position: relative;
+  box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13);
 }
 
 .message-wrapper.user .message-bubble {
-  background: linear-gradient(135deg, var(--red-primary), var(--red-dark));
+  background: var(--bg-bubble-user);
   color: var(--text-bubble-user);
-  border-bottom-right-radius: 4px;
-  box-shadow: none;
+  border-top-right-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .message-wrapper.assistant .message-bubble {
   background: var(--bg-bubble-ai);
-  border: none;
-  /* Borda removida conforme pedido */
   color: var(--text-bubble-ai);
-  border-bottom-left-radius: 4px;
-  box-shadow: none;
+  border-top-left-radius: 4px;
+  box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13);
 }
 
 .message-time {
@@ -851,8 +848,8 @@ body {
 }
 
 .action-btn:hover {
-  color: var(--text-primary);
-  background: var(--bg-hover);
+  color: var(--red-primary);
+  background: rgba(227, 38, 54, 0.15);
 }
 
 .action-btn input[type="file"] {
@@ -2738,4 +2735,192 @@ body {
 .tf-counter {
   font-size: 13px;
   color: var(--text-muted);
+}
+
+/* ─── Reply/Quote System (WhatsApp Style) ─── */
+.message-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  width: 100%;
+}
+
+.message-wrapper.user .message-container {
+  flex-direction: row-reverse;
+}
+
+.message-reply-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  opacity: 0;
+  transition: all var(--transition-normal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.message-wrapper:hover .message-reply-btn {
+  opacity: 1;
+}
+
+.message-reply-btn:hover {
+  background: rgba(227, 38, 54, 0.2);
+  color: var(--red-primary);
+  /* Seta vermelha ao passar o mouse */
+  transform: scale(1.1);
+}
+
+.message-quote {
+  background: #22272E;
+  /* Azul da sidebar conforme pedido */
+  border-radius: 6px;
+  padding: 6px 10px;
+  margin-bottom: 8px;
+  display: flex;
+  gap: 8px;
+  border-left: 4px solid var(--green);
+  /* Cor para quote na bolha da IA */
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+/* Quote na bolha do usuário (ESTA É A MUDANÇA CRÍTICA) */
+.message-wrapper.user .message-quote {
+  background: #22272E;
+  /* Azul da sidebar para matar o conflito com o vermelho */
+  border-left-color: #FFFFFF;
+  /* Borda branca neutra */
+}
+
+/* Cores dos nomes na citação */
+.quote-author {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--green);
+  margin-bottom: 1px;
+}
+
+.message-wrapper.user .quote-author {
+  color: #FFFFFF;
+  /* Nome em branco puro */
+}
+
+.quote-text {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  opacity: 0.9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.message-wrapper.user .quote-text {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Reply Preview above Input */
+.reply-preview-container {
+  position: absolute;
+  bottom: 74px;
+  /* Fixado acima do input flutuante */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  max-width: 800px;
+  z-index: 9;
+  animation: slideUp var(--transition-spring);
+}
+
+.reply-preview-card {
+  background: #22272E;
+  /* Azul da sidebar */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-color);
+  border-bottom: none;
+  border-radius: 16px 16px 0 0;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+}
+
+.reply-preview-sidebar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  background: var(--red-primary);
+  border-radius: 4px 0 0 0;
+}
+
+.reply-preview-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.reply-preview-author {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--red-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 3px;
+}
+
+.reply-preview-text {
+  font-size: 13px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.reply-preview-close {
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.reply-preview-close:hover {
+  background: rgba(227, 38, 54, 0.2);
+  color: var(--red-primary);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@media (max-width: 768px) {
+
+  .reply-preview-container,
+  .chat-input-area {
+    width: 95%;
+  }
 }

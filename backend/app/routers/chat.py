@@ -226,8 +226,9 @@ def _clean_audio_markers(text: str) -> str:
 @router.post("/send")
 async def send_message(
     phone_number: str = Form(...),
-    message: str = Form(""),
-    file: UploadFile | None = File(None),
+    message: str = Form(None),
+    file: UploadFile = File(None),
+    parent_id: str = Form(None),
 ):
     """
     Envia mensagem ao Meu MEI.
@@ -301,6 +302,8 @@ async def send_message(
         "content_type": content_type,
         "file_url": file_url,
         "file_name": file_name,
+        "parent_id": parent_id,
+        "processed": False, # Nova coluna de controle
     }
     insert_resp = db.table("messages").insert(user_message_data).execute()
     current_msg_id = insert_resp.data[0]["id"] if insert_resp.data else None
@@ -308,15 +311,20 @@ async def send_message(
     # 4. Gestão de Contexto e Memória (Token Optimization)
     # Busca apenas mensagens posteriores ao último resumo
     # Inclui ID para filtrar a mensagem atual e evitar duplicação no prompt
-    # Busca apenas mensagens recentes (últimas 100) para contexto
-    query = db.table("messages").select("id, role, content, created_at").eq("phone_number", phone_number).order("created_at", desc=True)
+    # Busca as últimas mensagens (recente para antigo)
+    query = db.table("messages").select("id, role, content, created_at, processed").eq("phone_number", phone_number).order("created_at", desc=True)
     
     if last_summary_at:
         query = query.gt("created_at", last_summary_at)
         
     history_resp = query.limit(100).execute()
-    # Reverte para ordem cronológica correta
-    messages = sorted(history_resp.data or [], key=lambda x: x["created_at"])
+    raw_messages = history_resp.data or []
+
+    # Identifica mensagens pendentes (não processadas e vindas do usuário)
+    pending_messages = [msg["content"] for msg in raw_messages if msg["role"] == "user" and not msg.get("processed", True)]
+    
+    # Inverte para ordem cronológica (antigo para recente)
+    messages = sorted(raw_messages, key=lambda x: x["created_at"])
     messages = [msg for msg in messages if msg["id"] != current_msg_id]
     
     chat_history = []
@@ -359,7 +367,16 @@ async def send_message(
                 f"{message}\n\n[Contexto financeiro atual do usuário:\n{financial_context}]"
             )
 
-    # 6. Streaming da resposta via SSE
+    # 6. Contexto de Resposta (Reply To)
+    replied_to_content = None
+    if parent_id:
+        parent_resp = db.table("messages").select("content, role").eq("id", parent_id).execute()
+        if parent_resp.data:
+            pmsg = parent_resp.data[0]
+            author = "Meu MEI" if pmsg["role"] == "assistant" else "Você"
+            replied_to_content = f"[{author}: {pmsg['content']}]"
+
+    # 7. Streaming da resposta via SSE
     async def event_generator():
         full_response = []
         try:
@@ -373,6 +390,8 @@ async def send_message(
                 file_bytes=file_bytes,
                 file_mime=file_mime,
                 user_summary=user_summary,
+                pending_messages=pending_messages,
+                replied_to_content=replied_to_content, # Passa o conteúdo da citação
             ):
                 full_response.append(chunk)
                 yield {"event": "message", "data": json.dumps({"text": chunk})}
@@ -492,6 +511,13 @@ async def send_message(
                 }).execute()
             except Exception as db_err:
                 print(f"Erro ao salvar mensagem no banco: {db_err}")
+
+            # 4. Marcar a mensagem do usuário ORIGINAL como processada (Sucesso Total)
+            if current_msg_id:
+                try:
+                    db.table("messages").update({"processed": True}).eq("id", current_msg_id).execute()
+                except Exception as up_err:
+                    print(f"Erro ao atualizar status de processamento: {up_err}")
 
             yield {"event": "done", "data": json.dumps({"complete": True})}
 
