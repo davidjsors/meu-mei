@@ -19,6 +19,7 @@ from supabase import Client
 
 from app.services.ai import generate_response_stream, summarize_context
 from app.services.finance import get_financial_summary
+from app.services.tts import text_to_speech_base64
 from app.prompts.system import get_maturity_level
 
 router = APIRouter(prefix="/api/chat", tags=["chat"])
@@ -73,6 +74,9 @@ TRANSACTION_PATTERN = re.compile(
     r"\[/TRANSACTION\]",
     re.IGNORECASE | re.DOTALL,
 )
+
+# Regex para extrair áudio (voz do mentor)
+AUDIO_PATTERN = re.compile(r"\[AUDIO\](.*?)\[/AUDIO\]", re.IGNORECASE | re.DOTALL)
 
 # Regex para resetar finanças (agora com argumento opcional)
 # Ex: [RESET_FINANCE: ALL] ou [RESET_FINANCE: 2023-01-01]
@@ -206,6 +210,17 @@ def _clean_delete_markers(text: str) -> str:
 def _is_onboarding_mode(profile: dict) -> bool:
     """Verifica se o usuário ainda está no onboarding (sem maturity_score)."""
     return profile.get("maturity_score") is None
+
+
+def _parse_audio(text: str) -> str | None:
+    """Extrai o texto para conversão em áudio."""
+    match = AUDIO_PATTERN.search(text)
+    return match.group(1).strip() if match else None
+
+
+def _clean_audio_markers(text: str) -> str:
+    """Remove [AUDIO] marcadores da resposta."""
+    return AUDIO_PATTERN.sub("", text).strip()
 
 
 @router.post("/send")
@@ -449,13 +464,32 @@ async def send_message(
                     "data": json.dumps({"deleted": len(deletions)}),
                 }
 
-            # Salvar resposta no banco (já limpa de marcadores)
-            db.table("messages").insert({
-                "phone_number": phone_number,
-                "role": "assistant",
-                "content": assistant_content,
-                "content_type": "text",
-            }).execute()
+            # Verificar se há áudio para gerar (NÃO salvar no DB para evitar sobrecarga/limites)
+            try:
+                audio_text = _parse_audio(assistant_content)
+                if audio_text:
+                    audio_b64 = await text_to_speech_base64(audio_text)
+                    if audio_b64:
+                        yield {
+                            "event": "agent_audio",
+                            "data": json.dumps({"audio": audio_b64}),
+                        }
+            except Exception as audio_err:
+                print(f"Erro silencioso no áudio: {audio_err}")
+            
+            # Limpar marcadores de áudio do conteúdo final ANTES de salvar
+            assistant_content = _clean_audio_markers(assistant_content)
+
+            # Salvar resposta de texto no banco (Sempre salvar, mesmo se o áudio falhar)
+            try:
+                db.table("messages").insert({
+                    "phone_number": phone_number,
+                    "role": "assistant",
+                    "content": assistant_content,
+                    "content_type": "text",
+                }).execute()
+            except Exception as db_err:
+                print(f"Erro ao salvar mensagem no banco: {db_err}")
 
             yield {"event": "done", "data": json.dumps({"complete": True})}
 

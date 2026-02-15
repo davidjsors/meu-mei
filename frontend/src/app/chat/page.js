@@ -15,6 +15,7 @@ const ONBOARDING_MARKER_RE = /\[ONBOARDING_COMPLETE\][\s\S]*?\[\/ONBOARDING_COMP
 const TRANSACTION_MARKER_RE = /\[TRANSACTION\][\s\S]*?\[\/TRANSACTION\]/gi;
 const DELETE_MARKER_RE = /\[DELETE_TRANSACTION\][\s\S]*?\[\/DELETE_TRANSACTION\]/gi;
 const RESET_MARKER_RE = /\[RESET_FINANCE.*?\]/gi;
+const AUDIO_MARKER_RE = /\[AUDIO\][\s\S]*?\[\/AUDIO\]/gi;
 
 function cleanMarkers(text) {
     if (!text) return "";
@@ -22,7 +23,8 @@ function cleanMarkers(text) {
         .replace(ONBOARDING_MARKER_RE, "")
         .replace(TRANSACTION_MARKER_RE, "")
         .replace(DELETE_MARKER_RE, "")
-        .replace(RESET_MARKER_RE, "");
+        .replace(RESET_MARKER_RE, "")
+        .replace(AUDIO_MARKER_RE, "");
 
     // Colapsar múltiplas quebras de linha (evita grandes buracos no texto)
     return cleaned.replace(/\n{3,}/g, "\n\n").trim();
@@ -182,6 +184,29 @@ export default function ChatPage() {
                     // onFinanceUpdated — recarregar sidebar
                     () => {
                         setFinanceKey((k) => k + 1);
+                    },
+                    // onAgentAudio — tocar o áudio do mentor E adicionar bolha
+                    (audioBase64) => {
+                        try {
+                            const audio = new Audio(audioBase64);
+                            audio.play().catch(e => console.error("Erro ao tocar áudio:", e));
+
+                            // Adiciona a bolha de áudio na lista de mensagens (Estilo WhatsApp)
+                            setMessages((prev) => [
+                                ...prev,
+                                {
+                                    id: `ai-audio-${Date.now()}`,
+                                    phone_number: phone,
+                                    role: "assistant",
+                                    content: "Áudio do Mentor",
+                                    content_type: "audio",
+                                    file_url: audioBase64,
+                                    created_at: new Date().toISOString(),
+                                },
+                            ]);
+                        } catch (err) {
+                            console.error("Erro ao processar áudio do mentor:", err);
+                        }
                     }
                 );
 
