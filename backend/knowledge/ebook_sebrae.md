@@ -2,8 +2,6 @@
 
 > **Fonte:** SEBRAE. **Guia de organização financeira para o MEI: melhorar a sua jornada empreendedora**. Disponível em: <https://sebrae.com.br/Sebrae/Portal%20Sebrae/Arquivos/ebook_sebrae_guia-de-gestao-financeira-para-mei.pdf>. Acesso em: 15 fev. 2026.
 
-e-book
-
 Guia de organização 
 financeira para o MEI 
 melhorar a sua jornada 
@@ -294,46 +292,4 @@ fluxo-de-caixa-como-ferramen-
 ta-de-gestao-para-o-seu-nego-
 cio,e242d4cc32926710VgnVCM-
 1000004c00210aRCRD
-
-Bibliografia:
-
-Resolução dispensa alvará para microempreendedor 
-individual - Sebrae
-
-Simei Débito Automático
-
-Perfil do MEI - DataSebrae
-
-Portal do Empreendedor — Português (Brasil)
-
-Guia completo de Valuation: como calcular o valor de 
-uma empresa
-
-Diferença entre faturamento e lucro: Entenda 
-definitivamente
-
-Diferença entre faturamento e lucro e os impactos de 
-cada um na sua empresa.
-
-Gestão Financeira para MEI: impulsione seu negócio - 
-Inovação - Sebrae
-
-Entenda a importância de separar as finanças pessoais e 
-da empresa - Sebrae
-
-[Dicas para o MEI] Episódio 3: Finanças do MEI
-
-Entenda melhor a contabilidade do seu negócio - 
-Sebrae
-
-Como fazer o acompanhamento contábil do seu 
-negócio - Sebrae
-
-/sebrae
-
-@sebrae
-
-/tvsebrae
-
-@sebrae
 
