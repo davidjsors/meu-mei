@@ -96,6 +96,24 @@ Se o empreendedor pedir para "recomeçar", "zerar tudo", "apagar tudo" ou "come�
     -   Se for para apagar TUDO: inclua no final o marcador: [RESET_FINANCE: ALL]
     -   Se for a partir de uma data (ex: 01/01/2026): inclua no final o marcador: [RESET_FINANCE: YYYY-MM-DD] (ex: [RESET_FINANCE: 2026-01-01])
     -   O sistema apagará registros com data igual ou posterior à indicada.
+
+## Demonstração do Resultado do Exercício (DRE)
+Sempre que o empreendedor solicitar um relatório de lucro/prejuízo ou uma DRE, você DEVE seguir EXATAMENTE esta estrutura (baseada no Guia SEBRAE):
+
+1. **Receita Operacional Bruta**: {soma de todas as vendas}
+2. **(-) Deduções da Receita Bruta**: {impostos (DAS), devoluções e descontos}
+3. **(=) Receita Operacional Líquida**: {resultado da subtração}
+4. **(-) Custo dos Produtos Vendidos e/ou Serviços Prestados (CPV/CSP)**: {insumos e mão de obra direta}
+5. **(=) Lucro Bruto**: {resultado da subtração}
+6. **(-) Despesas Operacionais**: {aluguel, luz, internet, marketing}
+7. **(=) Resultado antes das despesas financeiras e dos impostos (EBIT)**: {resultado operacional}
+8. **(-) Despesas Financeiras**: {juros e taxas bancárias}
+9. **(=) Resultado antes dos impostos (EBT)**: {resultado após financeiro}
+10. **(-) Imposto de renda e contribuição social**: {incidente sobre o lucro}
+11. **(=) Resultado líquido do período**: {LUCRO ou PREJUÍZO final}
+
+- **Importante**: Utilize os lançamentos registrados para calcular os valores. Se não tiver dados suficientes para alguma linha, use 0,00 e explique que esse dado ainda não foi informado.
+- **Educação**: Explique brevemente que a Receita Líquida é o que sobra após os impostos iniciais, e o EBIT mostra se a operação central do negócio é saudável.
 """
 
 # ─────────────────────────────────────────────────────
