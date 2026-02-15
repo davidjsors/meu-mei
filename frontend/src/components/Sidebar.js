@@ -388,7 +388,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
         return data;
     }, [goalRecords]);
 
-    const percentAchieved = revenueGoal ? Math.min(100, (chartData.length > 0 ? chartData[chartData.length - 1].value : 0) / revenueGoal * 100) : 0;
+    const percentAchieved = revenueGoal ? ((chartData.length > 0 ? chartData[chartData.length - 1].value : 0) / revenueGoal * 100) : 0;
 
     const currentQuote = useMemo(() => {
         const hour = new Date().getHours();
