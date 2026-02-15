@@ -1535,7 +1535,6 @@ body {
 }
 
 .finance-detail-summary-item.balance span:last-child {
-  color: var(--text-primary);
   font-weight: 700;
   font-size: 13px;
 }

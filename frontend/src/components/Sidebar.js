@@ -799,7 +799,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                             <span>Saídas</span>
                             <span style={{ color: "var(--outflow-light)" }}>{formatCurrency(totals.saidas)}</span>
                         </div>
-                        <div className="finance-detail-summary-item balance">
+                        <div className={`finance-detail-summary-item balance ${(totals.entradas - totals.saidas) >= 0 ? 'positive' : 'negative'}`}>
                             <span>Saldo</span>
                             <span>{formatCurrency(totals.entradas - totals.saidas)}</span>
                         </div>

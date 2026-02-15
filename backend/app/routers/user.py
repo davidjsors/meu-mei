@@ -248,7 +248,7 @@ async def get_finance_records(
 
 
 @router.delete("/finance/record/{record_id}")
-async def delete_financial_record(record_id: int, phone_number: str):
+async def delete_financial_record(record_id: str, phone_number: str):
     """
     Exclui um registro financeiro específico.
     Verifica se o registro pertence ao usuário (phone_number).
