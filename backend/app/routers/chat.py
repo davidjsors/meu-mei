@@ -65,9 +65,9 @@ ONBOARDING_PATTERN = re.compile(
 
 # Regex para extrair transações financeiras (Altamente Flexível)
 TRANSACTION_PATTERN = re.compile(
-    r"\[TRANSACTION\]\s*(?:\n|\r\n)?"
-    r"(?:\*+)?tipo:(?:\*+)?\s*(entrada|saída|saida).*?\n"
-    r"(?:\*+)?valor:(?:\*+)?\s*([\d,.]+).*?\n"
+    r"\[TRANSACTION\]\s*"
+    r"(?:\*+)?tipo:(?:\*+)?\s*(entrada|saída|saida|receita|despesa).*?\n"
+    r"(?:\*+)?valor:(?:\*+)?\s*([\d,.\s]*\d+\s*[kK]?|[\d,.]+).*?\n"
     r"(?:\*+)?descricao:(?:\*+)?\s*(.*?)\n"
     r"(?:\*+)?categoria:(?:\*+)?\s*(.*?)\n?\s*"
     r"\[/TRANSACTION\]",
@@ -117,18 +117,23 @@ def _parse_transactions(text: str) -> list[dict]:
     seen = set()
     for match in TRANSACTION_PATTERN.finditer(text):
         try:
-            tipo = match.group(1).strip().lower()
+            tipo_raw = match.group(1).strip().lower()
+            tipo = "entrada" if tipo_raw in ["entrada", "receita"] else "saida"
+            
             # Trata formatos brasileiros (1.234,56) e gírias (1k, 2k)
-            v_clean = match.group(2).strip().lower()
+            v_raw = match.group(2).strip().lower()
             
             # Reconhece "k" como milhar
             multiplier = 1
-            if v_clean.endswith("k"):
+            if "k" in v_raw:
                 multiplier = 1000
-                v_clean = v_clean.replace("k", "").strip()
+                v_raw = v_raw.replace("k", "").strip()
+            
+            # Limpeza de números (remove R$, espaços, etc se o regex pegou)
+            v_clean = re.sub(r"[^\d,.]", "", v_raw)
             
             if "," in v_clean and "." in v_clean:
-                # Se tem ambos, o último é o decimal
+                # Se tem ambos, o último é o decimal (BRA: 1.234,56 | USA: 1,234.56)
                 if v_clean.rfind(",") > v_clean.rfind("."):
                     v_clean = v_clean.replace(".", "").replace(",", ".")
                 else:
