@@ -308,14 +308,16 @@ async def send_message(
     # 4. Gestão de Contexto e Memória (Token Optimization)
     # Busca apenas mensagens posteriores ao último resumo
     # Inclui ID para filtrar a mensagem atual e evitar duplicação no prompt
-    query = db.table("messages").select("id, role, content, created_at").eq("phone_number", phone_number).order("created_at", desc=False)
+    # Busca apenas mensagens recentes (últimas 100) para contexto
+    query = db.table("messages").select("id, role, content, created_at").eq("phone_number", phone_number).order("created_at", desc=True)
     
     if last_summary_at:
         query = query.gt("created_at", last_summary_at)
         
     history_resp = query.limit(100).execute()
-    # Remove a mensagem atual da lista de histórico, pois ela será injetada explicitamente no generate_response_stream
-    messages = [msg for msg in (history_resp.data or []) if msg["id"] != current_msg_id]
+    # Reverte para ordem cronológica correta
+    messages = sorted(history_resp.data or [], key=lambda x: x["created_at"])
+    messages = [msg for msg in messages if msg["id"] != current_msg_id]
     
     chat_history = []
     
@@ -507,8 +509,10 @@ async def get_history(phone_number: str, limit: int = 50):
     """Retorna o histórico de mensagens do usuário."""
     db = _get_db()
 
+    # Busca as últimas mensagens primeiro (DESC) para respeitar o limite, depois inverte para exibir em ordem (ASC)
     resp = db.table("messages").select("*").eq(
         "phone_number", phone_number
-    ).order("created_at", desc=False).limit(limit).execute()
+    ).order("created_at", desc=True).limit(limit).execute()
 
-    return {"messages": resp.data or []}
+    messages = sorted(resp.data or [], key=lambda x: x["created_at"])
+    return {"messages": messages}
