@@ -1,6 +1,6 @@
 # Cestas_MEI_e_PJ_Facil_Bradesco
 
-> Fonte Original: Cestas_MEI_e_PJ_Facil_Bradesco.pdf
+> **Fonte:** BANCO BRADESCO. **Cestas de Serviços MEI Bradesco e PJ Fácil**. Disponível em: <https://publish-p128342-e1259725.adobeaemcloud.com/content/dam/banco-bradesco/portal/tarifas/cestas-de-servicos/pj/Cestas%20MEI%20e%20PJ%20Fácil.pdf>. Acesso em: 15 fev. 2026.
 
 **Vigência a partir de 01.02**
 **Serviços Bancários - Tabela de Tarifas**
