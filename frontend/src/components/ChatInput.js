@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, forwardRef, useImperativeHandle } from "react";
 import { Paperclip, Mic, SendHorizontal, X } from "lucide-react";
 import FilePreview from "./FilePreview";
 
@@ -9,7 +9,7 @@ import FilePreview from "./FilePreview";
  * Suporta texto + upload de arquivos (imagem, áudio, PDF) + gravação de áudio.
  * Áudio é enviado automaticamente ao parar a gravação (estilo WhatsApp).
  */
-export default function ChatInput({ onSend, disabled = false }) {
+const ChatInput = forwardRef(({ onSend, disabled = false }, ref) => {
     const [text, setText] = useState("");
     const [file, setFile] = useState(null);
     const [isRecording, setIsRecording] = useState(false);
@@ -20,6 +20,12 @@ export default function ChatInput({ onSend, disabled = false }) {
     const chunksRef = useRef([]);
     const timerRef = useRef(null);
     const cancelledRef = useRef(false);
+
+    useImperativeHandle(ref, () => ({
+        focus: () => {
+            textareaRef.current?.focus();
+        }
+    }));
 
     const handleSubmit = useCallback(() => {
         if ((!text.trim() && !file) || disabled) return;
@@ -237,4 +243,6 @@ export default function ChatInput({ onSend, disabled = false }) {
             </div>
         </div>
     );
-}
+});
+
+export default ChatInput;

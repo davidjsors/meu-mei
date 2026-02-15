@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { sendMessage, streamResponse, getHistory, getProfile } from "../../lib/api";
 import MessageList from "../../components/MessageList";
@@ -41,6 +41,7 @@ export default function ChatPage() {
     const [financeKey, setFinanceKey] = useState(0);
     const [showTour, setShowTour] = useState(false);
     const [replyingTo, setReplyingTo] = useState(null); // Mensagem sendo respondida (Estilo Zap)
+    const chatInputRef = useRef(null);
 
     // Mapa de mensagens por ID para lookup rápido de citações
     const messagesMap = useMemo(() => {
@@ -50,6 +51,15 @@ export default function ChatPage() {
         });
         return map;
     }, [messages]);
+
+    // Handle Reply click
+    const handleReply = useCallback((msg) => {
+        setReplyingTo(msg);
+        // Pequeno delay para garantir que o state atualizou, se necessário
+        setTimeout(() => {
+            chatInputRef.current?.focus();
+        }, 10);
+    }, []);
 
     // Load user data on mount
     useEffect(() => {
@@ -332,7 +342,7 @@ export default function ChatPage() {
                     messages={messages}
                     isTyping={isTyping}
                     streamingText={streamingText}
-                    onReply={setReplyingTo}
+                    onReply={handleReply}
                     messagesMap={messagesMap}
                 />
 
@@ -361,6 +371,7 @@ export default function ChatPage() {
 
                 {/* Input */}
                 <ChatInput
+                    ref={chatInputRef}
                     onSend={handleSend}
                     disabled={isTyping || !!streamingText}
                 />
