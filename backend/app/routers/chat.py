@@ -19,14 +19,20 @@ from supabase import Client
 import os
 import shutil
 import uuid
+from datetime import datetime
 from app.config import settings
 
-from app.services.ai import generate_response_stream, summarize_context
+from app.services.ai import generate_response_stream, summarize_context, transcribe_audio
 from app.services.finance import get_financial_summary
 from app.services.tts import text_to_speech_base64
 from app.prompts.system import get_maturity_level
 
 router = APIRouter(prefix="/api/chat", tags=["chat"])
+
+# Configurações de Upload
+UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "uploads")
+if not os.path.exists(UPLOAD_DIR):
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # Supabase client será injetado pelo main.py
 _supabase: Client | None = None
@@ -44,18 +50,29 @@ def _get_db() -> Client:
 
 
 ALLOWED_MIMES = {
-    # Imagens
-    "image/jpeg", "image/png", "image/webp", "image/gif",
-    # Áudio
-    "audio/mpeg", "audio/wav", "audio/ogg", "audio/webm", "audio/mp4",
-    # PDF
-    "application/pdf",
+    "image/jpeg": "image/jpeg",
+    "image/png": "image/png",
+    "image/webp": "image/webp",
+    "image/gif": "image/gif",
+    "audio/mpeg": "audio/mpeg",
+    "audio/mp3": "audio/mp3",
+    "audio/wav": "audio/wav", # WAV geralmente é x-wav ou wav
+    "audio/x-wav": "audio/wav",
+    "audio/webm": "audio/webm",
+    "audio/ogg": "audio/ogg",
+    "audio/mp4": "audio/mp4",
+    "application/pdf": "application/pdf"
 }
 
 
 def _normalize_mime(mime: str) -> str:
     """Remove parâmetros do MIME type (ex: audio/webm;codecs=opus → audio/webm)."""
-    return mime.split(";")[0].strip().lower()
+    base = mime.split(";")[0].strip().lower()
+    # Verifica se base está nas chaves ou valores (para compatibilidade com set antigo)
+    if base in ALLOWED_MIMES:
+        return ALLOWED_MIMES[base]
+    # Fallback para procurar nos valores se for um set virando dict
+    return base
 
 # Regex para extrair dados do onboarding (Flexibilizado)
 ONBOARDING_PATTERN = re.compile(
@@ -230,9 +247,9 @@ def _clean_audio_markers(text: str) -> str:
 @router.post("/send")
 async def send_message(
     phone_number: str = Form(...),
-    message: str = Form(None),
-    file: UploadFile = File(None),
-    parent_id: str = Form(None),
+    message: str | None = Form(None),
+    file: UploadFile | None = File(None),
+    parent_id: str | None = Form(None), # ID da mensagem sendo respondida
 ):
     """
     Envia mensagem ao Meu MEI.
@@ -275,7 +292,7 @@ async def send_message(
     if file and file.filename:
         file_mime = file.content_type or "application/octet-stream"
         file_mime_base = _normalize_mime(file_mime)
-        if file_mime_base not in ALLOWED_MIMES:
+        if file_mime_base not in ALLOWED_MIMES.values(): # Check against values of the dict
             raise HTTPException(
                 status_code=400,
                 detail=f"Tipo de arquivo não suportado: {file_mime}"
@@ -295,7 +312,6 @@ async def send_message(
             content_type = "pdf"
 
         # Save to disk (backend/uploads)
-        UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "uploads")
         if not os.path.exists(UPLOAD_DIR):
             os.makedirs(UPLOAD_DIR, exist_ok=True)
             
@@ -309,6 +325,18 @@ async def send_message(
         # Generate URL
         # Uses BACKEND_URL from settings (default http://localhost:8000)
         file_url = f"{settings.BACKEND_URL}/uploads/{safe_filename}"
+        
+        # Se for áudio, transcrever para adicionar ao histórico/contexto
+        if content_type == "audio":
+            try:
+                transcript = await transcribe_audio(file_bytes, file_mime)
+                if transcript:
+                    if message:
+                        message += f"\n\n[Transcrição]: {transcript}"
+                    else:
+                        message = f"[Áudio]: {transcript}"
+            except Exception as e:
+                print(f"Erro ao transcrever áudio recebido: {e}")
 
     # Validar se parent_id é um UUID válido
     if parent_id:
@@ -509,15 +537,36 @@ async def send_message(
                     "data": json.dumps({"deleted": len(deletions)}),
                 }
 
-            # Verificar se há áudio para gerar (NÃO salvar no DB para evitar sobrecarga/limites)
+            # Verificar se há áudio para gerar
             try:
                 audio_text = _parse_audio(assistant_content)
                 if audio_text:
                     audio_b64 = await text_to_speech_base64(audio_text)
                     if audio_b64:
+                        # 1. Decodificar e Salvar no Disco
+                        audio_bytes = base64.b64decode(audio_b64)
+                        filename = f"tts-{uuid.uuid4()}.mp3"
+                        filepath = os.path.join(UPLOAD_DIR, filename)
+                        
+                        with open(filepath, "wb") as f:
+                            f.write(audio_bytes)
+                            
+                        audio_url = f"{settings.BACKEND_URL}/uploads/{filename}"
+
+                        # 2. Salvar mensagem de áudio no Banco de Dados (Persistência)
+                        db.table("messages").insert({
+                            "phone_number": phone_number,
+                            "role": "assistant",
+                            "content": "Áudio do Mentor",
+                            "content_type": "audio",
+                            "file_url": audio_url,
+                            "created_at": datetime.utcnow().isoformat()
+                        }).execute()
+
+                        # 3. Enviar URL para o frontend
                         yield {
                             "event": "agent_audio",
-                            "data": json.dumps({"audio": audio_b64}),
+                            "data": json.dumps({"audio": audio_url}),
                         }
             except Exception as audio_err:
                 print(f"Erro silencioso no áudio: {audio_err}")

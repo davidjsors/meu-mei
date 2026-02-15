@@ -56,6 +56,32 @@ async def search_knowledge(query: str, limit: int = 5) -> str:
         return ""
 
 
+async def transcribe_audio(file_bytes: bytes, mime_type: str) -> str:
+    """Transcreve áudio usando Gemini Flash (rápido e barato)."""
+    try:
+        prompt = "Transcreva o seguinte áudio fielmente. Retorne APENAS o texto transcrito, sem comentários."
+        
+        response = client.models.generate_content(
+            model=settings.GEMINI_MODEL,
+            contents=[
+                types.Content(
+                   role="user",
+                   parts=[
+                       types.Part.from_text(text=prompt),
+                       types.Part.from_bytes(data=file_bytes, mime_type=mime_type)
+                   ]
+                )
+            ],
+            config=types.GenerateContentConfig(
+                temperature=0.0, # Mais determinístico para transcrição
+            ),
+        )
+        return response.text.strip() if response.text else ""
+    except Exception as e:
+        print(f"Erro na transcrição: {e}")
+        return ""
+
+
 def _build_chat_history(messages: list[dict]) -> list[types.Content]:
     """Converte histórico do banco em formato Gemini."""
     history = []

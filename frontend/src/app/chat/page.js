@@ -117,10 +117,21 @@ export default function ChatPage() {
         init();
     }, [router]);
 
+    const pendingAudioRef = useRef(null);
+
     // Send message
     const handleSend = useCallback(
         async (text, file) => {
             if (!phone) return;
+
+            // Limpar citação imediatamente para evitar delay visual (UX)
+            const currentReplyId = replyingTo?.id;
+            setReplyingTo(null);
+            if (chatInputRef.current) {
+                // Remove focus to prevent keyboard popping up again if on mobile, 
+                // or keep it? User wants "ready", but immediate clear is key.
+                // Keeping focus logic in handleReply is enough.
+            }
 
             // Add user message to UI immediately
             const userMsg = {
@@ -137,17 +148,17 @@ export default function ChatPage() {
                     : "text",
                 file_name: file?.name || null,
                 file_url: file ? URL.createObjectURL(file) : null,
-                parent_id: replyingTo?.id || null, // Vínculo com a mensagem pai
+                parent_id: currentReplyId || null, // Vínculo com a mensagem pai
                 created_at: new Date().toISOString(),
             };
 
             setMessages((prev) => [...prev, userMsg]);
             setIsTyping(true);
             setStreamingText("");
+            pendingAudioRef.current = null; // Reset pending audio
 
             try {
-                const response = await sendMessage(phone, text, file, replyingTo?.id);
-                setReplyingTo(null); // Limpar citação após envio
+                const response = await sendMessage(phone, text, file, currentReplyId);
 
                 // Stream the response
                 let accumulated = "";
@@ -165,17 +176,36 @@ export default function ChatPage() {
                     () => {
                         isDone = true;
                         const cleanContent = cleanMarkers(accumulated);
-                        setMessages((prev) => [
-                            ...prev,
-                            {
-                                id: `ai-${Date.now()}`,
-                                phone_number: phone,
-                                role: "assistant",
-                                content: cleanContent,
-                                content_type: "text",
-                                created_at: new Date().toISOString(),
-                            },
-                        ]);
+
+                        setMessages((prev) => {
+                            const newMessages = [
+                                ...prev,
+                                {
+                                    id: `ai-${Date.now()}`,
+                                    phone_number: phone,
+                                    role: "assistant",
+                                    content: cleanContent,
+                                    content_type: "text",
+                                    created_at: new Date().toISOString(),
+                                }
+                            ];
+
+                            // Se houver áudio pendente, adiciona APÓS o texto
+                            if (pendingAudioRef.current) {
+                                newMessages.push({
+                                    id: `ai-audio-${Date.now()}`,
+                                    phone_number: phone,
+                                    role: "assistant",
+                                    content: "Áudio do Mentor",
+                                    content_type: "audio",
+                                    file_url: pendingAudioRef.current,
+                                    created_at: new Date().toISOString(),
+                                });
+                                pendingAudioRef.current = null;
+                            }
+
+                            return newMessages;
+                        });
                         setStreamingText("");
                     },
                     // onError
@@ -211,42 +241,42 @@ export default function ChatPage() {
                             setFinanceKey((k) => k + 1);
                         }, 500);
                     },
-                    // onAgentAudio — apenas adicionar a bolha (Estilo WhatsApp)
+                    // onAgentAudio — agora apenas enfileira para exibir DEPOIS do texto
                     (audioBase64) => {
-                        try {
-                            // Adiciona a bolha de áudio na lista de mensagens
-                            setMessages((prev) => [
-                                ...prev,
-                                {
-                                    id: `ai-audio-${Date.now()}`,
-                                    phone_number: phone,
-                                    role: "assistant",
-                                    content: "Áudio do Mentor",
-                                    content_type: "audio",
-                                    file_url: audioBase64,
-                                    created_at: new Date().toISOString(),
-                                },
-                            ]);
-                        } catch (err) {
-                            console.error("Erro ao processar áudio do mentor:", err);
-                        }
+                        pendingAudioRef.current = audioBase64;
                     }
                 );
 
                 // Safety net: if stream ended but onDone never fired, finalize the message
                 if (!isDone && accumulated) {
                     const cleanContent = cleanMarkers(accumulated);
-                    setMessages((prev) => [
-                        ...prev,
-                        {
-                            id: `ai-${Date.now()}`,
-                            phone_number: phone,
-                            role: "assistant",
-                            content: cleanContent,
-                            content_type: "text",
-                            created_at: new Date().toISOString(),
-                        },
-                    ]);
+                    setMessages((prev) => {
+                        const newMessages = [
+                            ...prev,
+                            {
+                                id: `ai-${Date.now()}`,
+                                phone_number: phone,
+                                role: "assistant",
+                                content: cleanContent,
+                                content_type: "text",
+                                created_at: new Date().toISOString(),
+                            },
+                        ];
+                        // Check for pending audio in safety net too
+                        if (pendingAudioRef.current) {
+                            newMessages.push({
+                                id: `ai-audio-${Date.now()}`,
+                                phone_number: phone,
+                                role: "assistant",
+                                content: "Áudio do Mentor",
+                                content_type: "audio",
+                                file_url: pendingAudioRef.current,
+                                created_at: new Date().toISOString(),
+                            });
+                            pendingAudioRef.current = null;
+                        }
+                        return newMessages;
+                    });
                     setStreamingText("");
                 }
             } catch (err) {
@@ -257,7 +287,7 @@ export default function ChatPage() {
                         id: `error-${Date.now()}`,
                         phone_number: phone,
                         role: "assistant",
-                        content: "Hmm, não consegui me conectar ao servidor. Verifique sua conexão e tente novamente.",
+                        content: "Hmm, não consegui me conectar ao servidor. Verifique a conexão e tente novamente.",
                         content_type: "text",
                         created_at: new Date().toISOString(),
                     },
