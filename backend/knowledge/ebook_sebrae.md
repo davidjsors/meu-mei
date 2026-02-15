@@ -1,6 +1,6 @@
 # ebook_sebrae_guia-de-gestao-financeira-para-mei
 
-> Fonte Original: ebook_sebrae_guia-de-gestao-financeira-para-mei.pdf
+> **Fonte:** SEBRAE. **Guia de organização financeira para o MEI: melhorar a sua jornada empreendedora**. Disponível em: <https://sebrae.com.br/Sebrae/Portal%20Sebrae/Arquivos/ebook_sebrae_guia-de-gestao-financeira-para-mei.pdf>. Acesso em: 15 fev. 2026.
 
 e-book
 
