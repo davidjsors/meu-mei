@@ -195,7 +195,10 @@ export default function ChatPage() {
                     },
                     // onFinanceUpdated — recarregar sidebar
                     () => {
-                        setFinanceKey((k) => k + 1);
+                        // Pequeno delay para garantir que o banco processou a inserção
+                        setTimeout(() => {
+                            setFinanceKey((k) => k + 1);
+                        }, 500);
                     },
                     // onAgentAudio — apenas adicionar a bolha (Estilo WhatsApp)
                     (audioBase64) => {
