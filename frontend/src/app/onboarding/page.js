@@ -19,6 +19,7 @@ import {
     AlertCircle
 } from "lucide-react";
 import { setPin, loginPin, getProfile } from "../../lib/api";
+import Modal from "../../components/Modal";
 
 const SESSION_DURATION_MS = 24 * 60 * 60 * 1000;
 
@@ -69,6 +70,19 @@ export default function OnboardingPage() {
     const [acceptedTerms, setAcceptedTerms] = useState(false);
     const [showPin, setShowPin] = useState(false);
     const [showConfirmPin, setShowConfirmPin] = useState(false);
+
+    // Modal State
+    const [modal, setModal] = useState({
+        isOpen: false,
+        title: "",
+        message: "",
+        type: "info",
+        onConfirm: null,
+        confirmText: "OK",
+        cancelText: "Fechar"
+    });
+
+    const closeModal = () => setModal(prev => ({ ...prev, isOpen: false }));
 
     useEffect(() => {
         // Clearing session on onboarding load to avoid loops
@@ -239,7 +253,16 @@ export default function OnboardingPage() {
             <button
                 className="link-btn"
                 style={{ marginTop: '20px', background: 'none', border: 'none', color: 'var(--text-secondary)', textDecoration: 'underline', cursor: 'pointer' }}
-                onClick={() => { alert("Envie email para david.sors@gmail.com para recuperar acesso."); }}
+                onClick={() => {
+                    setModal({
+                        isOpen: true,
+                        title: "Recuperar Acesso",
+                        message: "Para recuperar seu PIN, entre em contato com o suporte através do email: david.sors@gmail.com",
+                        type: "info",
+                        confirmText: "Entendi",
+                        onConfirm: closeModal
+                    });
+                }}
             >
                 Esqueci meu PIN
             </button>
@@ -587,6 +610,17 @@ export default function OnboardingPage() {
             {step === 4 && <div className="onboarding-content">{renderMaturity()}</div>}
             {step === 5 && <div className="onboarding-content">{renderRevenueGoal()}</div>}
             {step === 6 && <div className="onboarding-content">{renderTerms()}</div>}
+
+            <Modal
+                isOpen={modal.isOpen}
+                title={modal.title}
+                message={modal.message}
+                type={modal.type}
+                confirmText={modal.confirmText}
+                cancelText={modal.cancelText}
+                onConfirm={modal.onConfirm}
+                onCancel={closeModal}
+            />
         </main>
     );
 }

@@ -16,6 +16,10 @@ import base64
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from sse_starlette.sse import EventSourceResponse
 from supabase import Client
+import os
+import shutil
+import uuid
+from app.config import settings
 
 from app.services.ai import generate_response_stream, summarize_context
 from app.services.finance import get_financial_summary
@@ -290,9 +294,21 @@ async def send_message(
         elif file_mime == "application/pdf":
             content_type = "pdf"
 
-        # Converter para data URL (evita dependência do Supabase Storage)
-        b64 = base64.b64encode(file_bytes).decode("utf-8")
-        file_url = f"data:{file_mime};base64,{b64}"
+        # Save to disk (backend/uploads)
+        UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "uploads")
+        if not os.path.exists(UPLOAD_DIR):
+            os.makedirs(UPLOAD_DIR, exist_ok=True)
+            
+        ext = file.filename.split(".")[-1] if "." in file.filename else "bin"
+        safe_filename = f"{uuid.uuid4()}.{ext}"
+        filepath = os.path.join(UPLOAD_DIR, safe_filename)
+        
+        with open(filepath, "wb") as f:
+            f.write(file_bytes)
+
+        # Generate URL
+        # Uses BACKEND_URL from settings (default http://localhost:8000)
+        file_url = f"{settings.BACKEND_URL}/uploads/{safe_filename}"
 
     # 3. Salvar mensagem do usuário
     user_message_data = {

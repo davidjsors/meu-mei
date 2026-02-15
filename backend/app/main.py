@@ -7,6 +7,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from supabase import create_client
 
+from fastapi.staticfiles import StaticFiles
+import os
 from app.config import settings
 from app.routers import chat, user, auth
 
@@ -41,6 +43,13 @@ if settings.SUPABASE_URL and settings.SUPABASE_KEY:
 app.include_router(chat.router)
 app.include_router(user.router)
 app.include_router(auth.router)
+
+# Mount uploads directory
+UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "uploads")
+if not os.path.exists(UPLOAD_DIR):
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
+    
+app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 
 @app.get("/api/health")

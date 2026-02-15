@@ -16,6 +16,7 @@ import {
     ChevronLeft, ChevronRight, ChevronDown, ChevronUp
 } from "lucide-react";
 import { MOTIVATIONAL_QUOTES } from "../data/quotes";
+import Modal from "./Modal";
 
 const CATEGORY_LABELS = {
     vendas: "Vendas",
@@ -101,8 +102,20 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
     const [goalRecords, setGoalRecords] = useState([]);
 
     // Delete account state
-    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [deleting, setDeleting] = useState(false);
+
+    // Modal State
+    const [modal, setModal] = useState({
+        isOpen: false,
+        title: "",
+        message: "",
+        type: "info",
+        onConfirm: null,
+        confirmText: "Confirmar",
+        cancelText: "Cancelar"
+    });
+
+    const closeModal = () => setModal(prev => ({ ...prev, isOpen: false }));
 
     const monthRange = getMonthRange(monthOffset);
 
@@ -221,12 +234,22 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
     );
 
     const handleLogout = () => {
-        localStorage.removeItem("meumei_phone");
-        localStorage.removeItem("meumei_login_at");
-        router.push("/onboarding");
+        setModal({
+            isOpen: true,
+            title: "Sair do Meu MEI",
+            message: "Tem certeza que deseja sair agora?",
+            type: "confirm",
+            confirmText: "Sair",
+            onConfirm: () => {
+                localStorage.removeItem("meumei_phone");
+                localStorage.removeItem("meumei_login_at");
+                router.push("/onboarding");
+                closeModal();
+            }
+        });
     };
 
-    const handleDeleteAccount = async () => {
+    const confirmDeleteAccount = async () => {
         setDeleting(true);
         try {
             const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
@@ -243,9 +266,32 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
         router.push("/onboarding");
     };
 
-    const handleDeleteRecord = async (id) => {
-        if (!confirm("Tem certeza que deseja excluir esta transação?")) return;
+    const handleDeleteAccount = () => {
+        setModal({
+            isOpen: true,
+            title: "Excluir Conta",
+            message: "Tem certeza absoluta? Isso apagará todos os seus dados e histórico financeiro permanentemente. Essa ação não pode ser desfeita.",
+            type: "danger",
+            confirmText: "Excluir Definitivamente",
+            onConfirm: () => {
+                confirmDeleteAccount();
+                closeModal();
+            }
+        });
+    };
 
+    const handleDeleteRecord = (id) => {
+        setModal({
+            isOpen: true,
+            title: "Excluir Transação",
+            message: "Deseja realmente remover este lançamento? O valor será estornado do seu saldo.",
+            type: "danger",
+            confirmText: "Excluir",
+            onConfirm: () => processDeleteRecord(id)
+        });
+    };
+
+    const processDeleteRecord = async (id) => {
         try {
             const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
             const resp = await fetch(`${API_BASE}/api/user/finance/record/${id}?phone_number=${phoneNumber}`, {
@@ -263,11 +309,13 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                     setFinance(data);
                 }
             } else {
-                alert("Erro ao excluir transação.");
+                // alert("Erro ao excluir transação.");
             }
         } catch (err) {
             console.error("Erro ao excluir transação:", err);
-            alert("Erro ao excluir transação.");
+            // alert("Erro ao excluir transação.");
+        } finally {
+            closeModal();
         }
     };
 
@@ -993,6 +1041,16 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                     <LogOut size={18} /> Sair
                 </button>
             </div>
+            <Modal
+                isOpen={modal.isOpen}
+                title={modal.title}
+                message={modal.message}
+                type={modal.type}
+                confirmText={modal.confirmText}
+                cancelText={modal.cancelText}
+                onConfirm={modal.onConfirm}
+                onCancel={closeModal}
+            />
         </aside>
     );
 }

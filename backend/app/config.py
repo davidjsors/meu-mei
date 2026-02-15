@@ -20,6 +20,7 @@ class Settings:
 
     # CORS
     FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:3000")
+    BACKEND_URL: str = os.getenv("BACKEND_URL", "http://localhost:8000")
 
     # Knowledge base path
     KNOWLEDGE_DIR: str = os.path.join(
