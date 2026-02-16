@@ -8,8 +8,11 @@
 function formatMarkdown(text) {
     if (!text) return "";
 
+    // Trim inicial para remover lixo de formatação
+    let trimmedText = text.trim();
+
     // Processar linhas
-    let html = text
+    let html = trimmedText
         // Escapar HTML
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
@@ -19,12 +22,11 @@ function formatMarkdown(text) {
         .replace(/__(.+?)__/g, "<strong>$1</strong>")
         // Italic: *texto* ou _texto_
         .replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, "<em>$1</em>")
-        // Emoji bullet points (manter)
         // Listas com - ou •
         .replace(/^[-•]\s+(.+)$/gm, "<li>$1</li>")
         // Listas numeradas
         .replace(/^\d+\.\s+(.+)$/gm, "<li>$1</li>")
-        // Quebras de linha
+        // Quebras de linha (evita duplicar se já houver listas)
         .replace(/\n/g, "<br>");
 
     // Agrupar <li> consecutivos em <ul>
@@ -33,7 +35,8 @@ function formatMarkdown(text) {
         return `<ul>${items}</ul>`;
     });
 
-    return html;
+    // Limpeza final: remover <br> inúteis no fim gerados pela troca de \n
+    return html.replace(/(<br>)+$/g, "");
 }
 
 export default function ChatBubble({ message, onReply, messagesMap = {} }) {
@@ -48,6 +51,9 @@ export default function ChatBubble({ message, onReply, messagesMap = {} }) {
 
     // Busca o conteúdo da mensagem pai (citação)
     const parentMsg = parent_id ? messagesMap[parent_id] : null;
+
+    // Se não tiver conteúdo nenhum, nem arquivo, não renderiza a bolha
+    if (!content && !file_url && content_type !== "audio") return null;
 
     return (
         <div className={`message-wrapper ${role}`}>
@@ -105,7 +111,7 @@ export default function ChatBubble({ message, onReply, messagesMap = {} }) {
                     )}
 
                     {/* Texto com formatação */}
-                    {content && content_type === "text" && (
+                    {content && (content_type === "text" || !content_type) && (
                         <span
                             className="message-text"
                             dangerouslySetInnerHTML={{ __html: formatMarkdown(content) }}

@@ -17,17 +17,22 @@ const DELETE_MARKER_RE = /\[DELETE_TRANSACTION\][\s\S]*?\[\/DELETE_TRANSACTION\]
 const RESET_MARKER_RE = /\[RESET_FINANCE.*?\]/gi;
 const AUDIO_MARKER_RE = /\[AUDIO\][\s\S]*?\[\/AUDIO\]/gi;
 
-function cleanMarkers(text) {
+const cleanMarkers = (text) => {
     if (!text) return "";
-    const cleaned = text
-        .replace(ONBOARDING_MARKER_RE, "")
-        .replace(TRANSACTION_MARKER_RE, "")
-        .replace(DELETE_MARKER_RE, "")
-        .replace(RESET_MARKER_RE, "")
-        .replace(AUDIO_MARKER_RE, "");
+    let cleaned = text
+        .replace(/\[AUDIO\][\s\S]*?\[\/AUDIO\]/gi, "")
+        .replace(/\[TRANSACTION\][\s\S]*?\[\/TRANSACTION\]/gi, "")
+        .replace(/\[ONBOARDING_COMPLETE\][\s\S]*?\[\/ONBOARDING_COMPLETE\]/gi, "")
+        .replace(/\[DELETE_TRANSACTION\][\s\S]*?\[\/DELETE_TRANSACTION\]/gi, "")
+        .replace(/\[RESET_FINANCE:.*?\]/gi, "")
+        .replace(/\[CONTEXTO\]/gi, "");
 
-    // Colapsar múltiplas quebras de linha (evita grandes buracos no texto)
-    return cleaned.replace(/\n{3,}/g, "\n\n").trim();
+    // Limpeza agressiva de espaços e quebras múltiplas
+    return cleaned
+        .replace(/\r\n/g, "\n")
+        .replace(/\n{3,}/g, "\n\n")
+        .replace(/^\s+|\s+$/g, "") // trim manual mais robusto
+        .trim();
 }
 
 export default function ChatPage() {
@@ -41,6 +46,7 @@ export default function ChatPage() {
     const [financeKey, setFinanceKey] = useState(0);
     const [showTour, setShowTour] = useState(false);
     const [replyingTo, setReplyingTo] = useState(null); // Mensagem sendo respondida (Estilo Zap)
+    const [audioStatus, setAudioStatus] = useState(""); // Status de geração de áudio
     const chatInputRef = useRef(null);
 
     // Mapa de mensagens por ID para lookup rápido de citações
@@ -87,13 +93,22 @@ export default function ChatPage() {
 
                 setProfile(profileData);
 
-                // Limpar marcadores de onboarding do histórico exibido
-                const cleanedMessages = (historyData || []).map((msg) => ({
-                    ...msg,
-                    content: msg.role === "assistant"
-                        ? cleanMarkers(msg.content || "")
-                        : msg.content,
-                }));
+                // Limpar marcadores e filtrar mensagens que ficaram vazias após limpeza
+                const cleanedMessages = (historyData || [])
+                    .map((msg) => ({
+                        ...msg,
+                        content: msg.role === "assistant"
+                            ? cleanMarkers(msg.content || "")
+                            : msg.content,
+                    }))
+                    .filter((msg) => {
+                        // Se for texto, só mantém se não estiver vazio
+                        if (msg.content_type === "text" || !msg.content_type) {
+                            return (msg.content || "").trim().length > 0;
+                        }
+                        // Se for imagem/áudio/pdf, mantém
+                        return true;
+                    });
 
                 setMessages(cleanedMessages);
 
@@ -161,14 +176,18 @@ export default function ChatPage() {
                 const response = await sendMessage(phone, text, file, currentReplyId);
 
                 // Stream the response
+                setReplyingTo(null);
+
                 let accumulated = "";
                 let isDone = false;
+                let wasTextCommitted = false; // Flag para evitar duplicação entre onTextDone e onDone
+
                 await streamResponse(
                     response,
                     // onChunk
                     (chunk) => {
+                        if (wasTextCommitted) return; // Ignora se já finalizou o texto
                         accumulated += chunk;
-                        // Mostrar sem marcadores
                         setStreamingText(cleanMarkers(accumulated));
                         setIsTyping(false);
                     },
@@ -178,19 +197,22 @@ export default function ChatPage() {
                         const cleanContent = cleanMarkers(accumulated);
 
                         setMessages((prev) => {
-                            const newMessages = [
-                                ...prev,
-                                {
+                            let newMessages = [...prev];
+
+                            // Só adiciona se o texto ainda não foi commitado pelo onTextDone
+                            if (cleanContent.trim() && !wasTextCommitted) {
+                                newMessages.push({
                                     id: `ai-${Date.now()}`,
                                     phone_number: phone,
                                     role: "assistant",
                                     content: cleanContent,
                                     content_type: "text",
                                     created_at: new Date().toISOString(),
-                                }
-                            ];
+                                });
+                                wasTextCommitted = true;
+                            }
 
-                            // Se houver áudio pendente, adiciona APÓS o texto
+                            // Se houver áudio pendente, adiciona
                             if (pendingAudioRef.current) {
                                 newMessages.push({
                                     id: `ai-audio-${Date.now()}`,
@@ -207,31 +229,53 @@ export default function ChatPage() {
                             return newMessages;
                         });
                         setStreamingText("");
+                        setAudioStatus("");
                     },
                     // onError
                     (error) => {
-                        console.error("Erro no streaming:", error);
+                        console.warn("Erro no streaming (tratado):", error);
+
+                        let errorMessage = "Tive um probleminha técnico aqui, mas não se preocupe: recebi sua mensagem e vou processá-la assim que meu sistema estabilizar! 😊";
+
+                        if (error && (typeof error === 'string')) {
+                            const errorStr = error.toLowerCase();
+                            if (errorStr.includes("429") || errorStr.includes("quota")) {
+                                errorMessage = "Ops! Estamos conversando tão rápido que meu sistema pediu 1 minutinho para respirar. 😅 Tente novamente em alguns segundos!";
+                            } else if (errorStr.includes("400") || errorStr.includes("invalid_argument") || errorStr.includes("api key")) {
+                                errorMessage = "Parece que há um problema com a minha chave de acesso (API Key). Por favor, verifique as configurações do sistema! 🔑";
+                            }
+                        }
+
                         setMessages((prev) => [
                             ...prev,
                             {
                                 id: `error-${Date.now()}`,
                                 phone_number: phone,
                                 role: "assistant",
-                                content: "Tive um probleminha técnico aqui, mas não se preocupe: recebi sua mensagem e vou processá-la assim que meu sistema estabilizar! 😊",
+                                content: errorMessage,
                                 content_type: "text",
                                 created_at: new Date().toISOString(),
                             },
                         ]);
                         setStreamingText("");
                         setIsTyping(false);
+                        setAudioStatus("");
                     },
                     // onOnboardingComplete — recarregar perfil
                     async (level) => {
                         try {
-                            const updatedProfile = await getProfile(phone);
-                            setProfile(updatedProfile);
+                            const refreshed = await getProfile(phone);
+                            if (refreshed) setProfile(refreshed);
+                            if (level) {
+                                confetti({
+                                    particleCount: 150,
+                                    spread: 70,
+                                    origin: { y: 0.6 },
+                                    colors: ['#00D26A', '#FFD700', '#FFFFFF']
+                                });
+                            }
                         } catch (err) {
-                            console.error("Erro ao recarregar perfil:", err);
+                            console.error("Erro update profile", err);
                         }
                     },
                     // onFinanceUpdated — recarregar sidebar
@@ -241,44 +285,59 @@ export default function ChatPage() {
                             setFinanceKey((k) => k + 1);
                         }, 500);
                     },
-                    // onAgentAudio — agora apenas enfileira para exibir DEPOIS do texto
+                    // onAgentAudio
                     (audioBase64) => {
                         pendingAudioRef.current = audioBase64;
+                        setAudioStatus(""); // Áudio pronto
+                    },
+                    // onStatus
+                    (status) => {
+                        if (status === "generating_audio") {
+                            setAudioStatus("generating");
+                        }
+                    },
+                    // onTextDone (NOVO: Finaliza o texto antes do áudio)
+                    () => {
+                        const cleanContent = cleanMarkers(accumulated);
+                        if (cleanContent.trim() && !wasTextCommitted) {
+                            setMessages((prev) => [
+                                ...prev,
+                                {
+                                    id: `ai-${Date.now()}`,
+                                    phone_number: phone,
+                                    role: "assistant",
+                                    content: cleanContent,
+                                    content_type: "text",
+                                    created_at: new Date().toISOString(),
+                                }
+                            ]);
+                            wasTextCommitted = true;
+                        }
+                        setStreamingText("");
+                        accumulated = ""; // Limpa buffer
                     }
                 );
 
-                // Safety net: if stream ended but onDone never fired, finalize the message
-                if (!isDone && accumulated) {
+                // Safety net: if stream ended but content was never finalized
+                if (!isDone && accumulated.trim() && !wasTextCommitted) {
                     const cleanContent = cleanMarkers(accumulated);
-                    setMessages((prev) => {
-                        const newMessages = [
+                    if (cleanContent.trim()) {
+                        setMessages((prev) => [
                             ...prev,
                             {
-                                id: `ai-${Date.now()}`,
+                                id: `ai-safe-${Date.now()}`,
                                 phone_number: phone,
                                 role: "assistant",
                                 content: cleanContent,
                                 content_type: "text",
                                 created_at: new Date().toISOString(),
-                            },
-                        ];
-                        // Check for pending audio in safety net too
-                        if (pendingAudioRef.current) {
-                            newMessages.push({
-                                id: `ai-audio-${Date.now()}`,
-                                phone_number: phone,
-                                role: "assistant",
-                                content: "Áudio do Mentor",
-                                content_type: "audio",
-                                file_url: pendingAudioRef.current,
-                                created_at: new Date().toISOString(),
-                            });
-                            pendingAudioRef.current = null;
-                        }
-                        return newMessages;
-                    });
-                    setStreamingText("");
+                            }
+                        ]);
+                        wasTextCommitted = true;
+                    }
                 }
+                setStreamingText("");
+                setIsTyping(false);
             } catch (err) {
                 console.error("Erro ao enviar:", err);
                 setMessages((prev) => [
@@ -374,6 +433,7 @@ export default function ChatPage() {
                     streamingText={streamingText}
                     onReply={handleReply}
                     messagesMap={messagesMap}
+                    audioStatus={audioStatus}
                 />
 
                 {/* Preview de Resposta (Estilo Zap) */}

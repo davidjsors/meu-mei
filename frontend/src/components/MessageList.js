@@ -7,7 +7,7 @@ import ChatBubble from "./ChatBubble";
  * MessageList — Lista de mensagens com scroll automático.
  * Renderiza bolhas de chat e indicador de digitação.
  */
-export default function MessageList({ messages, isTyping = false, streamingText = "", onReply, messagesMap }) {
+export default function MessageList({ messages, isTyping = false, streamingText = "", onReply, messagesMap, audioStatus }) {
     const endRef = useRef(null);
 
     useEffect(() => {
@@ -43,10 +43,10 @@ export default function MessageList({ messages, isTyping = false, streamingText 
             ))}
 
             {/* Streaming response (being typed) */}
-            {streamingText && (
+            {streamingText.trim() && (
                 <div className="message-wrapper assistant">
                     <div className="message-bubble">
-                        <span>{streamingText}</span>
+                        <div dangerouslySetInnerHTML={{ __html: streamingText.trim().replace(/\n/g, "<br/>") }} />
                         <span className="typing-cursor" style={{
                             display: "inline-block",
                             width: 2,
@@ -55,6 +55,22 @@ export default function MessageList({ messages, isTyping = false, streamingText 
                             marginLeft: 2,
                             animation: "blink 1s step-end infinite",
                         }} />
+                    </div>
+                </div>
+            )}
+
+            {/* Audio Recording Indicator */}
+            {audioStatus === "generating" && !streamingText && (
+                <div className="message-wrapper assistant">
+                    <div className="message-bubble" style={{
+                        fontStyle: 'italic',
+                        opacity: 0.8,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        color: 'var(--red-light)'
+                    }}>
+                        <span>🎤</span> Gravando áudio...
                     </div>
                 </div>
             )}

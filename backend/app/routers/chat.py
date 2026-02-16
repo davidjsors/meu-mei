@@ -370,23 +370,23 @@ async def send_message(
         query = query.gt("created_at", last_summary_at)
         
     history_resp = query.limit(100).execute()
-    raw_messages = history_resp.data or []
+    raw_messages: list[dict] = history_resp.data or []
 
     # Identifica mensagens pendentes (não processadas e vindas do usuário)
-    pending_messages = [msg["content"] for msg in raw_messages if msg["role"] == "user" and not msg.get("processed", True)]
+    pending_messages: list[str] = [msg["content"] for msg in raw_messages if msg["role"] == "user" and not msg.get("processed", True)]
     
     # Inverte para ordem cronológica (antigo para recente)
-    messages = sorted(raw_messages, key=lambda x: x["created_at"])
+    messages: list[dict] = sorted(raw_messages, key=lambda x: x["created_at"])
     messages = [msg for msg in messages if msg["id"] != current_msg_id]
     
-    chat_history = []
+    chat_history: list[dict] = []
     
     # Se houver muitas mensagens novas, sumariza as antigas
     # Threshold: 20 mensagens. Mantém 10 no contexto, sumariza o resto.
     if len(messages) > 20:
         # Separa: [mensagens para sumarizar] ... [contexto ativo]
-        to_summarize = messages[:-10]
-        active_context = messages[-10:]
+        to_summarize: list[dict] = list(messages[:-10])
+        active_context: list[dict] = list(messages[-10:])
         
         # Gera novo resumo
         try:
@@ -430,7 +430,16 @@ async def send_message(
 
     # 7. Streaming da resposta via SSE
     async def event_generator():
-        full_response = []
+        full_response_list = []
+        buffer = ""
+        in_tag = False
+        hidden_depth = 0 # > 0 significa que estamos dentro de um bloco oculto (ex: [AUDIO]...[/AUDIO])
+        
+        # Comandos que abrem/fecham blocos de conteúdo oculto
+        BLOCK_COMMANDS = ["AUDIO", "TRANSACTION", "DELETE_TRANSACTION", "ONBOARDING_COMPLETE"]
+        # Comandos de tag única que devem ser ocultados (mas não têm conteúdo fechado)
+        SINGLE_COMMANDS = ["RESET_FINANCE", "DELETE", "CONTEXTO", "ONBOARDING"] 
+
         try:
             async for chunk in generate_response_stream(
                 message=enriched_message,
@@ -443,13 +452,76 @@ async def send_message(
                 file_mime=file_mime,
                 user_summary=user_summary,
                 pending_messages=pending_messages,
-                replied_to_content=replied_to_content, # Passa o conteúdo da citação
+                replied_to_content=replied_to_content,
             ):
-                full_response.append(chunk)
-                yield {"event": "message", "data": json.dumps({"text": chunk})}
+                buffer += chunk
 
-            # Resposta completa
-            assistant_content = "".join(full_response)
+                while True:
+                    if not in_tag:
+                        start = buffer.find('[')
+                        if start == -1:
+                            if buffer:
+                                full_response_list.append(buffer)
+                                # Só envia para front se NÃO estiver dentro de um bloco oculto
+                                if hidden_depth == 0:
+                                    yield {"event": "message", "data": json.dumps({"text": buffer})}
+                                buffer = ""
+                            break
+                        else:
+                            safe_text = buffer[:start]
+                            if safe_text:
+                                full_response_list.append(safe_text)
+                                if hidden_depth == 0:
+                                    yield {"event": "message", "data": json.dumps({"text": safe_text})}
+                            
+                            buffer = buffer[start:]
+                            in_tag = True
+                    else:
+                        end = buffer.find(']')
+                        if end == -1:
+                            break
+                        else:
+                            tag_content = buffer[:end+1]
+                            full_response_list.append(tag_content)
+                            
+                            # Analisar a Tag
+                            inner = tag_content[1:-1].strip().upper() # Remove [] e espaços
+                            is_closing = inner.startswith("/")
+                            clean_tag = inner[1:] if is_closing else inner
+                            # Remover argumentos (ex: RESET_FINANCE: ALL -> RESET_FINANCE)
+                            clean_cmd = clean_tag.split(":")[0].strip()
+                            
+                            # Lógica de Bloco
+                            if clean_cmd in BLOCK_COMMANDS:
+                                if is_closing:
+                                    hidden_depth = max(0, hidden_depth - 1)
+                                else:
+                                    hidden_depth += 1
+                                is_hidden_tag = True
+                            elif clean_cmd in SINGLE_COMMANDS:
+                                is_hidden_tag = True # Tag isolada oculta
+                            else:
+                                is_hidden_tag = False # Tag normal (ex: [1])
+                            
+                            # Se a tag NÃO for oculta E não estivermos em um bloco oculto, enviamos a tag
+                            # Se estivermos em bloco oculto, a tag também é oculta
+                            if not is_hidden_tag and hidden_depth == 0:
+                                yield {"event": "message", "data": json.dumps({"text": tag_content})}
+                            
+                            buffer = buffer[end+1:]
+                            in_tag = False
+
+            # Processar resto do buffer
+            if buffer:
+                full_response_list.append(buffer)
+                if hidden_depth == 0 and not in_tag:
+                    yield {"event": "message", "data": json.dumps({"text": buffer})}
+
+            # Sinalizar que o texto visível acabou
+            yield {"event": "text_done", "data": json.dumps({"done": True})}
+
+            # Resposta completa para processamento
+            assistant_content = "".join(full_response_list)
 
             # Verificar se o onboarding foi concluído
             if is_onboarding:
@@ -595,6 +667,7 @@ async def send_message(
             yield {"event": "done", "data": json.dumps({"complete": True})}
 
         except Exception as e:
+            print(f"ERRO SSE: {e}")
             yield {
                 "event": "error",
                 "data": json.dumps({"error": str(e)}),

@@ -132,7 +132,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                     setFinance(data);
                 }
             } catch (err) {
-                console.error("Erro ao buscar dados financeiros:", err);
+                console.warn("Erro ao buscar dados financeiros (ouvindo backend):", err);
             }
         };
 
