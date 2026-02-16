@@ -59,6 +59,14 @@ const ChatInput = forwardRef(({ onSend, disabled = false }, ref) => {
         e.target.value = "";
     };
 
+    const handlePaste = (e) => {
+        e.preventDefault();
+        const pastedText = e.clipboardData.getData("text");
+        // Remove espaços e quebras de linha extras do início e fim
+        const cleanText = pastedText.trim();
+        document.execCommand("insertText", false, cleanText);
+    };
+
     // ─── Gravação de áudio ───
     const startRecording = async () => {
         try {
@@ -215,6 +223,7 @@ const ChatInput = forwardRef(({ onSend, disabled = false }, ref) => {
                             value={text}
                             onChange={handleTextChange}
                             onKeyDown={handleKeyDown}
+                            onPaste={handlePaste}
                             rows={1}
                             disabled={disabled}
                         />
