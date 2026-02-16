@@ -30,31 +30,31 @@ const MATURITY_DATA = [
     {
         question: "1. Você costuma registrar todas as entradas e saídas do seu negócio? Tipo, anota tudo certinho o que vende e o que gasta?",
         options: [
-            { label: "Não anoto nada ❌", value: 1 },
+            { label: "Não anoto nada", value: 1 },
             { label: "Anoto só de vez em quando", value: 2 },
             { label: "Anoto quase tudo, mas esqueço alguns", value: 3 },
             { label: "Anoto tudo, mas não organizo muito", value: 4 },
-            { label: "Registro cada centavo (Entradas e Saídas) ✅", value: 5 }
+            { label: "Registro cada centavo (Entradas e Saídas)", value: 5 }
         ]
     },
     {
         question: "2. E sobre as contas: você usa conta separada pra vida pessoal e pro negócio, ou tá tudo junto ainda?",
         options: [
-            { label: "Tudo misturado na minha conta pessoal 🌀", value: 1 },
+            { label: "Tudo misturado na minha conta pessoal", value: 1 },
             { label: "Tento separar, mas acabo misturando", value: 2 },
             { label: "Tenho contas separadas, mas uso o dinheiro cruzado", value: 3 },
             { label: "Separo bem, só misturo em emergências", value: 4 },
-            { label: "Totalmente separadas (PJ e PF) 💎", value: 5 }
+            { label: "Totalmente separadas (PJ e PF)", value: 5 }
         ]
     },
     {
         question: "3. Quando chega a hora de pagar os boletos, você já sabe de antemão se vai ter dinheiro? Você acompanha isso?",
         options: [
-            { label: "Nunca sei, vivo no susto 😰", value: 1 },
+            { label: "Nunca sei, vivo no susto", value: 1 },
             { label: "Raramente sei antes", value: 2 },
             { label: "Às vezes tenho noção", value: 3 },
             { label: "Geralmente sei com antecedência", value: 4 },
-            { label: "Sempre sei (Controle total) 🧘‍♂️", value: 5 }
+            { label: "Sempre sei (Controle total)", value: 5 }
         ]
     },
     {
@@ -64,17 +64,17 @@ const MATURITY_DATA = [
             { label: "Raramente", value: 2 },
             { label: "Às vezes vejo uns vídeos", value: 3 },
             { label: "Frequentemente procuro dicas", value: 4 },
-            { label: "Sempre (Estudo constante) 📚", value: 5 }
+            { label: "Sempre (Estudo constante)", value: 5 }
         ]
     },
     {
         question: "5. Na hora de colocar preço no que você vende, você sabe direitinho quanto gasta pra produzir e quanto sobra de lucro?",
         options: [
-            { label: "Chuto o preço ou copio o vizinho 🎯", value: 1 },
+            { label: "Chuto o preço ou copio o vizinho", value: 1 },
             { label: "Tenho uma ideia por cima", value: 2 },
             { label: "Calculo os custos principais, mas não o lucro", value: 3 },
             { label: "Calculo bem, mas às vezes erro a mão", value: 4 },
-            { label: "Calculo tudo (Custos + Margem + Lucro) 🧮", value: 5 }
+            { label: "Calculo tudo (Custos + Margem + Lucro)", value: 5 }
         ]
     }
 ];
@@ -237,7 +237,7 @@ export default function OnboardingPage() {
                 </p>
 
                 <div className="onboarding-form-group">
-                    <label className="onboarding-label"><Smartphone size={16} /> Seu telefone</label>
+                    <label className="onboarding-label">Seu telefone</label>
                     <input
                         className="onboarding-input"
                         style={{ textAlign: 'center', fontSize: '20px', letterSpacing: '2px', fontWeight: 'bold' }}
@@ -272,9 +272,6 @@ export default function OnboardingPage() {
 
     const renderLoginPin = () => (
         <div className="onboarding-card">
-            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-                <Lock size={48} color="var(--blue-primary)" />
-            </div>
             <h2 className="onboarding-title">Que bom que você está de volta, {existingName || "Empreendedor"}!</h2>
             <p className="onboarding-subtitle">
                 Digite seu PIN para acessar.
@@ -336,25 +333,24 @@ export default function OnboardingPage() {
             <div className="onboarding-form-group">
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                     <div>
-                        <label className="onboarding-label"><User size={16} /> Nome</label>
+                        <label className="onboarding-label">Nome</label>
                         <input className={`onboarding-input ${invalidField === 'name' ? 'input-error-blink' : ''}`} placeholder="Seu nome" value={name} onChange={e => { setName(e.target.value); if (invalidField === 'name') setInvalidField(""); }} />
                     </div>
                     <div>
-                        <label className="onboarding-label"><Briefcase size={16} /> Profissão</label>
+                        <label className="onboarding-label">Profissão</label>
                         <input className={`onboarding-input ${invalidField === 'businessType' ? 'input-error-blink' : ''}`} placeholder="Ex: Eletricista..." value={businessType} onChange={e => { setBusinessType(e.target.value); if (invalidField === 'businessType') setInvalidField(""); }} />
                     </div>
                 </div>
             </div>
             <div className="onboarding-form-group">
-                <label className="onboarding-label"><Rocket size={16} /> Qual o seu maior sonho relacionado ao seu negócio?</label>
+                <label className="onboarding-label">Qual o seu maior sonho relacionado ao seu negócio?</label>
                 <textarea className={`onboarding-input ${invalidField === 'dream' ? 'input-error-blink' : ''}`} style={{ minHeight: '80px', resize: 'none' }} placeholder="Ex: Abrir minha loja física..." value={dream} onChange={e => { setDream(e.target.value); if (invalidField === 'dream') setInvalidField(""); }} />
             </div>
 
             <div className="onboarding-form-group" style={{ marginTop: '24px', borderTop: '1px solid var(--border-color)', paddingTop: '24px' }}>
-                <label className="onboarding-label" style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '6px' }}><Lock size={16} /> Crie seu PIN de acesso</label>
+                <label className="onboarding-label" style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '6px' }}>Crie seu PIN de acesso</label>
 
                 <div style={{ background: 'rgba(55, 65, 81, 0.5)', padding: '12px', borderRadius: '8px', marginBottom: '16px', display: 'flex', gap: '10px', alignItems: 'start', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                    <AlertCircle size={18} color="var(--red-primary)" style={{ marginTop: '2px', flexShrink: 0 }} />
                     <p style={{ fontSize: '13px', color: 'var(--text-primary)', margin: 0, lineHeight: '1.4', textShadow: 'none !important' }}>
                         <span style={{ color: 'var(--red-primary)', fontWeight: '600', textShadow: 'none !important' }}>Atenção:</span> Guarde bem este número! Ele será sua senha para entrar no aplicativo sempre que precisar.
                     </p>
@@ -399,7 +395,7 @@ export default function OnboardingPage() {
 
                 {pin && confirmPin && pin !== confirmPin && (
                     <p style={{ color: 'var(--red-primary)', fontSize: '12px', marginTop: '12px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', textShadow: 'none !important' }}>
-                        <AlertCircle size={14} /> Os códigos informados não coincidem
+                        Os códigos informados não coincidem
                     </p>
                 )}
             </div>
@@ -417,18 +413,19 @@ export default function OnboardingPage() {
 
     // Reuse existing components logic for Maturity, Terms
     const handleAnswer = (value) => {
-        const newAnswers = [...answers, value];
+        const newAnswers = [...answers];
+        newAnswers[currentQuestion] = value;
         setAnswers(newAnswers);
         if (currentQuestion < MATURITY_DATA.length - 1) {
             setCurrentQuestion(currentQuestion + 1);
         } else {
-            handleSubmitMaturity(newAnswers);
+            setStep(5);
         }
     };
 
     const handleRevenueGoalNext = () => {
         if (!revenueGoal.trim()) { setError("Informe sua meta de vendas para este mês."); setInvalidField("revenueGoal"); return; }
-        setStep(6);
+        setStep(7);
     };
 
     const EXPENSE_CATEGORIES = [
@@ -538,16 +535,13 @@ export default function OnboardingPage() {
 
     const renderMaturityIntro = () => (
         <div className="onboarding-card" style={{ textAlign: 'center', maxWidth: '640px' }}>
-            <div style={{ marginBottom: '24px' }}>
-                <BarChart3 size={72} color="var(--red-primary)" style={{ margin: '0 auto' }} />
-            </div>
             <h2 className="onboarding-title">Quase lá! Vamos falar da gestão do seu negócio?</h2>
             <p className="onboarding-subtitle" style={{ fontSize: '18px', lineHeight: '1.6', marginBottom: '32px' }}>
                 Agora que conhecemos seu sonho, precisamos entender como você gerencia as finanças da sua empresa. <br /><br />
                 O objetivo é termos um <strong>diagnóstico inicial</strong> para que possamos te ajudar a conquistar o seu sonho com segurança!
             </p>
             <button className="onboarding-btn" onClick={() => setStep(4)} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                Começar Diagnóstico <ArrowRight size={20} />
+                Começar Diagnóstico
             </button>
         </div>
     );
@@ -561,7 +555,7 @@ export default function OnboardingPage() {
                 <div className="tf-progress-bar"><div className="tf-progress-inner" style={{ width: `${progress}%` }} /></div>
                 <div className="tf-container">
                     <div className="tf-question-header">
-                        <div className="tf-question-number"><span>{currentQuestion + 1}</span><ArrowRight size={14} /></div>
+                        <div className="tf-question-number"><span>{currentQuestion + 1}</span></div>
                         <h2 className="tf-question-text">{question.question}</h2>
                     </div>
                     <div className="tf-options-list">
@@ -569,12 +563,11 @@ export default function OnboardingPage() {
                             <button key={opt.value} className={`tf-btn ${answers[currentQuestion] === opt.value ? 'selected' : ''}`} onClick={() => handleAnswer(opt.value)}>
                                 <span className="tf-option-key">{opt.value}</span>
                                 <span className="tf-option-label">{opt.label}</span>
-                                {answers[currentQuestion] === opt.value && <CheckCircle2 size={18} style={{ color: 'var(--red-primary)', marginLeft: 'auto' }} />}
                             </button>
                         ))}
                     </div>
                     <div className="tf-actions">
-                        <button className="tf-back-btn" disabled={currentQuestion === 0} onClick={() => setCurrentQuestion(prev => prev - 1)}><ArrowLeft size={16} /> Voltar</button>
+                        <button className="tf-back-btn" disabled={currentQuestion === 0} onClick={() => setCurrentQuestion(prev => prev - 1)}>Voltar</button>
                         <div className="tf-counter">Questão {currentQuestion + 1} de {MATURITY_DATA.length}</div>
                     </div>
                 </div>
@@ -590,7 +583,7 @@ export default function OnboardingPage() {
             <div className="onboarding-form-group">
                 <label className="onboarding-label">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <Target size={16} /> Qual é a sua meta mensal de vendas ou o valor que você gostaria de faturar?
+                        Qual é a sua meta mensal de vendas ou o valor que você gostaria de faturar?
                     </div>
                 </label>
                 <div style={{ position: 'relative' }}>
@@ -622,7 +615,7 @@ export default function OnboardingPage() {
             {/* Saldo Inicial */}
             <div className="onboarding-form-group" style={{ marginBottom: '24px' }}>
                 <label className="onboarding-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <DollarSign size={16} color="var(--green)" /> Saldo Atual (Dinheiro em mãos + Banco)
+                    Saldo Atual (Dinheiro em mãos + Banco)
                 </label>
                 <div style={{ position: 'relative' }}>
                     <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', fontWeight: '600', color: 'var(--text-muted)' }}>R$</span>
@@ -645,10 +638,10 @@ export default function OnboardingPage() {
             <div className="onboarding-form-group" style={{ borderTop: '1px solid var(--border-color)', paddingTop: '20px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                     <label className="onboarding-label" style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: 0 }}>
-                        <AlertCircle size={16} color="var(--red-primary)" /> Contas a Pagar (Pendentes)
+                        Contas a Pagar (Pendentes)
                     </label>
                     <button onClick={handleAddExpense} style={{ background: 'var(--surface-color)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '4px 8px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', color: 'var(--text-primary)' }}>
-                        <Plus size={14} /> Adicionar
+                        Adicionar
                     </button>
                 </div>
 
@@ -693,7 +686,7 @@ export default function OnboardingPage() {
                                 />
                             </div>
                             <button onClick={() => removeExpense(exp.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: 0 }}>
-                                <Trash2 size={16} />
+                                X
                             </button>
                         </div>
                     ))}
@@ -725,7 +718,6 @@ export default function OnboardingPage() {
 
     const renderTerms = () => (
         <div className="onboarding-card" style={{ textAlign: 'center', maxWidth: '640px' }}>
-            <div style={{ marginBottom: '24px' }}><CheckCircle2 size={72} color="var(--green)" style={{ margin: '0 auto' }} /></div>
             <h2 className="onboarding-title">Está quase tudo pronto!</h2>
             <p className="onboarding-subtitle">Para sua segurança, leia e aceite nossos termos de uso para começar.</p>
             <div className="onboarding-terms-scroller">
@@ -855,7 +847,6 @@ export default function OnboardingPage() {
             {step === 3 && <div className="onboarding-content">{renderMaturityIntro()}</div>}
             {step === 4 && <div className="onboarding-content">{renderMaturity()}</div>}
             {step === 5 && <div className="onboarding-content">{renderRevenueGoal()}</div>}
-            {step === 6 && <div className="onboarding-content">{renderInitialFinance()}</div>}
             {step === 7 && <div className="onboarding-content">{renderTerms()}</div>}
 
             <Modal
