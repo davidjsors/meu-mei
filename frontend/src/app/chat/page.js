@@ -35,6 +35,29 @@ const cleanMarkers = (text) => {
         .trim();
 }
 
+/**
+ * Dicionário de Erros: Mapeia mensagens técnicas para mensagens amigáveis ao usuário.
+ */
+const ERROR_DICTIONARY = {
+    QUOTA: "Ops! Estamos conversando tão rápido que meu sistema pediu 1 minutinho para respirar. 😅 Tente novamente em alguns segundos!",
+    AUTH: "Parece que há um problema com a minha chave de acesso (API Key). Por favor, verifique as configurações do sistema! 🔑",
+    MODEL: "Estou tentando usar um modelo de inteligência que parece estar indisponível ou em manutenção agora. 🛠️",
+    CONNECTION: "Hmm, não consegui me conectar ao servidor. Verifique sua internet ou tente novamente em instantes. 🌐",
+    GENERIC: "Tive um probleminha técnico aqui, mas não se preocupe: recebi sua mensagem e vou processá-la assim que meu sistema estabilizar! 😊"
+};
+
+const getFriendlyErrorMessage = (error) => {
+    if (!error) return ERROR_DICTIONARY.GENERIC;
+    const errorStr = (typeof error === 'string' ? error : error.message || "").toLowerCase();
+
+    if (errorStr.includes("429") || errorStr.includes("quota")) return ERROR_DICTIONARY.QUOTA;
+    if (errorStr.includes("400") || errorStr.includes("invalid_argument") || errorStr.includes("api key")) return ERROR_DICTIONARY.AUTH;
+    if (errorStr.includes("404") || errorStr.includes("model not found")) return ERROR_DICTIONARY.MODEL;
+    if (errorStr.includes("fetch") || errorStr.includes("network") || errorStr.includes("failed to connect")) return ERROR_DICTIONARY.CONNECTION;
+
+    return ERROR_DICTIONARY.GENERIC;
+};
+
 export default function ChatPage() {
     const router = useRouter();
     const [messages, setMessages] = useState([]);
@@ -234,17 +257,7 @@ export default function ChatPage() {
                     // onError
                     (error) => {
                         console.warn("Erro no streaming (tratado):", error);
-
-                        let errorMessage = "Tive um probleminha técnico aqui, mas não se preocupe: recebi sua mensagem e vou processá-la assim que meu sistema estabilizar! 😊";
-
-                        if (error && (typeof error === 'string')) {
-                            const errorStr = error.toLowerCase();
-                            if (errorStr.includes("429") || errorStr.includes("quota")) {
-                                errorMessage = "Ops! Estamos conversando tão rápido que meu sistema pediu 1 minutinho para respirar. 😅 Tente novamente em alguns segundos!";
-                            } else if (errorStr.includes("400") || errorStr.includes("invalid_argument") || errorStr.includes("api key")) {
-                                errorMessage = "Parece que há um problema com a minha chave de acesso (API Key). Por favor, verifique as configurações do sistema! 🔑";
-                            }
-                        }
+                        const errorMessage = getFriendlyErrorMessage(error);
 
                         setMessages((prev) => [
                             ...prev,
@@ -340,13 +353,15 @@ export default function ChatPage() {
                 setIsTyping(false);
             } catch (err) {
                 console.error("Erro ao enviar:", err);
+                const errorMessage = getFriendlyErrorMessage(err);
+
                 setMessages((prev) => [
                     ...prev,
                     {
                         id: `error-${Date.now()}`,
                         phone_number: phone,
                         role: "assistant",
-                        content: "Hmm, não consegui me conectar ao servidor. Verifique a conexão e tente novamente.",
+                        content: errorMessage,
                         content_type: "text",
                         created_at: new Date().toISOString(),
                     },

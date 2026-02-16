@@ -381,29 +381,27 @@ async def send_message(
     
     chat_history: list[dict] = []
     
-    # Se houver muitas mensagens novas, sumariza as antigas
-    # Threshold: 20 mensagens. Mantém 10 no contexto, sumariza o resto.
-    if len(messages) > 20:
+    # Só sumariza se houver pelo menos 25 mensagens (para dar um fôlego de 5 mensagens entre resumos)
+    if len(messages) >= 25:
         # Separa: [mensagens para sumarizar] ... [contexto ativo]
         to_summarize: list[dict] = list(messages[:-10])
         active_context: list[dict] = list(messages[-10:])
         
-        # Gera novo resumo
+        # Só gera resumo se o último resumo gravado não for de AGORA (evita repetição inútil)
+        # (Nesta versão simplificada, apenas aumentamos o threshold para 25 para economizar chamadas)
         try:
             new_summary = await summarize_context(user_summary, to_summarize)
             
-            # Atualiza perfil com novo resumo e novo cursor
-            last_msg = to_summarize[-1]
+            # Atualiza perfil com novo resumo
             db.table("profiles").update({
                 "summary": new_summary,
-                "last_summary_at": last_msg["created_at"]
             }).eq("phone_number", phone_number).execute()
             
             user_summary = new_summary
             chat_history = active_context
         except Exception as e:
-            print(f"Erro na sumarização: {e}")
-            chat_history = messages # Fallback: usa tudo
+            print(f"Erro na sumarizacao: {e}")
+            chat_history = messages
     else:
         chat_history = messages
 
@@ -430,6 +428,9 @@ async def send_message(
 
     # 7. Streaming da resposta via SSE
     async def event_generator():
+        # Envia logo um sinal de vida para evitar timeout do browser
+        yield {"event": "status", "data": json.dumps({"status": "Iniciando mentor..."})}
+        
         full_response_list = []
         buffer = ""
         in_tag = False
@@ -495,8 +496,14 @@ async def send_message(
                             if clean_cmd in BLOCK_COMMANDS:
                                 if is_closing:
                                     hidden_depth = max(0, hidden_depth - 1)
+                                    if hidden_depth == 0:
+                                        yield {"event": "status", "data": json.dumps({"status": "Finalizando processamento..."})}
                                 else:
-                                    hidden_depth += 1
+                                    hidden_depth = hidden_depth + 1
+                                    if clean_cmd == "AUDIO":
+                                        yield {"event": "status", "data": json.dumps({"status": "Gerando resposta em áudio..."})}
+                                    elif clean_cmd == "TRANSACTION":
+                                        yield {"event": "status", "data": json.dumps({"status": "Registrando transação..."})}
                                 is_hidden_tag = True
                             elif clean_cmd in SINGLE_COMMANDS:
                                 is_hidden_tag = True # Tag isolada oculta
