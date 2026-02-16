@@ -22,6 +22,7 @@ import {
     Trash2
 } from "lucide-react";
 import { setPin, loginPin, getProfile } from "../../lib/api";
+import { cleanDream } from "../../lib/utils";
 import Modal from "../../components/Modal";
 
 const SESSION_DURATION_MS = 24 * 60 * 60 * 1000;
@@ -214,6 +215,10 @@ export default function OnboardingPage() {
 
         setLoading(true);
         try {
+            // Limpa o sonho antes de salvar para evitar redundâncias na UI (ex: remover "meu sonho é")
+            const cleanedDream = cleanDream(dream);
+            setDream(cleanedDream);
+
             // Create User & PIN (Upsert)
             await setPin(phone, pin);
             // Success -> Move to Maturity Intro

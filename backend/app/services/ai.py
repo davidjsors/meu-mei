@@ -161,11 +161,13 @@ async def generate_response_stream(
     if is_onboarding:
         system_prompt = str(build_onboarding_prompt())
     else:
-        print(f"Gerando resposta para: {user_name}, Score: {maturity_score}, Dream: {dream}")
+        # Usar apenas o primeiro nome do usuário para maior proximidade
+        first_name = (user_name or "Empreendedor").strip().split(" ")[0]
+        print(f"Gerando resposta para: {first_name}, Score: {maturity_score}, Dream: {dream}")
         system_prompt = str(build_system_prompt(
-            user_name or "Empreendedor",
+            first_name,
             maturity_score or 10, 
-            dream or "crescer o negocio", 
+            dream or "crescer o negócio", 
             business_type or "empreendedor",
             user_summary,
             revenue_goal or 0.0

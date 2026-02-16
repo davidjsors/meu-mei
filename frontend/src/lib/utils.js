@@ -57,6 +57,37 @@ export const getFriendlyErrorMessage = (error) => {
 };
 
 /**
+ * Limpa o texto do sonho para remover prefixos redundantes.
+ */
+export const cleanDream = (text) => {
+    if (!text) return "";
+    let cleaned = text.trim();
+
+    // Lista de prefixos comuns para remover (case-insensitive)
+    const prefixes = [
+        /^meu sonho é\s+/i,
+        /^meu sonho e\s+/i,
+        /^meu objetivo é\s+/i,
+        /^meu objetivo e\s+/i,
+        /^eu sonho em\s+/i,
+        /^eu quero\s+/i,
+        /^quero\s+/i,
+        /^pretendo\s+/i,
+        /^gostaria de\s+/i
+    ];
+
+    for (const prefix of prefixes) {
+        cleaned = cleaned.replace(prefix, "");
+    }
+
+    // Capitalização básica: se começou com minúscula e não é uma sigla, deixa como está
+    // mas se começou com maiúscula, apenas removemos o prefixo.
+    // O Sidebar já faz o toLowerCase() se necessário.
+
+    return cleaned.charAt(0).toLowerCase() + cleaned.slice(1);
+};
+
+/**
  * Formata valores monetários no padrão brasileiro.
  */
 export const formatCurrency = (value) => {

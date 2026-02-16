@@ -180,9 +180,9 @@ Nesta mensagem, você DEVE:
 3. Incluir o marcador EXATAMENTE assim no fim (numa linha separada):
 
 [ONBOARDING_COMPLETE]
-nome: {{nome}}
+nome: {{apenas o primeiro nome do empreendedor}}
 negocio: {{ramo do negócio}}
-sonho: {{sonho mencionado}}
+sonho: {{sonho mencionado, corrigido e limpo}}
 score: {{total de 5 a 25}}
 [/ONBOARDING_COMPLETE]
 
