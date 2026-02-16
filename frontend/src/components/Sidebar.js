@@ -240,6 +240,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
     const performLogout = () => {
         localStorage.removeItem("meumei_phone");
         localStorage.removeItem("meumei_login_at");
+        localStorage.removeItem("meumei_onboarding_progress");
         router.push("/onboarding");
     };
 
