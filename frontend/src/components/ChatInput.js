@@ -48,7 +48,7 @@ const ChatInput = forwardRef(({ onSend, disabled = false }, ref) => {
         setText(e.target.value);
         const ta = e.target;
         ta.style.height = "auto";
-        ta.style.height = Math.min(ta.scrollHeight, 120) + "px";
+        ta.style.height = Math.min(ta.scrollHeight, 200) + "px";
     };
 
     const handleFileSelect = (e) => {
