@@ -172,6 +172,15 @@ export default function OnboardingPage() {
 
     // --- STEP 1: Login PIN ---
     const handleLoginPin = async () => {
+        setInvalidField("");
+        setError("");
+
+        if (!pin || pin.length < 4) {
+            setError("Por favor, informe seu PIN completo para acessar.");
+            setInvalidField("pin");
+            return;
+        }
+
         setLoading(true);
         try {
             const resp = await loginPin(phone, pin);
@@ -182,6 +191,7 @@ export default function OnboardingPage() {
             }
         } catch (err) {
             setError(err.message || "PIN incorreto");
+            setInvalidField("pin");
             setPinValue("");
         } finally {
             setLoading(false);
@@ -265,7 +275,7 @@ export default function OnboardingPage() {
             <div style={{ textAlign: 'center', marginBottom: '24px' }}>
                 <Lock size={48} color="var(--blue-primary)" />
             </div>
-            <h2 className="onboarding-title">Bem-vindo de volta, {existingName || "Empreendedor"}!</h2>
+            <h2 className="onboarding-title">Que bom que você está de volta, {existingName || "Empreendedor"}!</h2>
             <p className="onboarding-subtitle">
                 Digite seu PIN para acessar.
             </p>
@@ -274,15 +284,16 @@ export default function OnboardingPage() {
                 <input
                     type="password"
                     inputMode="numeric"
-                    className="onboarding-input"
+                    className={`onboarding-input ${invalidField === 'pin' ? 'input-error-blink' : ''}`}
                     style={{ textAlign: 'center', fontSize: '24px', letterSpacing: '8px' }}
                     placeholder="PIN"
                     value={pin}
                     onChange={(e) => {
                         setPinValue(e.target.value.replace(/\D/g, "").slice(0, 6));
+                        if (invalidField === 'pin') setInvalidField("");
                         setError("");
                     }}
-                    onKeyDown={(e) => e.key === 'Enter' && pin.length >= 4 && handleLoginPin()}
+                    onKeyDown={(e) => e.key === 'Enter' && handleLoginPin()}
                     autoFocus
                 />
             </div>
@@ -292,7 +303,7 @@ export default function OnboardingPage() {
             <button
                 className={`onboarding-btn ${pin.length < 4 ? 'is-inactive' : ''}`}
                 onClick={handleLoginPin}
-                disabled={loading || pin.length < 4}
+                disabled={loading}
             >
                 {loading ? "Entrando..." : "Acessar →"}
             </button>
