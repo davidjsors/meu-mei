@@ -587,8 +587,10 @@ export default function OnboardingPage() {
             setTimeout(() => {
                 router.push("/chat");
             }, 1000);
-        } catch (e) { setError("Erro ao finalizar cadastro. Tente novamente."); }
-        finally { setLoading(false); }
+        } catch (e) {
+            setError("Erro ao finalizar cadastro. Tente novamente.");
+            setLoading(false);
+        }
     };
 
     const renderMaturityIntro = () => (
