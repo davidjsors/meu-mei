@@ -13,6 +13,7 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [name, setName] = useState("");
+    const [showForgotInfo, setShowForgotInfo] = useState(false);
 
     useEffect(() => {
         const savedPhone = localStorage.getItem("meumei_phone");
@@ -68,7 +69,7 @@ export default function LoginPage() {
     };
 
     const handleForgotPin = () => {
-        alert("Para recuperar seu PIN, envie um e-mail para: david.sors@gmail.com");
+        setShowForgotInfo(!showForgotInfo);
     };
 
     return (
@@ -143,9 +144,17 @@ export default function LoginPage() {
 
                 <div className="login-footer">
                     {step === 2 && (
-                        <button className="forgot-pin-btn" onClick={handleForgotPin}>
-                            Esqueci meu PIN
-                        </button>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                            <button className="forgot-pin-btn" onClick={handleForgotPin}>
+                                Esqueci meu PIN
+                            </button>
+                            {showForgotInfo && (
+                                <div className="forgot-info-box">
+                                    Para recuperar, envie e-mail para:<br />
+                                    <strong>david.sors@gmail.com</strong>
+                                </div>
+                            )}
+                        </div>
                     )}
                     {step === 1 && (
                         <button className="forgot-pin-btn" onClick={() => router.push("/onboarding")}>

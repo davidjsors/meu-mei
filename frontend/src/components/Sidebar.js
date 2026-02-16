@@ -115,6 +115,10 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
         cancelText: "Cancelar"
     });
 
+    // Inline Deletion State
+    const [deletingRecordId, setDeletingRecordId] = useState(null);
+    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
     const closeModal = () => setModal(prev => ({ ...prev, isOpen: false }));
 
     const monthRange = getMonthRange(monthOffset);
@@ -233,20 +237,10 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
         { entradas: 0, saidas: 0 }
     );
 
-    const handleLogout = () => {
-        setModal({
-            isOpen: true,
-            title: "Sair do Meu MEI",
-            message: "Tem certeza que deseja sair agora?",
-            type: "confirm",
-            confirmText: "Sair",
-            onConfirm: () => {
-                localStorage.removeItem("meumei_phone");
-                localStorage.removeItem("meumei_login_at");
-                router.push("/onboarding");
-                closeModal();
-            }
-        });
+    const performLogout = () => {
+        localStorage.removeItem("meumei_phone");
+        localStorage.removeItem("meumei_login_at");
+        router.push("/onboarding");
     };
 
     const confirmDeleteAccount = async () => {
@@ -281,14 +275,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
     };
 
     const handleDeleteRecord = (id) => {
-        setModal({
-            isOpen: true,
-            title: "Excluir Transação",
-            message: "Deseja realmente remover este lançamento? O valor será estornado do seu saldo.",
-            type: "danger",
-            confirmText: "Excluir",
-            onConfirm: () => processDeleteRecord(id)
-        });
+        setDeletingRecordId(id);
     };
 
     const processDeleteRecord = async (id) => {
@@ -315,6 +302,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
             console.error("Erro ao excluir transação:", err);
             // alert("Erro ao excluir transação.");
         } finally {
+            setDeletingRecordId(null);
             closeModal();
         }
     };
@@ -878,16 +866,41 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                                     <div className={`finance-record-amount ${r.type}`} style={{ color: r.type === "saida" ? "var(--outflow-light)" : "var(--green)" }}>
                                         {r.type === "saida" ? "- " : "+ "}
                                         {formatCurrency(r.amount)}
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleDeleteRecord(r.id);
-                                            }}
-                                            className="finance-record-delete-btn"
-                                            title="Excluir"
-                                        >
-                                            <Trash2 size={14} />
-                                        </button>
+
+                                        {deletingRecordId === r.id ? (
+                                            <div className="delete-confirm-inline" onClick={(e) => e.stopPropagation()}>
+                                                <span>Excluir?</span>
+                                                <button
+                                                    className="confirm-yes"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        processDeleteRecord(r.id);
+                                                    }}
+                                                >
+                                                    Sim
+                                                </button>
+                                                <button
+                                                    className="confirm-no"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setDeletingRecordId(null);
+                                                    }}
+                                                >
+                                                    Não
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDeleteRecord(r.id);
+                                                }}
+                                                className="finance-record-delete-btn"
+                                                title="Excluir"
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             ))
@@ -1037,9 +1050,17 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                 <button className="sidebar-footer-btn" onClick={() => setView(view === "terms" ? "home" : "terms")}>
                     <ShieldCheck size={18} /> Termos
                 </button>
-                <button className="sidebar-footer-btn sidebar-logout-btn" onClick={handleLogout}>
-                    <LogOut size={18} /> Sair
-                </button>
+                {showLogoutConfirm ? (
+                    <div className="delete-confirm-inline" style={{ marginLeft: '12px' }}>
+                        <span>Sair?</span>
+                        <button className="confirm-yes" onClick={performLogout}>Sim</button>
+                        <button className="confirm-no" onClick={() => setShowLogoutConfirm(false)}>Não</button>
+                    </div>
+                ) : (
+                    <button className="sidebar-footer-btn sidebar-logout-btn" onClick={() => setShowLogoutConfirm(true)}>
+                        <LogOut size={18} /> Sair
+                    </button>
+                )}
             </div>
             <Modal
                 isOpen={modal.isOpen}

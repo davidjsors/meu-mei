@@ -3497,3 +3497,70 @@ body {
 .chat-textarea::-webkit-scrollbar-thumb:hover {
   background-color: rgba(255, 255, 255, 0.25);
 }
+
+/* ─── Inline Action Confirmations ─── */
+.delete-confirm-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.delete-confirm-inline span {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.confirm-yes {
+  background: var(--red-primary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.confirm-yes:hover {
+  opacity: 0.9;
+}
+
+.confirm-no {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.confirm-no:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ─── Forgot PIN Info Box ─── */
+.forgot-info-box {
+  background: rgba(59, 130, 246, 0.1);
+  /* Blue tint */
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 12px;
+  padding: 12px;
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-align: center;
+  line-height: 1.4;
+  animation: slideDown 0.2s ease-out;
+}
+
+.forgot-info-box strong {
+  color: var(--blue-primary);
+  display: block;
+  margin-top: 4px;
+  font-size: 14px;
+}

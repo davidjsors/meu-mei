@@ -70,6 +70,7 @@ export default function OnboardingPage() {
     const [acceptedTerms, setAcceptedTerms] = useState(false);
     const [showPin, setShowPin] = useState(false);
     const [showConfirmPin, setShowConfirmPin] = useState(false);
+    const [showForgotInfo, setShowForgotInfo] = useState(false);
 
     // Modal State
     const [modal, setModal] = useState({
@@ -250,22 +251,21 @@ export default function OnboardingPage() {
                 {loading ? "Entrando..." : "Acessar →"}
             </button>
 
-            <button
-                className="link-btn"
-                style={{ marginTop: '20px', background: 'none', border: 'none', color: 'var(--text-secondary)', textDecoration: 'underline', cursor: 'pointer' }}
-                onClick={() => {
-                    setModal({
-                        isOpen: true,
-                        title: "Recuperar Acesso",
-                        message: "Para recuperar seu PIN, entre em contato com o suporte através do email: david.sors@gmail.com",
-                        type: "info",
-                        confirmText: "Entendi",
-                        onConfirm: closeModal
-                    });
-                }}
-            >
-                Esqueci meu PIN
-            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, marginTop: '20px' }}>
+                <button
+                    className="link-btn"
+                    style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', textDecoration: 'underline', cursor: 'pointer' }}
+                    onClick={() => setShowForgotInfo(!showForgotInfo)}
+                >
+                    Esqueci meu PIN
+                </button>
+                {showForgotInfo && (
+                    <div className="forgot-info-box">
+                        Para recuperar, envie e-mail para:<br />
+                        <strong>david.sors@gmail.com</strong>
+                    </div>
+                )}
+            </div>
         </div>
     );
 
