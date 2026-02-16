@@ -146,6 +146,7 @@ async def transcribe_audio(file_bytes: bytes, mime_type: str) -> str:
 async def generate_response_stream(
     message: str,
     chat_history: list[dict],
+    user_name: str | None = None,
     maturity_score: int | None = None,
     dream: str | None = None,
     business_type: str | None = None,
@@ -160,6 +161,7 @@ async def generate_response_stream(
         system_prompt = str(build_onboarding_prompt())
     else:
         system_prompt = str(build_system_prompt(
+            user_name or "Empreendedor",
             maturity_score or 10, 
             dream or "crescer o negocio", 
             business_type or "empreendedor",
@@ -243,6 +245,7 @@ async def generate_response_stream(
 async def generate_response(
     message: str,
     chat_history: list[dict],
+    user_name: str | None = None,
     maturity_score: int | None = None,
     dream: str | None = None,
     business_type: str | None = None,
@@ -253,7 +256,7 @@ async def generate_response(
 ) -> str:
     full_response = []
     async for chunk in generate_response_stream(
-        message, chat_history, maturity_score, dream, business_type,
+        message, chat_history, user_name, maturity_score, dream, business_type,
         is_onboarding, file_bytes, file_mime, user_summary
     ):
         full_response.append(chunk)

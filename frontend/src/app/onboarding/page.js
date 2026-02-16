@@ -28,7 +28,7 @@ const SESSION_DURATION_MS = 24 * 60 * 60 * 1000;
 
 const MATURITY_DATA = [
     {
-        question: "1. Você costuma registrar todas as entradas e saídas do seu negócio? Tipo, anota tudo certinho o que vende e o que gasta?",
+        question: "Você costuma registrar todas as entradas e saídas do seu negócio? Tipo, anota tudo certinho o que vende e o que gasta?",
         options: [
             { label: "Não anoto nada", value: 1 },
             { label: "Anoto só de vez em quando", value: 2 },
@@ -38,7 +38,7 @@ const MATURITY_DATA = [
         ]
     },
     {
-        question: "2. E sobre as contas: você usa conta separada pra vida pessoal e pro negócio, ou tá tudo junto ainda?",
+        question: "E sobre as contas: você usa conta separada pra vida pessoal e pro negócio, ou tá tudo junto ainda?",
         options: [
             { label: "Tudo misturado na minha conta pessoal", value: 1 },
             { label: "Tento separar, mas acabo misturando", value: 2 },
@@ -48,7 +48,7 @@ const MATURITY_DATA = [
         ]
     },
     {
-        question: "3. Quando chega a hora de pagar os boletos, você já sabe de antemão se vai ter dinheiro? Você acompanha isso?",
+        question: "Quando chega a hora de pagar os boletos, você já sabe de antemão se vai ter dinheiro? Você acompanha isso?",
         options: [
             { label: "Nunca sei, vivo no susto", value: 1 },
             { label: "Raramente sei antes", value: 2 },
@@ -58,7 +58,7 @@ const MATURITY_DATA = [
         ]
     },
     {
-        question: "4. Você costuma buscar aprender sobre gestão financeira? Cursos, vídeos, dicas...",
+        question: "Você costuma buscar aprender sobre gestão financeira? Cursos, vídeos, dicas...",
         options: [
             { label: "Nunca busco", value: 1 },
             { label: "Raramente", value: 2 },
@@ -68,7 +68,7 @@ const MATURITY_DATA = [
         ]
     },
     {
-        question: "5. Na hora de colocar preço no que você vende, você sabe direitinho quanto gasta pra produzir e quanto sobra de lucro?",
+        question: "Na hora de colocar preço no que você vende, você sabe direitinho quanto gasta pra produzir e quanto sobra de lucro?",
         options: [
             { label: "Chuto o preço ou copio o vizinho", value: 1 },
             { label: "Tenho uma ideia por cima", value: 2 },

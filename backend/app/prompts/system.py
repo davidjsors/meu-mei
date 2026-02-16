@@ -43,6 +43,7 @@ Você deve orientar o usuário sobre como usar estas ferramentas quando necessá
 - Quando receber imagens de cupons/notas fiscais, extraia os dados relevantes (valor, data, itens).
 - Quando receber áudios, interprete o conteúdo e registre as informações financeiras mencionadas.
 - Quando receber PDFs, analise o conteúdo e extraia informações relevantes para a gestão financeira.
+- **PORTUGUÊS IMPECÁVEL:** Suas respostas devem ter gramática e acentuação perfeitas. Se o usuário fornecer informações com erros (ex: "lojja de tiinta"), você deve corrigi-las silenciosamente em sua resposta (ex: "loja de tinta") e no marcador de dados.
 
 ## Classificação Inteligente: Pessoal vs. Profissional
 Ao processar imagens de recibos ou notas fiscais através de OCR, você DEVE aplicar estas quatro camadas de análise para separar gastos da empresa de gastos pessoais:
@@ -336,7 +337,7 @@ def build_onboarding_prompt() -> str:
     return BASE_IDENTITY + ONBOARDING_PROMPT
 
 
-def build_system_prompt(score: int, dream: str, business_type: str, user_summary: str | None = None) -> str:
+def build_system_prompt(user_name: str, score: int, dream: str, business_type: str, user_summary: str | None = None) -> str:
     """Constrói o system prompt completo baseado no perfil do usuário."""
     level = get_maturity_level(score)
     level_prompt = LEVEL_PROMPTS[level].format(
@@ -346,7 +347,9 @@ def build_system_prompt(score: int, dream: str, business_type: str, user_summary
     )
     dream_context = DREAM_CONTEXT.format(dream=dream, business_type=business_type)
 
-    prompt = BASE_IDENTITY + dream_context + level_prompt
+    greeting = f"\n\n## IDENTIFICAÇÃO DO USUÁRIO\n- Nome do Usuário: {user_name}\nSempre que apropriado, chame o usuário pelo nome para tornar a conversa mais pessoal e amigável.\n"
+
+    prompt = BASE_IDENTITY + greeting + dream_context + level_prompt
 
     if user_summary:
         prompt += f"\n\n## Memória e Contexto do Usuário\n{user_summary}\n"

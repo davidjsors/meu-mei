@@ -451,6 +451,7 @@ async def send_message(
             async for chunk in generate_response_stream(
                 message=enriched_message,
                 chat_history=chat_history,
+                user_name=profile.get("name"),
                 maturity_score=maturity_score,
                 dream=dream,
                 business_type=business_type,
