@@ -20,7 +20,7 @@
   --bg-sidebar: #0D1117;
   --bg-chat: transparent;
   --bg-input: #1C2128;
-  --bg-bubble-user: linear-gradient(135deg, #2d3e50 0%, #3a506b 100%);
+  --bg-bubble-user: linear-gradient(135deg, #75131C 0%, #9E1B26 100%);
   --bg-bubble-ai: #22272E;
   --bg-hover: rgba(255, 255, 255, 0.05);
 
@@ -2777,7 +2777,7 @@ body {
 }
 
 .message-quote {
-  background: #22272E;
+  background: #2B080B;
   border-radius: 6px;
   padding: 8px 10px;
   margin-bottom: 6px;
@@ -2792,7 +2792,7 @@ body {
 }
 
 .message-wrapper.user .message-quote {
-  background: #22272E;
+  background: #2B080B;
   border-left-color: #FFFFFF;
 }
 
@@ -2841,7 +2841,7 @@ body {
 }
 
 .reply-preview-card {
-  background: #22272E;
+  background: #2B080B;
   /* Azul da sidebar */
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
