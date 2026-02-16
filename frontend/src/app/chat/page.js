@@ -111,7 +111,7 @@ export default function ChatPage() {
                 const [profileData, historyData] = await Promise.all([
                     getProfile(savedPhone),
                     getHistory(savedPhone),
-                    new Promise(resolve => setTimeout(resolve, 5000)) // Garante 5s de animação
+                    new Promise(resolve => setTimeout(resolve, 2000)) // 2s é o ideal para UX rápida
                 ]);
 
                 setProfile(profileData);
@@ -406,6 +406,18 @@ export default function ChatPage() {
                     <small style={{ color: "var(--text-muted)" }}>
                         Carregando o Meu MEI...
                     </small>
+                    <img
+                        src="https://flagcdn.com/w160/br.png"
+                        alt="Brasil"
+                        style={{
+                            width: '42px',
+                            height: 'auto',
+                            display: 'block',
+                            margin: '16px auto 0',
+                            opacity: 0.9,
+                            borderRadius: '4px'
+                        }}
+                    />
                 </p>
             </div>
         );

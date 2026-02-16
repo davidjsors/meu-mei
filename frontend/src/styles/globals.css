@@ -1147,7 +1147,8 @@ body {
 }
 
 .loading-text {
-  font-size: 14px;
+  font-size: 18px;
+  /* Aumentado 30% (de 14px) */
   color: var(--text-secondary);
   text-align: center;
   max-width: 300px;
@@ -3160,30 +3161,32 @@ body {
   }
 }
 
-/*  SLOWER ANIMATION 5s  */
 .money-in,
 .money-out,
 .success-icon {
-  animation-duration: 5s !important;
+  animation-duration: 2s !important;
 }
 
 
 /*  SUCCESS CHECK EXPLOSION  */
 .success-animation {
   position: relative;
-  width: 100px;
-  height: 100px;
+  width: 130px;
+  /* Aumentado 30% (de 100px) */
+  height: 130px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .checkmark {
-  width: 80px;
-  height: 80px;
+  width: 104px;
+  /* Aumentado 30% (de 80px) */
+  height: 104px;
   border-radius: 50%;
   display: block;
-  stroke-width: 3;
+  stroke-width: 4;
+  /* Engrossado para acompanhar o tamanho */
   stroke: #fff;
   stroke-miterlimit: 10;
   box-shadow: inset 0px 0px 0px var(--red-primary);
@@ -3193,7 +3196,7 @@ body {
 .checkmark-circle {
   stroke-dasharray: 166;
   stroke-dashoffset: 166;
-  stroke-width: 3;
+  stroke-width: 4;
   stroke-miterlimit: 10;
   stroke: var(--red-primary);
   fill: none;
@@ -3253,78 +3256,78 @@ body {
 .c-0 {
   --x: 0px;
   --y: -60px;
-  --color: #FFD700;
+  --color: #00FF88;
 }
 
 .c-1 {
   --x: 30px;
   --y: -52px;
-  --color: var(--red-primary);
+  --color: var(--green);
 }
 
 .c-2 {
   --x: 52px;
   --y: -30px;
-  --color: #fff;
+  --color: #AAFFCC;
 }
 
 .c-3 {
   --x: 60px;
   --y: 0px;
-  --color: #FFD700;
+  --color: #00FF88;
 }
 
 .c-4 {
   --x: 52px;
   --y: 30px;
-  --color: var(--red-primary);
+  --color: var(--green);
 }
 
 .c-5 {
   --x: 30px;
   --y: 52px;
-  --color: #fff;
+  --color: #AAFFCC;
 }
 
 .c-6 {
   --x: 0px;
   --y: 60px;
-  --color: #FFD700;
+  --color: #00FF88;
 }
 
 .c-7 {
   --x: -30px;
   --y: 52px;
-  --color: var(--red-primary);
+  --color: var(--green);
 }
 
 .c-8 {
   --x: -52px;
   --y: 30px;
-  --color: #fff;
+  --color: #AAFFCC;
 }
 
 .c-9 {
   --x: -60px;
   --y: 0px;
-  --color: #FFD700;
+  --color: #00FF88;
 }
 
 .c-10 {
   --x: -52px;
   --y: -30px;
-  --color: var(--red-primary);
+  --color: var(--green);
 }
 
 .c-11 {
   --x: -30px;
   --y: -52px;
-  --color: #fff;
+  --color: #AAFFCC;
 }
 
 .confetti-piece {
   background: var(--color);
-  animation: popConfetti 0.8s ease-out 0.9s forwards;
+  animation: popConfetti 1s ease-out 1s forwards;
 }
 
 @keyframes popConfetti {
@@ -3355,8 +3358,9 @@ body {
 
 /* UPDATE LOGO SIZE & MARGIN */
 .loading-app-logo {
-  width: 180px !important;
-  margin-bottom: 8px !important;
+  width: 234px !important;
+  /* Aumentado 30% (de 180px) */
+  margin-bottom: 12px !important;
 }
 
 /*  MODAL COMPONENT  */

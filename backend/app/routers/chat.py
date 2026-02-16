@@ -91,7 +91,7 @@ TRANSACTION_PATTERN = re.compile(
     r"(?:\*+)?tipo:(?:\*+)?\s*(entrada|saída|saida|receita|despesa).*?\n"
     r"(?:\*+)?valor:(?:\*+)?\s*([\d,.\s]*\d+\s*[kK]?|[\d,.]+).*?\n"
     r"(?:\*+)?descricao:(?:\*+)?\s*(.*?)\n"
-    r"(?:\*+)?categoria:(?:\*+)?\s*(.*?)\n?\s*"
+    r"(?:\*+)?categoria:(?:\*+)?\s*(.*?)\s*"
     r"\[/TRANSACTION\]",
     re.IGNORECASE | re.DOTALL,
 )
@@ -143,7 +143,13 @@ def _parse_transactions(text: str) -> list[dict]:
     for match in TRANSACTION_PATTERN.finditer(text):
         try:
             tipo_raw = match.group(1).strip().lower()
-            tipo = "entrada" if tipo_raw in ["entrada", "receita"] else "saida"
+            # Normalização de tipos (brasileiro/português)
+            if tipo_raw in ["entrada", "receita"]:
+                tipo = "entrada"
+            elif tipo_raw in ["saida", "saída", "despesa"]:
+                tipo = "saida"
+            else:
+                tipo = "saida" # Fallback seguro
             
             # Trata formatos brasileiros (1.234,56) e gírias (1k, 2k)
             v_raw = match.group(2).strip().lower()

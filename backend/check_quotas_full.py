@@ -7,13 +7,17 @@ load_dotenv()
 
 keys_raw = os.getenv("GEMINI_API_KEY", "")
 keys = [k.strip() for k in keys_raw.split(",") if k.strip()]
+keys = [k.strip() for k in keys_raw.split(",") if k.strip()]
 print(f"Total de chaves: {len(keys)}")
+for k in keys:
+    print(f"  - Key: ...{k[-4:]}")
 
 for i, key in enumerate(keys):
     print(f"\n--- CHAVE {i} ({key[-4:]}) ---")
     client = genai.Client(api_key=key)
     # Testing models with models/ prefix
-    for model in ["models/gemini-1.5-flash", "models/gemini-2.0-flash"]:
+    env_model = os.getenv("GEMINI_MODEL", "models/gemini-2.0-flash")
+    for model in [env_model, "models/gemini-2.0-flash"]:
         try:
             resp = client.models.generate_content(model=model, contents="Test")
             print(f"  [OK] {model}")
