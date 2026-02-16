@@ -3,60 +3,11 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { sendMessage, streamResponse, getHistory, getProfile } from "../../lib/api";
+import { cleanMarkers, getFriendlyErrorMessage } from "../../lib/utils";
 import MessageList from "../../components/MessageList";
 import ChatInput from "../../components/ChatInput";
 import Sidebar from "../../components/Sidebar";
 import GuidanceTour from "../../components/GuidanceTour";
-
-/**
- * Regex para limpar marcadores internos da resposta exibida.
- */
-const ONBOARDING_MARKER_RE = /\[ONBOARDING_COMPLETE\][\s\S]*?\[\/ONBOARDING_COMPLETE\]/gi;
-const TRANSACTION_MARKER_RE = /\[TRANSACTION\][\s\S]*?\[\/TRANSACTION\]/gi;
-const DELETE_MARKER_RE = /\[DELETE_TRANSACTION\][\s\S]*?\[\/DELETE_TRANSACTION\]/gi;
-const RESET_MARKER_RE = /\[RESET_FINANCE.*?\]/gi;
-const AUDIO_MARKER_RE = /\[AUDIO\][\s\S]*?\[\/AUDIO\]/gi;
-
-const cleanMarkers = (text) => {
-    if (!text) return "";
-    let cleaned = text
-        .replace(/\[AUDIO\][\s\S]*?\[\/AUDIO\]/gi, "")
-        .replace(/\[TRANSACTION\][\s\S]*?\[\/TRANSACTION\]/gi, "")
-        .replace(/\[ONBOARDING_COMPLETE\][\s\S]*?\[\/ONBOARDING_COMPLETE\]/gi, "")
-        .replace(/\[DELETE_TRANSACTION\][\s\S]*?\[\/DELETE_TRANSACTION\]/gi, "")
-        .replace(/\[RESET_FINANCE:.*?\]/gi, "")
-        .replace(/\[CONTEXTO\]/gi, "");
-
-    // Limpeza agressiva de espaços e quebras múltiplas
-    return cleaned
-        .replace(/\r\n/g, "\n")
-        .replace(/\n{3,}/g, "\n\n")
-        .replace(/^\s+|\s+$/g, "") // trim manual mais robusto
-        .trim();
-}
-
-/**
- * Dicionário de Erros: Mapeia mensagens técnicas para mensagens amigáveis ao usuário.
- */
-const ERROR_DICTIONARY = {
-    QUOTA: "Ops! Estamos conversando tão rápido que meu sistema pediu 1 minutinho para respirar. 😅 Tente novamente em alguns segundos!",
-    AUTH: "Parece que há um problema com a minha chave de acesso (API Key). Por favor, verifique as configurações do sistema! 🔑",
-    MODEL: "Estou tentando usar um modelo de inteligência que parece estar indisponível ou em manutenção agora. 🛠️",
-    CONNECTION: "Hmm, não consegui me conectar ao servidor. Verifique sua internet ou tente novamente em instantes. 🌐",
-    GENERIC: "Tive um probleminha técnico aqui, mas não se preocupe: recebi sua mensagem e vou processá-la assim que meu sistema estabilizar! 😊"
-};
-
-const getFriendlyErrorMessage = (error) => {
-    if (!error) return ERROR_DICTIONARY.GENERIC;
-    const errorStr = (typeof error === 'string' ? error : error.message || "").toLowerCase();
-
-    if (errorStr.includes("429") || errorStr.includes("quota")) return ERROR_DICTIONARY.QUOTA;
-    if (errorStr.includes("400") || errorStr.includes("invalid_argument") || errorStr.includes("api key")) return ERROR_DICTIONARY.AUTH;
-    if (errorStr.includes("404") || errorStr.includes("model not found")) return ERROR_DICTIONARY.MODEL;
-    if (errorStr.includes("fetch") || errorStr.includes("network") || errorStr.includes("failed to connect")) return ERROR_DICTIONARY.CONNECTION;
-
-    return ERROR_DICTIONARY.GENERIC;
-};
 
 export default function ChatPage() {
     const router = useRouter();

@@ -74,27 +74,20 @@ def _normalize_mime(mime: str) -> str:
     # Fallback para procurar nos valores se for um set virando dict
     return base
 
-# Regex para extrair dados do onboarding (Flexibilizado)
-ONBOARDING_PATTERN = re.compile(
-    r"\[ONBOARDING_COMPLETE\]\s*"
-    r"(?:\*\*)?nome:(?:\*\*)?\s*(.+?)\s*\n"
-    r"(?:\*\*)?negocio:(?:\*\*)?\s*(.+?)\s*\n"
-    r"(?:\*\*)?sonho:(?:\*\*)?\s*(.+?)\s*\n"
-    r"(?:\*\*)?score:(?:\*\*)?\s*(\d+)\s*"
-    r"\[/ONBOARDING_COMPLETE\]",
-    re.IGNORECASE | re.DOTALL,
-)
+# Marcadores base (apenas tags externas)
+ONBOARDING_RE_BLOCK = re.compile(r"\[ONBOARDING_COMPLETE\](.*?)\[/ONBOARDING_COMPLETE\]", re.IGNORECASE | re.DOTALL)
+TRANSACTION_RE_BLOCK = re.compile(r"\[TRANSACTION\](.*?)\[/TRANSACTION\]", re.IGNORECASE | re.DOTALL)
 
-# Regex para extrair transações financeiras (Altamente Flexível)
-TRANSACTION_PATTERN = re.compile(
-    r"\[TRANSACTION\]\s*"
-    r"(?:\*+)?tipo:(?:\*+)?\s*(entrada|saída|saida|receita|despesa).*?\n"
-    r"(?:\*+)?valor:(?:\*+)?\s*([\d,.\s]*\d+\s*[kK]?|[\d,.]+).*?\n"
-    r"(?:\*+)?descricao:(?:\*+)?\s*(.*?)\n"
-    r"(?:\*+)?categoria:(?:\*+)?\s*(.*?)\s*"
-    r"\[/TRANSACTION\]",
-    re.IGNORECASE | re.DOTALL,
-)
+# Padrões para extração interna de campos
+RE_FIELD_NAME = re.compile(r"(?:\*+)?nome:(?:\*+)?\s*(.+)", re.IGNORECASE)
+RE_FIELD_NEGOCIO = re.compile(r"(?:\*+)?negocio:(?:\*+)?\s*(.+)", re.IGNORECASE)
+RE_FIELD_SONHO = re.compile(r"(?:\*+)?sonho:(?:\*+)?\s*(.+)", re.IGNORECASE)
+RE_FIELD_SCORE = re.compile(r"(?:\*+)?score:(?:\*+)?\s*(\d+)", re.IGNORECASE)
+
+RE_FIELD_TIPO = re.compile(r"(?:\*+)?tipo:(?:\*+)?\s*(entrada|saída|saida|receita|despesa)", re.IGNORECASE)
+RE_FIELD_VALOR = re.compile(r"(?:\*+)?valor:(?:\*+)?\s*([\d,.\s]*\d+\s*[kK]?|[\d,.]+)", re.IGNORECASE)
+RE_FIELD_DESC = re.compile(r"(?:\*+)?descricao:(?:\*+)?\s*(.+)", re.IGNORECASE)
+RE_FIELD_CAT = re.compile(r"(?:\*+)?categoria:(?:\*+)?\s*(.+)", re.IGNORECASE)
 
 # Regex para extrair áudio (voz do mentor)
 AUDIO_PATTERN = re.compile(r"\[AUDIO\](.*?)\[/AUDIO\]", re.IGNORECASE | re.DOTALL)
@@ -114,57 +107,56 @@ DELETE_TRANSACTION_PATTERN = re.compile(
 
 
 def _parse_onboarding(text: str) -> dict | None:
-    """
-    Verifica se a resposta da IA contém o marcador de onboarding completo.
-    Retorna dict com nome, negocio, sonho e score, ou None.
-    """
-    match = ONBOARDING_PATTERN.search(text)
-    if match:
+    """Extrai dados do onboarding via blocos."""
+    match_block = ONBOARDING_RE_BLOCK.search(text)
+    if not match_block:
+        return None
+    
+    inner = match_block.group(1)
+    name_m = RE_FIELD_NAME.search(inner)
+    biz_m = RE_FIELD_NEGOCIO.search(inner)
+    dream_m = RE_FIELD_SONHO.search(inner)
+    score_m = RE_FIELD_SCORE.search(inner)
+    
+    if all([name_m, biz_m, dream_m, score_m]):
         return {
-            "name": match.group(1).strip(),
-            "business_type": match.group(2).strip(),
-            "dream": match.group(3).strip(),
-            "score": int(match.group(4).strip()),
+            "name": name_m.group(1).strip(),
+            "business_type": biz_m.group(1).strip(),
+            "dream": dream_m.group(1).strip(),
+            "score": int(score_m.group(1).strip()),
         }
     return None
 
-
 def _clean_onboarding_markers(text: str) -> str:
-    """Remove marcadores [ONBOARDING_COMPLETE] da resposta visível ao usuário."""
-    return ONBOARDING_PATTERN.sub("", text).strip()
+    """Remove blocos de onboarding."""
+    return ONBOARDING_RE_BLOCK.sub("", text).strip()
 
 
 def _parse_transactions(text: str) -> list[dict]:
-    """
-    Extrai todas as transações financeiras marcadas pela IA.
-    """
+    """Extrai transações via blocos."""
     transactions = []
     seen = set()
-    for match in TRANSACTION_PATTERN.finditer(text):
+    
+    for match_block in TRANSACTION_RE_BLOCK.finditer(text):
+        inner = match_block.group(1)
+        
+        tipo_m = RE_FIELD_TIPO.search(inner)
+        valor_m = RE_FIELD_VALOR.search(inner)
+        desc_m = RE_FIELD_DESC.search(inner)
+        cat_m = RE_FIELD_CAT.search(inner)
+        
+        if not all([tipo_m, valor_m, desc_m, cat_m]):
+            continue
+            
         try:
-            tipo_raw = match.group(1).strip().lower()
-            # Normalização de tipos (brasileiro/português)
-            if tipo_raw in ["entrada", "receita"]:
-                tipo = "entrada"
-            elif tipo_raw in ["saida", "saída", "despesa"]:
-                tipo = "saida"
-            else:
-                tipo = "saida" # Fallback seguro
+            tipo_raw = tipo_m.group(1).strip().lower()
+            tipo = "entrada" if tipo_raw in ["entrada", "receita"] else "saida"
             
-            # Trata formatos brasileiros (1.234,56) e gírias (1k, 2k)
-            v_raw = match.group(2).strip().lower()
-            
-            # Reconhece "k" como milhar
-            multiplier = 1
-            if "k" in v_raw:
-                multiplier = 1000
-                v_raw = v_raw.replace("k", "").strip()
-            
-            # Limpeza de números (remove R$, espaços, etc se o regex pegou)
-            v_clean = re.sub(r"[^\d,.]", "", v_raw)
+            v_raw = valor_m.group(1).strip().lower()
+            multiplier = 1000 if "k" in v_raw else 1
+            v_clean = re.sub(r"[^\d,.]", "", v_raw.replace("k", ""))
             
             if "," in v_clean and "." in v_clean:
-                # Se tem ambos, o último é o decimal (BRA: 1.234,56 | USA: 1,234.56)
                 if v_clean.rfind(",") > v_clean.rfind("."):
                     v_clean = v_clean.replace(".", "").replace(",", ".")
                 else:
@@ -173,8 +165,8 @@ def _parse_transactions(text: str) -> list[dict]:
                 v_clean = v_clean.replace(",", ".")
             
             valor = float(v_clean) * multiplier
-            desc = match.group(3).strip()
-            cat = match.group(4).strip().lower()
+            desc = desc_m.group(1).strip()
+            cat = cat_m.group(1).strip().lower()
             
             tx_key = (tipo, valor, desc, cat)
             if tx_key not in seen:
@@ -185,15 +177,14 @@ def _parse_transactions(text: str) -> list[dict]:
                     "category": cat,
                 })
                 seen.add(tx_key)
-        except (ValueError, IndexError):
+        except Exception:
             continue
+            
     return transactions
 
-
 def _clean_transaction_markers(text: str) -> str:
-    """Remove marcadores [TRANSACTION] e limpa espaços extras."""
-    cleaned = TRANSACTION_PATTERN.sub("", text)
-    # Remove excesso de quebras de linha (colapsa 3+ em 2)
+    """Remove blocos de transação."""
+    cleaned = TRANSACTION_RE_BLOCK.sub("", text)
     return re.sub(r"\n{3,}", "\n\n", cleaned).strip()
 
 

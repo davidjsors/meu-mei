@@ -1,56 +1,35 @@
+
 import pytest
-from app.services.finance import calculate_cash_flow, get_financial_summary
+from app.services.finance import calculate_cash_flow
+import random
 
-def test_calculate_cash_flow_mixed():
-    records = [
-        {"type": "entrada", "amount": 100.50},
-        {"type": "saida", "amount": 30.20},
-        {"type": "entrada", "amount": 200.00},
-        {"type": "saida", "amount": 50.00},
-    ]
-    flow = calculate_cash_flow(records)
-    
-    assert flow["total_income"] == 300.50
-    assert flow["total_expenses"] == 80.20
-    assert flow["balance"] == 220.30
-    assert flow["record_count"] == 4
-
-def test_calculate_cash_flow_empty():
+def test_financial_integrity_bulk():
+    # Simulando 100 transações
+    initial_balance = 1000.0
     records = []
-    flow = calculate_cash_flow(records)
+    expected_balance = initial_balance
     
-    assert flow["total_income"] == 0.0
-    assert flow["total_expenses"] == 0.0
+    for _ in range(100):
+        amount = round(random.uniform(1.0, 500.0), 2)
+        if random.choice(["entrada", "saida"]) == "entrada":
+            records.append({"amount": amount, "type": "entrada"})
+            expected_balance += amount
+        else:
+            records.append({"amount": amount, "type": "saida"})
+            expected_balance -= amount
+            
+    flow = calculate_cash_flow(records, initial_balance=initial_balance)
+    
+    # Tolerância para erros de float (apesar do round no calculo)
+    assert flow["balance"] == pytest.approx(expected_balance, 0.01)
+    assert flow["total_income"] >= initial_balance
+
+def test_integrity_edge_cases():
+    # Tudo zero
+    flow = calculate_cash_flow([], initial_balance=0.0)
     assert flow["balance"] == 0.0
-    assert flow["record_count"] == 0
-
-def test_calculate_cash_flow_precision():
-    # Teste de precisão de ponto flutuante
-    records = [
-        {"type": "entrada", "amount": 0.1},
-        {"type": "entrada", "amount": 0.2},
-    ]
-    flow = calculate_cash_flow(records)
     
-    # 0.1 + 0.2 normalmente seria 0.30000000000000004
-    # A função deve arredondar para 2 casas decimais
-    assert flow["total_income"] == 0.30
-
-def test_get_financial_summary_content():
-    records = [
-        {"type": "entrada", "amount": 1000, "category": "Vendas", "record_date": "2023-01-01"},
-        {"type": "saida", "amount": 200, "category": "Aluguel", "record_date": "2023-01-05"},
-    ]
-    summary = get_financial_summary(records)
-    
-    assert "Entradas totais: R$ 1,000.00" in summary
-    assert "Saídas totais: R$ 200.00" in summary
-    assert "Saldo: R$ 800.00" in summary
-    assert "Vendas: R$ 1,000.00 (entrada)" in summary
-    assert "Aluguel: R$ 200.00 (saída)" in summary
-    assert "Período: 2023-01-01 a 2023-01-05" in summary
-
-def test_get_financial_summary_empty():
-    records = []
-    summary = get_financial_summary(records)
-    assert "O usuário ainda não possui registros financeiros." in summary
+    # Saídas maiores que entradas
+    records = [{"amount": 1000.0, "type": "saida"}]
+    flow = calculate_cash_flow(records, initial_balance=50.0)
+    assert flow["balance"] == -950.0

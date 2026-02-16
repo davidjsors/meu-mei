@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { MOTIVATIONAL_QUOTES } from "../data/quotes";
 import Modal from "./Modal";
+import { formatCurrency } from "../lib/utils";
 
 const CATEGORY_LABELS = {
     vendas: "Vendas",
@@ -221,8 +222,6 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
         return () => { active = false; };
     }, [view, phoneNumber, monthRange.start, monthRange.end, category, refreshKey]);
 
-    const formatCurrency = (value) =>
-        new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value || 0);
 
     const formatDate = (iso) =>
         new Date(iso).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
