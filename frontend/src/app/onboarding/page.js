@@ -16,27 +16,67 @@ import {
     BarChart3,
     Eye,
     EyeOff,
-    AlertCircle
+    AlertCircle,
+    DollarSign,
+    Plus,
+    Trash2
 } from "lucide-react";
 import { setPin, loginPin, getProfile } from "../../lib/api";
 import Modal from "../../components/Modal";
 
 const SESSION_DURATION_MS = 24 * 60 * 60 * 1000;
 
-const MATURITY_QUESTIONS = [
-    "Você costuma registrar todas as entradas e saídas do seu negócio? Tipo, anota tudo certinho o que vende e o que gasta?",
-    "E sobre as contas: você usa conta separada pra vida pessoal e pro negócio, ou tá tudo junto ainda?",
-    "Quando chega a hora de pagar os boletos, você já sabe de antemão se vai ter dinheiro? Você acompanha isso?",
-    "Você costuma buscar aprender sobre gestão financeira? Cursos, vídeos, dicas...",
-    "Na hora de colocar preço no que você vende, você sabe direitinho quanto gasta pra produzir e quanto sobra de lucro?"
-];
-
-const MATURITY_OPTIONS = [
-    { label: "Nunca", value: 1 },
-    { label: "Raramente", value: 2 },
-    { label: "Às vezes", value: 3 },
-    { label: "Frequentemente", value: 4 },
-    { label: "Sempre", value: 5 },
+const MATURITY_DATA = [
+    {
+        question: "1. Você costuma registrar todas as entradas e saídas do seu negócio? Tipo, anota tudo certinho o que vende e o que gasta?",
+        options: [
+            { label: "Não anoto nada ❌", value: 1 },
+            { label: "Anoto só de vez em quando", value: 2 },
+            { label: "Anoto quase tudo, mas esqueço alguns", value: 3 },
+            { label: "Anoto tudo, mas não organizo muito", value: 4 },
+            { label: "Registro cada centavo (Entradas e Saídas) ✅", value: 5 }
+        ]
+    },
+    {
+        question: "2. E sobre as contas: você usa conta separada pra vida pessoal e pro negócio, ou tá tudo junto ainda?",
+        options: [
+            { label: "Tudo misturado na minha conta pessoal 🌀", value: 1 },
+            { label: "Tento separar, mas acabo misturando", value: 2 },
+            { label: "Tenho contas separadas, mas uso o dinheiro cruzado", value: 3 },
+            { label: "Separo bem, só misturo em emergências", value: 4 },
+            { label: "Totalmente separadas (PJ e PF) 💎", value: 5 }
+        ]
+    },
+    {
+        question: "3. Quando chega a hora de pagar os boletos, você já sabe de antemão se vai ter dinheiro? Você acompanha isso?",
+        options: [
+            { label: "Nunca sei, vivo no susto 😰", value: 1 },
+            { label: "Raramente sei antes", value: 2 },
+            { label: "Às vezes tenho noção", value: 3 },
+            { label: "Geralmente sei com antecedência", value: 4 },
+            { label: "Sempre sei (Controle total) 🧘‍♂️", value: 5 }
+        ]
+    },
+    {
+        question: "4. Você costuma buscar aprender sobre gestão financeira? Cursos, vídeos, dicas...",
+        options: [
+            { label: "Nunca busco", value: 1 },
+            { label: "Raramente", value: 2 },
+            { label: "Às vezes vejo uns vídeos", value: 3 },
+            { label: "Frequentemente procuro dicas", value: 4 },
+            { label: "Sempre (Estudo constante) 📚", value: 5 }
+        ]
+    },
+    {
+        question: "5. Na hora de colocar preço no que você vende, você sabe direitinho quanto gasta pra produzir e quanto sobra de lucro?",
+        options: [
+            { label: "Chuto o preço ou copio o vizinho 🎯", value: 1 },
+            { label: "Tenho uma ideia por cima", value: 2 },
+            { label: "Calculo os custos principais, mas não o lucro", value: 3 },
+            { label: "Calculo bem, mas às vezes erro a mão", value: 4 },
+            { label: "Calculo tudo (Custos + Margem + Lucro) 🧮", value: 5 }
+        ]
+    }
 ];
 
 export default function OnboardingPage() {
@@ -49,7 +89,8 @@ export default function OnboardingPage() {
     // 4: Maturity Questions
     // 4: Maturity Questions
     // 5: Revenue Goal
-    // 6: Terms
+    // 6: Initial Finance (New)
+    // 7: Terms
     const [step, setStep] = useState(0);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -71,6 +112,11 @@ export default function OnboardingPage() {
     const [showPin, setShowPin] = useState(false);
     const [showConfirmPin, setShowConfirmPin] = useState(false);
     const [showForgotInfo, setShowForgotInfo] = useState(false);
+
+    // Initial Finance State (Step 6)
+    const [initialBalance, setInitialBalance] = useState("");
+    const [initialExpenses, setInitialExpenses] = useState([]); // [{id, amount, description, category}]
+    const [expenseCategoryOpen, setExpenseCategoryOpen] = useState(null); // id of open dropdown
 
     // Modal State
     const [modal, setModal] = useState({
@@ -360,13 +406,12 @@ export default function OnboardingPage() {
 
     // Reuse existing components logic for Maturity, Terms
     const handleAnswer = (value) => {
-        const newAnswers = [...answers];
-        newAnswers[currentQuestion] = value;
+        const newAnswers = [...answers, value];
         setAnswers(newAnswers);
-        if (currentQuestion < MATURITY_QUESTIONS.length - 1) {
-            setTimeout(() => setCurrentQuestion(prev => prev + 1), 300);
+        if (currentQuestion < MATURITY_DATA.length - 1) {
+            setCurrentQuestion(currentQuestion + 1);
         } else {
-            setStep(5);
+            handleSubmitMaturity(newAnswers);
         }
     };
 
@@ -374,6 +419,82 @@ export default function OnboardingPage() {
         if (!revenueGoal.trim()) { setError("Informe sua meta de vendas para este mês."); setInvalidField("revenueGoal"); return; }
         setStep(6);
     };
+
+    const EXPENSE_CATEGORIES = [
+        { value: "insumos", label: "Insumos (Matéria-prima)" },
+        { value: "aluguel", label: "Aluguel" },
+        { value: "transporte", label: "Transporte" },
+        { value: "marketing", label: "Marketing" },
+        { value: "salarios", label: "Salários / Pro-labore" },
+        { value: "impostos", label: "Impostos (DAS)" },
+        { value: "utilidades", label: "Luz, Água, Internet" },
+        { value: "outros_despesa", label: "Outros" },
+    ];
+
+    const handleAddExpense = () => {
+        setInitialExpenses([...initialExpenses, { id: Date.now(), amount: "", description: "", category: "outros_despesa" }]);
+    };
+
+    const updateExpense = (id, field, value) => {
+        setInitialExpenses(prev => prev.map(e => e.id === id ? { ...e, [field]: value } : e));
+    };
+
+    const removeExpense = (id) => {
+        setInitialExpenses(prev => prev.filter(e => e.id !== id));
+    };
+
+    const handleInitialFinanceNext = async () => {
+        setLoading(true);
+        setError("");
+
+        try {
+            const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
+
+            // 1. Salvar Saldo Inicial (se houver)
+            if (initialBalance) {
+                const val = parseFloat(initialBalance.replace(/\./g, '').replace(',', '.'));
+                if (val > 0) {
+                    await fetch(`${API_BASE}/api/user/finance/record`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            phone_number: phone,
+                            type: "entrada",
+                            amount: val,
+                            category: "outros_receita",
+                            description: "Saldo Inicial (Onboarding)"
+                        })
+                    });
+                }
+            }
+
+            // 2. Salvar Despesas Iniciais
+            for (const expense of initialExpenses) {
+                const val = parseFloat(expense.amount.replace(/\./g, '').replace(',', '.'));
+                if (val > 0) {
+                    await fetch(`${API_BASE}/api/user/finance/record`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            phone_number: phone,
+                            type: "saida",
+                            amount: val,
+                            category: expense.category,
+                            description: expense.description || "Despesa Inicial"
+                        })
+                    });
+                }
+            }
+
+            setStep(7); // Ir para Termos
+        } catch (err) {
+            console.error(err);
+            setError("Erro ao salvar dados financeiros. Tente novamente ou pule esta etapa.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
 
     const handleFinalSubmit = async () => {
         if (!acceptedTerms) {
@@ -421,17 +542,19 @@ export default function OnboardingPage() {
     );
 
     const renderMaturity = () => {
-        const progress = ((currentQuestion + 1) / MATURITY_QUESTIONS.length) * 100;
+        const question = MATURITY_DATA[currentQuestion];
+        const progress = ((currentQuestion + 1) / MATURITY_DATA.length) * 100;
+
         return (
             <div className="tf-view">
                 <div className="tf-progress-bar"><div className="tf-progress-inner" style={{ width: `${progress}%` }} /></div>
                 <div className="tf-container">
                     <div className="tf-question-header">
                         <div className="tf-question-number"><span>{currentQuestion + 1}</span><ArrowRight size={14} /></div>
-                        <h2 className="tf-question-text">{MATURITY_QUESTIONS[currentQuestion]}</h2>
+                        <h2 className="tf-question-text">{question.question}</h2>
                     </div>
                     <div className="tf-options-list">
-                        {MATURITY_OPTIONS.map((opt) => (
+                        {question.options.map((opt) => (
                             <button key={opt.value} className={`tf-btn ${answers[currentQuestion] === opt.value ? 'selected' : ''}`} onClick={() => handleAnswer(opt.value)}>
                                 <span className="tf-option-key">{opt.value}</span>
                                 <span className="tf-option-label">{opt.label}</span>
@@ -441,7 +564,7 @@ export default function OnboardingPage() {
                     </div>
                     <div className="tf-actions">
                         <button className="tf-back-btn" disabled={currentQuestion === 0} onClick={() => setCurrentQuestion(prev => prev - 1)}><ArrowLeft size={16} /> Voltar</button>
-                        <div className="tf-counter">Questão {currentQuestion + 1} de {MATURITY_QUESTIONS.length}</div>
+                        <div className="tf-counter">Questão {currentQuestion + 1} de {MATURITY_DATA.length}</div>
                     </div>
                 </div>
             </div>
@@ -474,6 +597,118 @@ export default function OnboardingPage() {
             <button className="onboarding-btn" onClick={handleRevenueGoalNext}>
                 Continuar →
             </button>
+        </div>
+    );
+
+    const renderInitialFinance = () => (
+        <div className="onboarding-card" style={{ maxWidth: '600px' }}>
+            <h2 className="onboarding-title">Primeiros Passos Financeiros</h2>
+            <p className="onboarding-subtitle">
+                Vamos começar com o pé direito? Se você já tem algum valor em caixa ou contas a pagar, registre aqui.
+                <br /><small style={{ opacity: 0.7 }}>(Esta etapa é opcional, mas recomendada!)</small>
+            </p>
+
+            {/* Saldo Inicial */}
+            <div className="onboarding-form-group" style={{ marginBottom: '24px' }}>
+                <label className="onboarding-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <DollarSign size={16} color="var(--green)" /> Saldo Atual (Dinheiro em mãos + Banco)
+                </label>
+                <div style={{ position: 'relative' }}>
+                    <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', fontWeight: '600', color: 'var(--text-muted)' }}>R$</span>
+                    <input
+                        className="onboarding-input"
+                        style={{ paddingLeft: '48px', fontSize: '20px', color: 'var(--green)' }}
+                        placeholder="0,00"
+                        value={initialBalance}
+                        onChange={e => {
+                            let v = e.target.value.replace(/\D/g, "");
+                            if (!v) { setInitialBalance(""); return; }
+                            const floatValue = parseInt(v) / 100;
+                            setInitialBalance(floatValue.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+                        }}
+                    />
+                </div>
+            </div>
+
+            {/* Despesas Iniciais */}
+            <div className="onboarding-form-group" style={{ borderTop: '1px solid var(--border-color)', paddingTop: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                    <label className="onboarding-label" style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: 0 }}>
+                        <AlertCircle size={16} color="var(--red-primary)" /> Contas a Pagar (Pendentes)
+                    </label>
+                    <button onClick={handleAddExpense} style={{ background: 'var(--surface-color)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '4px 8px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', color: 'var(--text-primary)' }}>
+                        <Plus size={14} /> Adicionar
+                    </button>
+                </div>
+
+                {initialExpenses.length === 0 && (
+                    <p style={{ fontSize: '13px', color: 'var(--text-muted)', textAlign: 'center', padding: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px' }}>
+                        Nenhuma conta adicionada. Se tiver boletos ou despesas próximas, adicione aqui.
+                    </p>
+                )}
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '240px', overflowY: 'auto' }}>
+                    {initialExpenses.map((exp, idx) => (
+                        <div key={exp.id} style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 24px', gap: '8px', alignItems: 'center', background: 'var(--bg-app)', padding: '8px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                <input
+                                    placeholder="Descrição (ex: Aluguel)"
+                                    value={exp.description}
+                                    onChange={e => updateExpense(exp.id, 'description', e.target.value)}
+                                    style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)', fontSize: '13px', width: '100%', outline: 'none' }}
+                                />
+                                <select
+                                    value={exp.category}
+                                    onChange={e => updateExpense(exp.id, 'category', e.target.value)}
+                                    style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', fontSize: '11px', outline: 'none', cursor: 'pointer' }}
+                                >
+                                    {EXPENSE_CATEGORIES.map(cat => (
+                                        <option key={cat.value} value={cat.value}>{cat.label}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div style={{ position: 'relative' }}>
+                                <span style={{ position: 'absolute', left: '4px', top: '50%', transform: 'translateY(-50%)', fontSize: '12px', color: 'var(--text-muted)' }}>R$</span>
+                                <input
+                                    placeholder="0,00"
+                                    value={exp.amount}
+                                    onChange={e => {
+                                        let v = e.target.value.replace(/\D/g, "");
+                                        if (!v) { updateExpense(exp.id, 'amount', ""); return; }
+                                        const floatValue = parseInt(v) / 100;
+                                        updateExpense(exp.id, 'amount', floatValue.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+                                    }}
+                                    style={{ background: 'var(--surface-color)', border: '1px solid var(--border-color)', borderRadius: '4px', padding: '4px 4px 4px 22px', color: 'var(--red-primary)', fontSize: '13px', width: '100%', textAlign: 'right' }}
+                                />
+                            </div>
+                            <button onClick={() => removeExpense(exp.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: 0 }}>
+                                <Trash2 size={16} />
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {error && <p className="onboarding-error">{error}</p>}
+
+            <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+                <button
+                    className="onboarding-btn"
+                    style={{ flex: 1, background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}
+                    onClick={() => setStep(7)}
+                    disabled={loading}
+                >
+                    Pular
+                </button>
+                <button
+                    className="onboarding-btn"
+                    style={{ flex: 2 }}
+                    onClick={handleInitialFinanceNext}
+                    disabled={loading}
+                >
+                    {loading ? "Salvando..." : "Salvar e Continuar →"}
+                </button>
+            </div>
         </div>
     );
 
@@ -609,7 +844,8 @@ export default function OnboardingPage() {
             {step === 3 && <div className="onboarding-content">{renderMaturityIntro()}</div>}
             {step === 4 && <div className="onboarding-content">{renderMaturity()}</div>}
             {step === 5 && <div className="onboarding-content">{renderRevenueGoal()}</div>}
-            {step === 6 && <div className="onboarding-content">{renderTerms()}</div>}
+            {step === 6 && <div className="onboarding-content">{renderInitialFinance()}</div>}
+            {step === 7 && <div className="onboarding-content">{renderTerms()}</div>}
 
             <Modal
                 isOpen={modal.isOpen}

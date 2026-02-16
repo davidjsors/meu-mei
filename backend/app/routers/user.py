@@ -6,7 +6,7 @@ Endpoints para perfil, questionário de maturidade IAMF-MEI e resumo financeiro.
 from fastapi import APIRouter, HTTPException
 from supabase import Client
 
-from app.models.schemas import MaturityRequest, ProfileResponse
+from app.models.schemas import MaturityRequest, ProfileResponse, FinancialRecord
 from app.prompts.system import get_maturity_level
 
 router = APIRouter(prefix="/api/user", tags=["user"])
@@ -272,3 +272,21 @@ async def delete_financial_record(record_id: str, phone_number: str):
         raise HTTPException(status_code=404, detail="Registro não encontrado ou não pertence ao usuário")
 
     return {"success": True, "deleted_id": record_id}
+
+
+@router.post("/finance/record")
+async def create_financial_record(record: FinancialRecord):
+    """
+    Cria um novo registro financeiro manualmente via API.
+    """
+    db = _get_db()
+    
+    # Converter para dict e garantir tipos
+    data = record.model_dump(exclude_unset=True) if hasattr(record, 'model_dump') else record.dict(exclude_unset=True)
+    
+    resp = db.table("financial_records").insert(data).execute()
+    
+    if not resp.data:
+        raise HTTPException(status_code=500, detail="Erro ao criar registro financeiro")
+        
+    return {"success": True, "record": resp.data[0]}
