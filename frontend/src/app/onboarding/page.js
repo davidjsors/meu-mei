@@ -296,13 +296,19 @@ export default function OnboardingPage() {
 
             {error && <p className="onboarding-error">{error}</p>}
 
-            <button
-                className={`onboarding-btn ${pin.length < 4 ? 'is-inactive' : ''}`}
-                onClick={handleLoginPin}
-                disabled={loading}
-            >
-                {loading ? "Entrando..." : "Acessar →"}
-            </button>
+            <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+                <button className="tf-back-btn" onClick={() => setStep(0)} style={{ padding: '12px 24px' }}>
+                    Voltar
+                </button>
+                <button
+                    className={`onboarding-btn ${pin.length < 4 ? 'is-inactive' : ''}`}
+                    onClick={handleLoginPin}
+                    disabled={loading}
+                    style={{ flex: 1, margin: 0 }}
+                >
+                    {loading ? "Entrando..." : "Acessar →"}
+                </button>
+            </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, marginTop: '20px' }}>
                 <button
@@ -400,13 +406,25 @@ export default function OnboardingPage() {
             </div>
 
             {error && <p className="onboarding-error">{error}</p>}
-            <button
-                onClick={handleProfileNext}
-                className={`onboarding-btn ${!isValidProfile ? 'is-inactive' : ''}`}
-                disabled={loading || !isValidProfile}
-            >
-                {loading ? "Salvando..." : "Tudo pronto! Vamos continuar →"}
-            </button>
+            <div style={{ display: 'flex', gap: '12px', marginTop: '32px' }}>
+                <button
+                    className="tf-back-btn"
+                    onClick={() => {
+                        setStep(0);
+                    }}
+                    style={{ padding: '12px 24px' }}
+                >
+                    Voltar
+                </button>
+                <button
+                    onClick={handleProfileNext}
+                    className={`onboarding-btn ${!isValidProfile ? 'is-inactive' : ''}`}
+                    disabled={loading || !isValidProfile}
+                    style={{ flex: 1, margin: 0 }}
+                >
+                    {loading ? "Salvando..." : "Tudo pronto! Vamos continuar →"}
+                </button>
+            </div>
         </div >
     );
 
@@ -575,9 +593,14 @@ export default function OnboardingPage() {
                 Agora que conhecemos seu sonho, precisamos entender como você gerencia as finanças da sua empresa. <br /><br />
                 O objetivo é termos um <strong>diagnóstico inicial</strong> para que possamos te ajudar a conquistar o seu sonho com segurança!
             </p>
-            <button className="onboarding-btn" onClick={() => setStep(4)} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                Começar Diagnóstico
-            </button>
+            <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+                <button className="tf-back-btn" onClick={() => setStep(2)} style={{ padding: '12px 24px' }}>
+                    Voltar
+                </button>
+                <button className="onboarding-btn" onClick={() => setStep(4)} style={{ flex: 1, margin: 0 }}>
+                    Começar Diagnóstico
+                </button>
+            </div>
         </div>
     );
 
@@ -602,7 +625,18 @@ export default function OnboardingPage() {
                         ))}
                     </div>
                     <div className="tf-actions">
-                        <button className="tf-back-btn" disabled={currentQuestion === 0} onClick={() => setCurrentQuestion(prev => prev - 1)}>Voltar</button>
+                        <button
+                            className="tf-back-btn"
+                            onClick={() => {
+                                if (currentQuestion > 0) {
+                                    setCurrentQuestion(prev => prev - 1);
+                                } else {
+                                    setStep(3);
+                                }
+                            }}
+                        >
+                            Voltar
+                        </button>
                         <div className="tf-counter">Questão {currentQuestion + 1} de {MATURITY_DATA.length}</div>
                     </div>
                 </div>
@@ -675,13 +709,19 @@ export default function OnboardingPage() {
 
                 {error && <p className="onboarding-error">{error}</p>}
 
-                <button
-                    className={`onboarding-btn ${!isComplete ? 'is-inactive' : ''}`}
-                    onClick={handleRevenueGoalNext}
-                    disabled={loading}
-                >
-                    {loading ? "Salvando..." : "Continuar →"}
-                </button>
+                <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+                    <button className="tf-back-btn" onClick={() => setStep(4)} style={{ padding: '12px 24px' }}>
+                        Voltar
+                    </button>
+                    <button
+                        className={`onboarding-btn ${!isComplete ? 'is-inactive' : ''}`}
+                        onClick={handleRevenueGoalNext}
+                        disabled={loading}
+                        style={{ flex: 1, margin: 0 }}
+                    >
+                        {loading ? "Salvando..." : "Continuar →"}
+                    </button>
+                </div>
             </div>
         );
     };

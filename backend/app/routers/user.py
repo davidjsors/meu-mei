@@ -57,6 +57,16 @@ async def submit_maturity(request: MaturityRequest):
 
     if not resp.data:
         raise HTTPException(status_code=500, detail="Erro ao salvar perfil")
+        
+    # Registrar saldo inicial como uma transação de "entrada/venda" se houver
+    if request.initial_balance and request.initial_balance > 0:
+        db.table("financial_records").insert({
+            "phone_number": request.phone_number,
+            "type": "entrada",
+            "amount": request.initial_balance,
+            "description": "Saldo Inicial",
+            "category": "vendas"
+        }).execute()
 
     return ProfileResponse(**resp.data[0])
 
@@ -188,42 +198,32 @@ async def get_finance_summary(phone_number: str):
     last_day = calendar.monthrange(today.year, today.month)[1]
     end_date = today.replace(day=last_day).isoformat()
 
-    resp = db.table("financial_records").select("*").eq(
+    # Entradas e Saídas do Mês (Para o Resumo Mensal e Meta)
+    resp_month = db.table("financial_records").select("amount, type").eq(
         "phone_number", phone_number
     ).gte("created_at", f"{start_date}T00:00:00").lte(
         "created_at", f"{end_date}T23:59:59"
     ).execute()
-
-    # Saldo Inicial do Perfil
-    profile_resp = db.table("profiles").select("initial_balance").eq("phone_number", phone_number).execute()
-    initial_balance = 0.0
-    if profile_resp.data:
-        initial_balance = float(profile_resp.data[0].get("initial_balance", 0) or 0)
-
-    records = resp.data or []
-
-    # Somar entradas do mês, excluindo o registro de 'Saldo Inicial' se ele estiver na lista
-    # para evitar duplicidade com o initial_balance do perfil
-    entradas_mes = sum(
-        float(r.get("amount", 0))
-        for r in records
-        if r.get("type") == "entrada" and r.get("description") != "Saldo Inicial (Onboarding)"
-    )
     
-    # O total de entradas exibido no card inclui o saldo que o usuário já tinha
-    entradas_total = entradas_mes + initial_balance
+    month_records = resp_month.data or []
+    entradas_mes = sum(float(r["amount"]) for r in month_records if r["type"] == "entrada")
+    saidas_mes = sum(float(r["amount"]) for r in month_records if r["type"] == "saida")
 
-    saidas_total = sum(
-        float(r.get("amount", 0))
-        for r in records
-        if r.get("type") == "saida"
-    )
+    # Saldo Total (Soma de tudo que já entrou menos tudo que já saiu)
+    resp_all = db.table("financial_records").select("amount, type").eq(
+        "phone_number", phone_number
+    ).execute()
+    
+    all_records = resp_all.data or []
+    total_entradas = sum(float(r["amount"]) for r in all_records if r["type"] == "entrada")
+    total_saidas = sum(float(r["amount"]) for r in all_records if r["type"] == "saida")
+    saldo_total = total_entradas - total_saidas
 
     return {
-        "entradas": entradas_total,
-        "saidas": saidas_total,
-        "saldo": entradas_total - saidas_total,
-        "initial_balance": initial_balance
+        "entradas": entradas_mes,
+        "saidas": saidas_mes,
+        "saldo": saldo_total,
+        "initial_balance": 0.0 # Removido da lógica de exibição separada
     }
 
 
