@@ -131,6 +131,22 @@ export default function ChatPage() {
                         }
                         // Se for imagem/áudio/pdf, mantém
                         return true;
+                    })
+                    .sort((a, b) => {
+                        const timeA = new Date(a.created_at).getTime();
+                        const timeB = new Date(b.created_at).getTime();
+
+                        // Se a diferença for menor que 2 segundos e forem do assistente
+                        // Forçamos o Texto a vir ANTES do Áudio
+                        if (Math.abs(timeA - timeB) < 2000 && a.role === "assistant" && b.role === "assistant") {
+                            const typeA = a.content_type || "text";
+                            const typeB = b.content_type || "text";
+
+                            if (typeA === "text" && typeB === "audio") return -1;
+                            if (typeA === "audio" && typeB === "text") return 1;
+                        }
+
+                        return timeA - timeB;
                     });
 
                 setMessages(cleanedMessages);
