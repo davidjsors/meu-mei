@@ -44,11 +44,13 @@ async def submit_maturity(request: MaturityRequest):
         "business_type": request.business_type,
         "dream": request.dream,
         "revenue_goal": request.revenue_goal,
+        "initial_balance": request.initial_balance,
         "maturity_score": score,
         "maturity_level": level,
     }
 
     # Upsert — cria ou atualiza
+    print(f"User: Salvando perfil para {request.name} ({request.phone_number}). Bal: {request.initial_balance}. Data: {profile_data}")
     resp = db.table("profiles").upsert(
         profile_data, on_conflict="phone_number"
     ).execute()
@@ -192,23 +194,36 @@ async def get_finance_summary(phone_number: str):
         "created_at", f"{end_date}T23:59:59"
     ).execute()
 
+    # Saldo Inicial do Perfil
+    profile_resp = db.table("profiles").select("initial_balance").eq("phone_number", phone_number).execute()
+    initial_balance = 0.0
+    if profile_resp.data:
+        initial_balance = float(profile_resp.data[0].get("initial_balance", 0) or 0)
+
     records = resp.data or []
 
-    entradas = sum(
+    # Somar entradas do mês, excluindo o registro de 'Saldo Inicial' se ele estiver na lista
+    # para evitar duplicidade com o initial_balance do perfil
+    entradas_mes = sum(
         float(r.get("amount", 0))
         for r in records
-        if r.get("type") == "entrada"
+        if r.get("type") == "entrada" and r.get("description") != "Saldo Inicial (Onboarding)"
     )
-    saidas = sum(
+    
+    # O total de entradas exibido no card inclui o saldo que o usuário já tinha
+    entradas_total = entradas_mes + initial_balance
+
+    saidas_total = sum(
         float(r.get("amount", 0))
         for r in records
         if r.get("type") == "saida"
     )
 
     return {
-        "entradas": entradas,
-        "saidas": saidas,
-        "saldo": entradas - saidas,
+        "entradas": entradas_total,
+        "saidas": saidas_total,
+        "saldo": entradas_total - saidas_total,
+        "initial_balance": initial_balance
     }
 
 

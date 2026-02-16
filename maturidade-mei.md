@@ -13,60 +13,60 @@ Diagnosticar a maturidade financeira do MEI para personalizar a mentoria digital
 ### 🚀 Uso e Aplicação
 O instrumento deve ser aplicado no primeiro contacto do utilizador com o agente de IA. A interação deve ser conduzida de forma leve e conversacional, utilizando uma **Escala Likert de cinco pontos**.
 
-## � 2. Itens do Questionário
+## 📑 2. Itens do Questionário (Versão Conversacional)
+ 
+ ### 1. Registro e controle
+**Conversa:** Você costuma registrar todas as entradas e saídas do seu negócio? Tipo, anota tudo certinho o que vende e o que gasta?
 
-### 1. Registro e controle
-**Afirmação:** Eu registro todas as entradas e saídas de dinheiro do meu negócio, identificando exatamente para onde vai cada valor.
-
-* **1:** Nunca
-* **2:** Raramente
-* **3:** Às vezes
-* **4:** Frequentemente
-* **5:** Sempre
+* **1:** Não anoto nada
+* **2:** Anoto só de vez em quando
+* **3:** Anoto quase tudo, mas esqueço alguns
+* **4:** Anoto tudo, mas não organizo muito
+* **5:** Registro cada centavo (Entradas e Saídas)
 
 > _Fundamentação:_ anotar tudo o que se vende e gasta é o primeiro passo para gerir a saúde do negócio (SEBRAE, [s.d.]).
 
 ### 2. Separação de contas
-**Afirmação:** Eu utilizo contas bancárias diferentes para minha vida pessoal e para minha empresa.
+**Conversa:** E sobre as contas: você usa conta separada pra vida pessoal e pro negócio, ou tá tudo junto ainda?
 
-* **1:** Minha conta pessoal e profissional é uma só
-* **2:** Tudo na mesma conta, mas controlo no papel/excel
-* **3:** Tudo na mesma conta, mas uso bancos diferentes para organizar
-* **4:** Contas separadas, mas ainda transfiro entre elas sem muito critério
-* **5:** Tenho uma conta pessoal e outra da empresa
+* **1:** Tudo misturado na minha conta pessoal
+* **2:** Tento separar, mas acabo misturando
+* **3:** Tenho contas separadas, mas uso o dinheiro cruzado
+* **4:** Separo bem, só misturo em emergências
+* **5:** Totalmente separadas (PJ e PF)
 
 > _Fundamentação:_ a confusão patrimonial compromete a análise do lucro real e a sustentabilidade da empresa (BANCO DO NORDESTE, 2024).
 
 ### 3. Olhar para o futuro
-**Afirmação:** Eu acompanho meu saldo e sei com antecedência se terei dinheiro para pagar os boletos da próxima semana ou do próximo mês.
+**Conversa:** Quando chega a hora de pagar os boletos, você já sabe de antemão se vai ter dinheiro? Você acompanha isso?
 
-* **1:** Nunca
-* **2:** Raramente
-* **3:** Às vezes
-* **4:** Frequentemente
-* **5:** Sempre
+* **1:** Nunca sei, vivo no susto
+* **2:** Raramente sei antes
+* **3:** Às vezes tenho noção
+* **4:** Geralmente sei com antecedência
+* **5:** Sempre sei (Controle total)
 
 > _Fundamentação:_ a falta de previsão de saldo é um dos principais riscos detectados em microempreendedores (SEBRAE, 2018).
 
 ### 4. Busca por conhecimento
-**Afirmação:** Eu procuro aprender novas formas de cuidar do dinheiro e de melhorar a gestão da minha empresa.
+**Conversa:** Você costuma buscar aprender sobre gestão financeira? Cursos, vídeos, dicas...
 
-* **1:** Nunca
+* **1:** Nunca busco
 * **2:** Raramente
-* **3:** Às vezes
-* **4:** Frequentemente
-* **5:** Sempre
+* **3:** Às vezes vejo uns vídeos
+* **4:** Frequentemente procuro dicas
+* **5:** Sempre (Estudo constante)
 
 > _Fundamentação:_ o aprendizado contínuo sobre gestão financeira tende a gerar resultados positivos na longevidade dos negócios (BANCO CENTRAL DO BRASIL, 2018).
 
 ### 5. Cálculo de lucro
-**Afirmação:** Eu defino meus preços sabendo exatamente quanto gasto para produzir e qual será minha sobra (lucro) final.
+**Conversa:** Na hora de colocar preço no que você vende, você sabe direitinho quanto gasta pra produzir e quanto sobra de lucro?
 
-* **1:** Nunca
-* **2:** Raramente
-* **3:** Às vezes
-* **4:** Frequentemente
-* **5:** Sempre
+* **1:** Chuto o preço ou copio o vizinho
+* **2:** Tenho uma ideia por cima
+* **3:** Calculo os custos principais, mas não o lucro
+* **4:** Calculo bem, mas às vezes erro a mão
+* **5:** Calculo tudo (Custos + Margem + Lucro)
 
 > _Fundamentação:_ entender a diferença entre faturamento e lucro é vital para a continuidade do empreendimento (BANCO DO NORDESTE, 2024).
 ---

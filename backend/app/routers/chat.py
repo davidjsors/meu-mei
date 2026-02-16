@@ -274,17 +274,21 @@ async def send_message(
 
     if profile_resp.data:
         profile = profile_resp.data[0]
+        print(f"Chat: Perfil encontrado para {phone_number}: {profile.get('name')} | Score: {profile.get('maturity_score')}")
     else:
         # Novo usuário — criar perfil (upsert para garantir unicidade)
+        print(f"Chat: Perfil NÃO encontrado para {phone_number}. Criando perfil temporário.")
         db.table("profiles").upsert({
             "phone_number": phone_number,
         }, on_conflict="phone_number").execute()
         profile = {"phone_number": phone_number}
 
     is_onboarding = _is_onboarding_mode(profile)
+    user_name = profile.get("name") or "Empreendedor"
     maturity_score = profile.get("maturity_score")
     dream = profile.get("dream")
     business_type = profile.get("business_type")
+    revenue_goal = profile.get("revenue_goal", 0.0)
     user_summary = profile.get("summary")
     last_summary_at = profile.get("last_summary_at")
 
@@ -417,7 +421,11 @@ async def send_message(
         finance_resp = db.table("financial_records").select("*").eq(
             "phone_number", phone_number
         ).execute()
-        financial_context = get_financial_summary(finance_resp.data or [])
+        
+        # Obter saldo inicial do perfil para o resumo
+        initial_balance = float(profile.get("initial_balance", 0) or 0)
+        
+        financial_context = get_financial_summary(finance_resp.data or [], initial_balance)
         if financial_context and message:
             enriched_message = (
                 f"{message}\n\n[Contexto financeiro atual do usuário:\n{financial_context}]"
@@ -451,10 +459,11 @@ async def send_message(
             async for chunk in generate_response_stream(
                 message=enriched_message,
                 chat_history=chat_history,
-                user_name=profile.get("name"),
+                user_name=user_name,
                 maturity_score=maturity_score,
                 dream=dream,
                 business_type=business_type,
+                revenue_goal=revenue_goal,
                 is_onboarding=is_onboarding,
                 file_bytes=file_bytes,
                 file_mime=file_mime,

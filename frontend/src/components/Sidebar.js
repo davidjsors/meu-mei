@@ -465,6 +465,9 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                                             return d;
                                         })()}</strong></>
                                     ) : '.'}
+                                    {profile.initial_balance > 0 && (
+                                        <> Começamos com <strong>{formatCurrency(profile.initial_balance)}</strong> em caixa.</>
+                                    )}
                                 </span>
                             </div>
                         )}
@@ -481,6 +484,14 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                             <BarChart3 size={18} color={finance.saldo >= 0 ? "var(--green)" : "var(--outflow-light)"} />
                             <h3 style={{ margin: 0 }}>Resumo Financeiro</h3>
                         </div>
+
+                        {profile.initial_balance > 0 && (
+                            <div className="finance-row" style={{ opacity: 0.8, fontSize: '12px', marginBottom: '8px', borderBottom: '1px dashed var(--border-color)', paddingBottom: '4px' }}>
+                                <span>Saldo Inicial</span>
+                                <span>{formatCurrency(profile.initial_balance)}</span>
+                            </div>
+                        )}
+
                         <div className="finance-row positive">
                             <span>Entradas</span>
                             <span>{formatCurrency(finance.entradas)}</span>

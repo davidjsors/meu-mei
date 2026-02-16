@@ -81,7 +81,6 @@ async def social_login(request: SocialLoginRequest):
     }
 
 @router.post("/set-pin")
-@router.post("/set-pin")
 async def set_pin_endpoint(request: PinRequest):
     """
     Define ou atualiza o PIN do usuário.

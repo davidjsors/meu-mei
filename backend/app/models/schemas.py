@@ -16,6 +16,7 @@ class MaturityRequest(BaseModel):
     business_type: str
     dream: str
     revenue_goal: float
+    initial_balance: Optional[float] = 0.0
     answers: list[int] = Field(..., min_length=5, max_length=5, description="5 respostas Likert (1-5)")
 
 
@@ -27,6 +28,7 @@ class ProfileResponse(BaseModel):
     maturity_score: Optional[int] = None
     maturity_level: Optional[str] = None
     revenue_goal: Optional[float] = None
+    initial_balance: Optional[float] = None
     created_at: Optional[datetime] = None
     social_provider: Optional[str] = None
     has_pin: bool = False

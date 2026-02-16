@@ -206,7 +206,6 @@ export default function OnboardingPage() {
         // Profile Validations
         if (!name.trim()) { setError("Opa! Como podemos te chamar? Informe seu nome."); setInvalidField("name"); return; }
         if (!businessType.trim()) { setError("Qual a sua profissão? (ex: Eletricista)"); setInvalidField("businessType"); return; }
-        if (!businessType.trim()) { setError("Qual a sua profissão? (ex: Eletricista)"); setInvalidField("businessType"); return; }
         if (!dream.trim()) { setError("Conte para a gente qual o seu maior sonho!"); setInvalidField("dream"); return; }
 
         // PIN Validations
@@ -424,7 +423,22 @@ export default function OnboardingPage() {
     };
 
     const handleRevenueGoalNext = () => {
-        if (!revenueGoal.trim()) { setError("Informe sua meta de vendas para este mês."); setInvalidField("revenueGoal"); return; }
+        setInvalidField("");
+        setError("");
+
+        let hasError = false;
+        if (!revenueGoal.trim()) {
+            setError("Informe sua meta de vendas para este mês.");
+            setInvalidField("revenueGoal");
+            hasError = true;
+        } else if (!initialBalance.trim()) {
+            setError("Informe quanto você tem em caixa para começarmos.");
+            setInvalidField("initialBalance");
+            hasError = true;
+        }
+
+        if (hasError) return;
+
         setStep(7);
     };
 
@@ -514,21 +528,42 @@ export default function OnboardingPage() {
         try {
             const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
             const goalValue = parseFloat(revenueGoal.replace(/\./g, '').replace(',', '.')) || 0;
-            // Save Maturity
+            const balanceValue = initialBalance ? parseFloat(initialBalance.replace(/\./g, '').replace(',', '.')) : 0;
+
+            console.log("Onboarding: Salvando dados finais...", { name, businessType, dream, goalValue, balanceValue });
+
+            // 1. Salvar Perfil e Maturidade
+            // O initial_balance já foi salvo como record em handleInitialFinanceNext, 
+            // mas aqui salvamos no perfil para persistência e contexto da IA.
             await fetch(`${API_BASE}/api/user/maturity`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ phone_number: phone, name, business_type: businessType, dream, revenue_goal: goalValue, answers }),
+                body: JSON.stringify({
+                    phone_number: phone,
+                    name,
+                    business_type: businessType,
+                    dream,
+                    revenue_goal: goalValue,
+                    initial_balance: balanceValue,
+                    answers
+                }),
             });
-            // Accept Terms
+
+            // 2. Aceitar Termos
             await fetch(`${API_BASE}/api/user/accept-terms`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ phone_number: phone }),
             });
+
             localStorage.setItem("meumei_phone", phone);
             localStorage.setItem("meumei_login_at", String(Date.now()));
-            router.push("/chat");
+
+            console.log("Onboarding: Finalizado. Redirecionando...");
+            // Pequeno delay para garantir persistência e processamento no backend
+            setTimeout(() => {
+                router.push("/chat");
+            }, 1000);
         } catch (e) { setError("Erro ao finalizar cadastro. Tente novamente."); }
         finally { setLoading(false); }
     };
@@ -575,34 +610,81 @@ export default function OnboardingPage() {
         );
     };
 
-    const renderRevenueGoal = () => (
-        <div className="onboarding-card" style={{ maxWidth: '580px' }}>
-            <h2 className="onboarding-title">Defina sua Meta</h2>
-            <p className="onboarding-subtitle">Para que o Meu MEI possa te ajudar a alcançar seus objetivos, precisamos saber onde você quer chegar financeiramente.</p>
+    const renderRevenueGoal = () => {
+        const isComplete = revenueGoal.trim() && initialBalance.trim();
 
-            <div className="onboarding-form-group">
-                <label className="onboarding-label">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        Qual é a sua meta mensal de vendas ou o valor que você gostaria de faturar?
+        return (
+            <div className="onboarding-card" style={{ maxWidth: '580px' }}>
+                <h2 className="onboarding-title">Defina sua Meta e Saldo</h2>
+                <p className="onboarding-subtitle">Para que o Meu MEI possa te ajudar a alcançar seus objetivos, precisamos saber onde você quer chegar e com quanto estamos começando.</p>
+
+                <div className="onboarding-form-group">
+                    <label className="onboarding-label">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            1. Qual é a sua meta mensal de vendas ou o valor que você gostaria de faturar?
+                        </div>
+                    </label>
+                    <div style={{ position: 'relative' }}>
+                        <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', fontWeight: '600', color: 'var(--text-muted)' }}>R$</span>
+                        <input
+                            autoFocus
+                            className={`onboarding-input ${invalidField === 'revenueGoal' ? 'input-error-blink' : ''}`}
+                            style={{ paddingLeft: '48px', fontSize: '24px' }}
+                            placeholder="0,00"
+                            value={revenueGoal}
+                            onChange={e => {
+                                let v = e.target.value.replace(/\D/g, "");
+                                if (!v) { setRevenueGoal(""); return; }
+                                const floatValue = parseInt(v) / 100;
+                                setRevenueGoal(floatValue.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+                                if (invalidField === 'revenueGoal') setInvalidField("");
+                                setError("");
+                            }}
+                        />
                     </div>
-                </label>
-                <div style={{ position: 'relative' }}>
-                    <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', fontWeight: '600', color: 'var(--text-muted)' }}>R$</span>
-                    <input autoFocus className={`onboarding-input ${invalidField === 'revenueGoal' ? 'input-error-blink' : ''}`} style={{ paddingLeft: '48px', fontSize: '24px' }} placeholder="0,00" value={revenueGoal} onChange={e => {
-                        let v = e.target.value.replace(/\D/g, "");
-                        if (!v) { setRevenueGoal(""); return; }
-                        const floatValue = parseInt(v) / 100;
-                        setRevenueGoal(floatValue.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-                        if (invalidField === 'revenueGoal') setInvalidField("");
-                    }} />
                 </div>
+
+                <div className="onboarding-form-group" style={{ marginTop: '24px' }}>
+                    <label className="onboarding-label">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            2. Quanto você tem disponível em caixa hoje? (Dinheiro + Banco)
+                        </div>
+                    </label>
+                    <div style={{ position: 'relative' }}>
+                        <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', fontWeight: '600', color: 'var(--text-muted)' }}>R$</span>
+                        <input
+                            className={`onboarding-input ${invalidField === 'initialBalance' ? 'input-error-blink' : ''}`}
+                            style={{ paddingLeft: '48px', fontSize: '24px', color: 'var(--green)' }}
+                            placeholder="0,00"
+                            value={initialBalance}
+                            onChange={e => {
+                                let v = e.target.value.replace(/\D/g, "");
+                                if (!v) { setInitialBalance(""); return; }
+                                const floatValue = parseInt(v) / 100;
+                                setInitialBalance(floatValue.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+                                if (invalidField === 'initialBalance') setInvalidField("");
+                                setError("");
+                            }}
+                            onKeyDown={(e) => e.key === 'Enter' && handleRevenueGoalNext()}
+                        />
+                    </div>
+                    <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '8px' }}>
+                        * Este valor será o seu saldo inicial para começarmos a acompanhar seu fluxo de caixa.
+                    </p>
+                </div>
+
+                {error && <p className="onboarding-error">{error}</p>}
+
+                <button
+                    className={`onboarding-btn ${!isComplete ? 'is-inactive' : ''}`}
+                    onClick={handleRevenueGoalNext}
+                    disabled={loading}
+                >
+                    {loading ? "Salvando..." : "Continuar →"}
+                </button>
             </div>
-            {error && <p className="onboarding-error">{error}</p>}
-            <button className="onboarding-btn" onClick={handleRevenueGoalNext}>
-                Continuar →
-            </button>
-        </div>
-    );
+        );
+    };
 
     const renderInitialFinance = () => (
         <div className="onboarding-card" style={{ maxWidth: '600px' }}>

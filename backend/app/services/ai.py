@@ -154,18 +154,21 @@ async def generate_response_stream(
     file_bytes: bytes | None = None,
     file_mime: str | None = None,
     user_summary: str | None = None,
+    revenue_goal: float | None = None,
     pending_messages: list[str] | None = None,
     replied_to_content: str | None = None,
 ):
     if is_onboarding:
         system_prompt = str(build_onboarding_prompt())
     else:
+        print(f"Gerando resposta para: {user_name}, Score: {maturity_score}, Dream: {dream}")
         system_prompt = str(build_system_prompt(
             user_name or "Empreendedor",
             maturity_score or 10, 
             dream or "crescer o negocio", 
             business_type or "empreendedor",
-            user_summary
+            user_summary,
+            revenue_goal or 0.0
         ))
 
     if replied_to_content:
