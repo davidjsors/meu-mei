@@ -104,6 +104,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
 
     // Delete account state
     const [deleting, setDeleting] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
     // Modal State
     const [modal, setModal] = useState({

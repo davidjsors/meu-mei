@@ -39,7 +39,7 @@ export async function sendMessage(phoneNumber, message, file = null, parentId = 
  * Lê SSE stream e chama callbacks para cada evento.
  * Agora parseia tanto o 'event:' quanto o 'data:' lines do SSE.
  */
-export async function streamResponse(response, onChunk, onDone, onError, onOnboardingComplete, onFinanceUpdated, onAgentAudio, onStatus, onTextDone) {
+export async function streamResponse(response, onChunk, onDone, onError, onOnboardingComplete, onFinanceUpdated, onAgentAudio, onStatus, onTextDone, onProfileUpdated) {
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let buffer = "";
@@ -66,6 +66,9 @@ export async function streamResponse(response, onChunk, onDone, onError, onOnboa
                 }
                 if (currentEvent === "finance_updated") {
                     onFinanceUpdated?.();
+                }
+                if (currentEvent === "profile_updated") {
+                    onProfileUpdated?.();
                 }
                 if (currentEvent === "agent_audio" && data.audio) {
                     onAgentAudio?.(data.audio);

@@ -85,9 +85,13 @@ RE_FIELD_SONHO = re.compile(r"(?:\*+)?sonho:(?:\*+)?\s*(.+)", re.IGNORECASE)
 RE_FIELD_SCORE = re.compile(r"(?:\*+)?score:(?:\*+)?\s*(\d+)", re.IGNORECASE)
 
 RE_FIELD_TIPO = re.compile(r"(?:\*+)?tipo:(?:\*+)?\s*(entrada|saída|saida|receita|despesa)", re.IGNORECASE)
-RE_FIELD_VALOR = re.compile(r"(?:\*+)?valor:(?:\*+)?\s*([\d,.\s]*\d+\s*[kK]?|[\d,.]+)", re.IGNORECASE)
+RE_FIELD_VALOR = re.compile(r"(?:\*+)?valor:(?:\*+)?\s*(.+)", re.IGNORECASE)
 RE_FIELD_DESC = re.compile(r"(?:\*+)?descricao:(?:\*+)?\s*(.+)", re.IGNORECASE)
 RE_FIELD_CAT = re.compile(r"(?:\*+)?categoria:(?:\*+)?\s*(.+)", re.IGNORECASE)
+RE_FIELD_META = re.compile(r"(?:\*+)?meta:(?:\*+)?\s*(.+)", re.IGNORECASE)
+
+# Marcador de atualização de perfil (Meta e Sonho)
+UPDATE_PROFILE_RE_BLOCK = re.compile(r"\[UPDATE_PROFILE\](.*?)\[/UPDATE_PROFILE\]", re.IGNORECASE | re.DOTALL)
 
 # Regex para extrair áudio (voz do mentor)
 AUDIO_PATTERN = re.compile(r"\[AUDIO\](.*?)\[/AUDIO\]", re.IGNORECASE | re.DOTALL)
@@ -132,6 +136,22 @@ def _clean_onboarding_markers(text: str) -> str:
     return ONBOARDING_RE_BLOCK.sub("", text).strip()
 
 
+def _parse_amount(val_text: str) -> float:
+    """Extrai valor numérico tratando gírias (k) e formatos (BR/US)."""
+    v_raw = val_text.strip().lower()
+    multiplier = 1000 if "k" in v_raw else 1
+    v_clean = re.sub(r"[^\d,.]", "", v_raw.replace("k", ""))
+    
+    if "," in v_clean and "." in v_clean:
+        if v_clean.rfind(",") > v_clean.rfind("."):
+            v_clean = v_clean.replace(".", "").replace(",", ".")
+        else:
+            v_clean = v_clean.replace(",", "")
+    elif "," in v_clean:
+        v_clean = v_clean.replace(",", ".")
+    
+    return float(v_clean) * multiplier
+
 def _parse_transactions(text: str) -> list[dict]:
     """Extrai transações via blocos."""
     transactions = []
@@ -151,20 +171,7 @@ def _parse_transactions(text: str) -> list[dict]:
         try:
             tipo_raw = tipo_m.group(1).strip().lower()
             tipo = "entrada" if tipo_raw in ["entrada", "receita"] else "saida"
-            
-            v_raw = valor_m.group(1).strip().lower()
-            multiplier = 1000 if "k" in v_raw else 1
-            v_clean = re.sub(r"[^\d,.]", "", v_raw.replace("k", ""))
-            
-            if "," in v_clean and "." in v_clean:
-                if v_clean.rfind(",") > v_clean.rfind("."):
-                    v_clean = v_clean.replace(".", "").replace(",", ".")
-                else:
-                    v_clean = v_clean.replace(",", "")
-            elif "," in v_clean:
-                v_clean = v_clean.replace(",", ".")
-            
-            valor = float(v_clean) * multiplier
+            valor = _parse_amount(valor_m.group(1))
             desc = desc_m.group(1).strip()
             cat = cat_m.group(1).strip().lower()
             
@@ -199,6 +206,30 @@ def _get_reset_arg(text: str) -> str | None:
     if match:
         return match.group(1).upper() if match.group(1) else "ALL"
     return None
+
+def _parse_profile_update(text: str) -> dict | None:
+    """Extrai dados de atualização de perfil (Meta/Sonho)."""
+    match_block = UPDATE_PROFILE_RE_BLOCK.search(text)
+    if not match_block:
+        return None
+    
+    inner = match_block.group(1)
+    meta_m = RE_FIELD_META.search(inner)
+    dream_m = RE_FIELD_SONHO.search(inner)
+    
+    updates = {}
+    if meta_m:
+        try:
+            updates["revenue_goal"] = _parse_amount(meta_m.group(1))
+        except: pass
+    if dream_m:
+        updates["dream"] = dream_m.group(1).strip()
+        
+    return updates if updates else None
+
+def _clean_profile_update_markers(text: str) -> str:
+    """Remove blocos de atualização de perfil."""
+    return UPDATE_PROFILE_RE_BLOCK.sub("", text).strip()
 
 
 def _clean_reset_marker(text: str) -> str:
@@ -621,6 +652,16 @@ async def send_message(
                 yield {
                     "event": "finance_updated",
                     "data": json.dumps({"deleted": len(deletions)}),
+                }
+
+            # Verificar e atualizar perfil (Meta/Sonho)
+            profile_updates = _parse_profile_update(assistant_content)
+            if profile_updates:
+                db.table("profiles").update(profile_updates).eq("phone_number", phone_number).execute()
+                assistant_content = _clean_profile_update_markers(assistant_content)
+                yield {
+                    "event": "profile_updated",
+                    "data": json.dumps({"updated_fields": list(profile_updates.keys())}),
                 }
 
             # Verificar se há áudio para gerar

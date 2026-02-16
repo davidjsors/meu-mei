@@ -276,7 +276,7 @@ export default function ChatPage() {
                             setAudioStatus("generating");
                         }
                     },
-                    // onTextDone (NOVO: Finaliza o texto antes do áudio)
+                    // onTextDone
                     () => {
                         const cleanContent = cleanMarkers(accumulated);
                         if (cleanContent.trim() && !wasTextCommitted) {
@@ -295,6 +295,15 @@ export default function ChatPage() {
                         }
                         setStreamingText("");
                         accumulated = ""; // Limpa buffer
+                    },
+                    // onProfileUpdated
+                    async () => {
+                        try {
+                            const refreshed = await getProfile(phone);
+                            if (refreshed) setProfile(refreshed);
+                        } catch (err) {
+                            console.error("Erro refresh profile", err);
+                        }
                     }
                 );
 

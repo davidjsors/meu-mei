@@ -8,6 +8,7 @@ const ONBOARDING_MARKER_RE = /\[ONBOARDING_COMPLETE\][\s\S]*?\[\/ONBOARDING_COMP
 const DELETE_MARKER_RE = /\[DELETE_TRANSACTION\][\s\S]*?\[\/DELETE_TRANSACTION\]/gi;
 const RESET_MARKER_RE = /\[RESET_FINANCE.*?\]/gi;
 const CONTEXT_MARKER_RE = /\[CONTEXTO\]/gi;
+const UPDATE_PROFILE_MARKER_RE = /\[UPDATE_PROFILE\][\s\S]*?\[\/UPDATE_PROFILE\]/gi;
 
 /**
  * Limpa marcadores técnicos da resposta exibida ao usuário final.
@@ -20,7 +21,8 @@ export const cleanMarkers = (text) => {
         .replace(ONBOARDING_MARKER_RE, "")
         .replace(DELETE_MARKER_RE, "")
         .replace(RESET_MARKER_RE, "")
-        .replace(CONTEXT_MARKER_RE, "");
+        .replace(CONTEXT_MARKER_RE, "")
+        .replace(UPDATE_PROFILE_MARKER_RE, "");
 
     // Limpeza de espaços e quebras múltiplas
     return cleaned
