@@ -524,7 +524,8 @@ export default function OnboardingPage() {
                 }),
             });
 
-            // 3. Salvar Saldo Inicial como Record
+            // 3. Salvar Saldo Inicial como Record - REMOVIDO (Já é feito no backend ao salvar maturidade)
+            /*
             if (balanceValue > 0) {
                 await fetch(`${API_BASE}/api/user/finance/record`, {
                     method: "POST",
@@ -538,6 +539,7 @@ export default function OnboardingPage() {
                     })
                 });
             }
+            */
 
             // 4. Salvar Despesas Iniciais como Records
             for (const expense of initialExpenses) {
