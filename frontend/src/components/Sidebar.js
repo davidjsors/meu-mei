@@ -447,7 +447,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                 /* ═══ HOME VIEW ═══ */
                 <div className="sidebar-content">
                     {/* Saudação */}
-                    <div style={{ padding: "0 16px 8px", display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ padding: "0 0 8px", display: 'flex', flexDirection: 'column' }}>
                         <div style={{ color: "var(--text-secondary)", fontSize: 16, display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <span><strong style={{ color: "var(--red-primary)" }}>{profile.name?.trim().split(' ')[0]}</strong>!</span>
                             <Fingerprint size={14} style={{ color: "var(--green)" }} />
@@ -509,7 +509,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                     </div>
 
                     {/* META DE FATURAMENTO */}
-                    <div className="finance-card goal-bg" id="tour-sidebar-goal" style={{ marginTop: 16 }}>
+                    <div className="finance-card goal-bg" id="tour-sidebar-goal">
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                 <Target size={18} color="var(--green)" />
@@ -644,145 +644,178 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                         )}
                     </div>
 
-                    {/* Quick Actions */}
+                    {/* Quick Actions Layout: Lado-a-Lado */}
                     <div className="sidebar-quick-actions" id="tour-sidebar-actions">
-                        <button
-                            className={`btn-quick-action entry ${activeTransaction === "entry" ? "active" : ""}`}
-                            onClick={() => toggleTransaction("entry")}
-                        >
-                            <TrendingUp size={24} />
-                            <span>Entrou Dindin</span>
-                        </button>
-                        <button
-                            className={`btn-quick-action exit ${activeTransaction === "exit" ? "active" : ""}`}
-                            onClick={() => toggleTransaction("exit")}
-                        >
-                            <TrendingDown size={24} />
-                            <span>Saiu Dindin</span>
-                        </button>
+                        <div className="quick-actions-layout">
+                            {/* Stack de Botões */}
+                            <div className="quick-actions-btns-stack">
+                                <button
+                                    className={`btn-quick-action entry ${activeTransaction === "entry" ? "active" : ""}`}
+                                    onClick={() => toggleTransaction("entry")}
+                                >
+                                    <TrendingUp size={24} />
+                                    <span>Entrou Dindin</span>
+                                </button>
+                                <button
+                                    className={`btn-quick-action exit ${activeTransaction === "exit" ? "active" : ""}`}
+                                    onClick={() => toggleTransaction("exit")}
+                                >
+                                    <TrendingDown size={24} />
+                                    <span>Saiu Dindin</span>
+                                </button>
+                            </div>
+
+                            {/* Form ao lado */}
+                            {activeTransaction && (
+                                <form onSubmit={submitTransaction} className={`quick-action-inline-form ${activeTransaction}`}>
+                                    <div style={{ marginBottom: 6 }}>
+                                        <label style={{ display: "block", fontSize: 10, color: "var(--text-secondary)", marginBottom: 2 }}>
+                                            Valor (R$) *
+                                        </label>
+                                        <input
+                                            type="tel"
+                                            inputMode="numeric"
+                                            placeholder="0,00"
+                                            value={amount}
+                                            onChange={handleAmountChange}
+                                            style={{
+                                                width: "100%", padding: "8px", borderRadius: 6,
+                                                border: "1px solid var(--border-color)",
+                                                background: "var(--bg-app)",
+                                                color: "var(--text-primary)",
+                                                fontSize: 13
+                                            }}
+                                            autoFocus
+                                        />
+                                    </div>
+
+                                    <div style={{ marginBottom: 6 }}>
+                                        <label style={{ display: "block", fontSize: 10, color: "var(--text-secondary)", marginBottom: 2 }}>
+                                            Categoria *
+                                        </label>
+                                        <div className="custom-dropdown">
+                                            <button
+                                                type="button"
+                                                className="dropdown-trigger"
+                                                onClick={() => setIsShortcutCategoryOpen(!isShortcutCategoryOpen)}
+                                                style={{ height: '36px', background: 'var(--bg-app)', padding: '0 8px' }}
+                                            >
+                                                <span style={{ fontSize: 12 }}>
+                                                    {shortcutCategory
+                                                        ? (activeTransaction === "entry" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES).find(c => c.value === shortcutCategory)?.label
+                                                        : "Selecione..."}
+                                                </span>
+                                                {isShortcutCategoryOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                                            </button>
+
+                                            {isShortcutCategoryOpen && (
+                                                <div className="dropdown-menu" style={{ bottom: '100%', top: 'auto', marginBottom: '8px' }}>
+                                                    {(activeTransaction === "entry" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES).map((cat) => (
+                                                        <div
+                                                            key={cat.value}
+                                                            className={`dropdown-item ${shortcutCategory === cat.value ? 'active' : ''}`}
+                                                            style={{ padding: '8px 12px', fontSize: 12 }}
+                                                            onClick={() => {
+                                                                setShortcutCategory(cat.value);
+                                                                setIsShortcutCategoryOpen(false);
+                                                            }}
+                                                        >
+                                                            {cat.label}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div style={{ marginBottom: 8 }}>
+                                        <label style={{ display: "block", fontSize: 10, color: "var(--text-secondary)", marginBottom: 2 }}>
+                                            Descrição (opcional)
+                                        </label>
+                                        <input
+                                            type="text"
+                                            placeholder={activeTransaction === "entry" ? "Ex: Venda" : "Ex: Conta"}
+                                            value={description}
+                                            onChange={(e) => setDescription(e.target.value)}
+                                            style={{
+                                                width: "100%", padding: "8px", borderRadius: 6,
+                                                border: "1px solid var(--border-color)",
+                                                background: "var(--bg-app)",
+                                                color: "var(--text-primary)",
+                                                fontSize: 13
+                                            }}
+                                        />
+                                    </div>
+
+                                    <div style={{ display: "flex", gap: 8 }}>
+                                        <button
+                                            type="button"
+                                            onClick={() => setActiveTransaction(null)}
+                                            style={{
+                                                flex: 1, padding: "8px",
+                                                background: "transparent",
+                                                border: "1px solid var(--border-color)",
+                                                color: "var(--text-secondary)",
+                                                borderRadius: 6,
+                                                cursor: "pointer",
+                                                fontSize: 12
+                                            }}
+                                        >
+                                            Cancelar
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            disabled={!amount || !shortcutCategory}
+                                            style={{
+                                                flex: 1, padding: "8px",
+                                                background: activeTransaction === "entry" ? "var(--green)" : "var(--outflow-primary)",
+                                                border: "none",
+                                                color: "#fff",
+                                                borderRadius: 6,
+                                                cursor: "pointer",
+                                                fontWeight: "bold",
+                                                fontSize: 12,
+                                                opacity: (!amount || !shortcutCategory) ? 0.5 : 1
+                                            }}
+                                        >
+                                            Enviar
+                                        </button>
+                                    </div>
+                                </form>
+                            )}
+                        </div>
                     </div>
 
-                    {/* INLINE FORM */}
-                    {activeTransaction && (
-                        <form onSubmit={submitTransaction} style={{
-                            marginTop: 12,
-                            padding: "16px",
-                            background: "rgba(0,0,0,0.2)",
-                            borderTop: "1px solid var(--border-color)",
-                            borderBottom: "1px solid var(--border-color)",
-                            animation: "slideDown 0.2s ease-out"
-                        }}>
-                            <div style={{ marginBottom: 12 }}>
-                                <label style={{ display: "block", fontSize: 12, color: "var(--text-secondary)", marginBottom: 4 }}>
-                                    Valor (R$) *
-                                </label>
-                                <input
-                                    type="tel"
-                                    inputMode="numeric"
-                                    placeholder="0,00"
-                                    value={amount}
-                                    onChange={handleAmountChange}
-                                    style={{
-                                        width: "100%", padding: "10px", borderRadius: 6,
-                                        border: "1px solid var(--border-color)",
-                                        background: "var(--bg-app)",
-                                        color: "var(--text-primary)",
-                                        fontSize: 14
-                                    }}
-                                    autoFocus
-                                />
-                            </div>
-                            <div style={{ marginBottom: 16 }}>
-                                <label style={{ display: "block", fontSize: 12, color: "var(--text-secondary)", marginBottom: 4 }}>
-                                    Categoria *
-                                </label>
-                                <div className="custom-dropdown">
-                                    <button
-                                        type="button"
-                                        className="dropdown-trigger"
-                                        onClick={() => setIsShortcutCategoryOpen(!isShortcutCategoryOpen)}
-                                        style={{ height: '42px', background: 'var(--bg-app)' }}
-                                    >
-                                        <span>
-                                            {shortcutCategory
-                                                ? (activeTransaction === "entry" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES).find(c => c.value === shortcutCategory)?.label
-                                                : "Selecione..."}
-                                        </span>
-                                        {isShortcutCategoryOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                                    </button>
-
-                                    {isShortcutCategoryOpen && (
-                                        <div className="dropdown-menu" style={{ bottom: '100%', top: 'auto', marginBottom: '8px' }}>
-                                            {(activeTransaction === "entry" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES).map((cat) => (
-                                                <div
-                                                    key={cat.value}
-                                                    className={`dropdown-item ${shortcutCategory === cat.value ? 'active' : ''}`}
-                                                    onClick={() => {
-                                                        setShortcutCategory(cat.value);
-                                                        setIsShortcutCategoryOpen(false);
-                                                    }}
-                                                >
-                                                    {cat.label}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                            <div style={{ marginBottom: 16 }}>
-                                <label style={{ display: "block", fontSize: 12, color: "var(--text-secondary)", marginBottom: 4 }}>
-                                    Descrição (opcional)
-                                </label>
-                                <input
-                                    type="text"
-                                    placeholder={activeTransaction === "entry" ? "Ex: Venda de bolo" : "Ex: Conta de luz"}
-                                    value={description}
-                                    onChange={(e) => setDescription(e.target.value)}
-                                    style={{
-                                        width: "100%", padding: "10px", borderRadius: 6,
-                                        border: "1px solid var(--border-color)",
-                                        background: "var(--bg-app)",
-                                        color: "var(--text-primary)",
-                                        fontSize: 14
-                                    }}
-                                />
-                            </div>
-                            <div style={{ display: "flex", gap: 10 }}>
-                                <button
-                                    type="button"
-                                    onClick={() => setActiveTransaction(null)}
-                                    style={{
-                                        flex: 1, padding: "10px",
-                                        background: "transparent",
-                                        border: "1px solid var(--border-color)",
-                                        color: "var(--text-secondary)",
-                                        borderRadius: 6,
-                                        cursor: "pointer"
-                                    }}
-                                >
-                                    Cancelar
-                                </button>
-                                <button
-                                    type="submit"
-                                    disabled={!amount || !shortcutCategory}
-                                    style={{
-                                        flex: 2, padding: "10px",
-                                        background: activeTransaction === "entry" ? "var(--green)" : "var(--outflow-primary)",
-                                        border: "none",
-                                        color: "#fff",
-                                        borderRadius: 6,
-                                        cursor: "pointer",
-                                        fontWeight: "bold",
-                                        opacity: (!amount || !shortcutCategory) ? 0.5 : 1
-                                    }}
-                                >
-                                    Enviar
-                                </button>
-                            </div>
-                        </form>
-                    )}
-
                     {/* REMOVED DREAM CARD */}
+                    {/* 3) Motive-se — Moved inside content for spacing consistency */}
+                    <div className="quote-card" id="tour-sidebar-quote">
+                        <div className="quote-header">
+                            <Trophy size={14} color="currentColor" />
+                            <h3>
+                                Motive-se para alcançar o seu sonho
+                            </h3>
+                        </div>
+                        <p>{currentQuote.text}</p>
+                        {currentQuote.author && <span className="quote-author">— {currentQuote.author}</span>}
+                    </div>
+
+                    {/* ═══ SIDEBAR FOOTER (Moved inside Home content) ═══ */}
+                    <div className="sidebar-footer">
+                        <button className="sidebar-footer-btn" onClick={() => setView(view === "terms" ? "home" : "terms")}>
+                            <ShieldCheck size={18} /> Termos
+                        </button>
+                        {showLogoutConfirm ? (
+                            <div className="delete-confirm-inline" style={{ marginLeft: '12px' }}>
+                                <span>Sair?</span>
+                                <button className="confirm-yes" onClick={performLogout}>Sim</button>
+                                <button className="confirm-no" onClick={() => setShowLogoutConfirm(false)}>Não</button>
+                            </div>
+                        ) : (
+                            <button className="sidebar-footer-btn sidebar-logout-btn" onClick={() => setShowLogoutConfirm(true)}>
+                                <LogOut size={18} /> Sair
+                            </button>
+                        )}
+                    </div>
                 </div>
             ) : view === "finance" ? (
                 /* ═══ FINANCE DETAIL VIEW ═══ */
@@ -1034,37 +1067,10 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                         </div>
                     </div>
                 </div>
-            )}
+            )
+            }
 
-            {/* 3) Motive-se — Fixed at bottom */}
-            <div className="quote-card" id="tour-sidebar-quote">
-                <div className="quote-header">
-                    <Trophy size={14} color="currentColor" />
-                    <h3>
-                        Motive-se para alcançar o seu sonho
-                    </h3>
-                </div>
-                <p>{currentQuote.text}</p>
-                {currentQuote.author && <span className="quote-author">— {currentQuote.author}</span>}
-            </div>
 
-            {/* ═══ SIDEBAR FOOTER ═══ */}
-            <div className="sidebar-footer">
-                <button className="sidebar-footer-btn" onClick={() => setView(view === "terms" ? "home" : "terms")}>
-                    <ShieldCheck size={18} /> Termos
-                </button>
-                {showLogoutConfirm ? (
-                    <div className="delete-confirm-inline" style={{ marginLeft: '12px' }}>
-                        <span>Sair?</span>
-                        <button className="confirm-yes" onClick={performLogout}>Sim</button>
-                        <button className="confirm-no" onClick={() => setShowLogoutConfirm(false)}>Não</button>
-                    </div>
-                ) : (
-                    <button className="sidebar-footer-btn sidebar-logout-btn" onClick={() => setShowLogoutConfirm(true)}>
-                        <LogOut size={18} /> Sair
-                    </button>
-                )}
-            </div>
             <Modal
                 isOpen={modal.isOpen}
                 title={modal.title}
@@ -1075,6 +1081,6 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                 onConfirm={modal.onConfirm}
                 onCancel={closeModal}
             />
-        </aside>
+        </aside >
     );
 }

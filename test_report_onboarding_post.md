@@ -77,9 +77,17 @@ O processo de deleção de conta foi testado para garantir que nenhum dado resid
 | Validação de campos R$ 0,00 | ✅ OK | Impede dados nulos na raiz. |
 | Navegação Retroativa (Stepper) | ✅ OK | Permite correção de dados durante onboarding. |
 | Personalização da IA | ✅ OK | Agente reconhece sonhos e profissão. |
-| Lançamentos Rápidos | ✅ OK | Sincronia perfeita entre UI e Motor de IA. |
+| Lançamentos Rápidos (Novo Layout) | ✅ OK | Design Lado-a-Lado evita sobreposição com frases. |
 | Histórico Financeiro | ✅ OK | Listagem cronológica precisa. |
 | Exclusão Total de Conta | ✅ OK | Cumpre requisitos de segurança e LGPD. |
+
+---
+
+## 7. Atualização de Layout: Sidebar Inteligente
+
+Após feedbacks de usabilidade, o componente de **Ações Rápidas** foi redesenhado:
+- **Design Colunar:** Os botões de entrada/saída agora ficam em uma coluna à esquerda, enquanto o formulário abre dinamicamente à direita.
+- **Otimização de Espaço:** Reduzimos o padding da frase motivacional em 20% e ajustamos as fontes para garantir que o formulário nunca oculte o conteúdo inspirador.
 
 ---
 
