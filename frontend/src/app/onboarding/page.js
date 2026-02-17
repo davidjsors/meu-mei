@@ -146,11 +146,15 @@ export default function OnboardingPage() {
 
     // --- STEP 0: PHONE ---
     const handlePhoneSubmit = async () => {
+        setInvalidField("");
+        setError("");
+
         if (phone.replace(/\D/g, "").length !== 11) {
-            return; // inactive button handles UI
+            setError("Por favor, informe seu celular completo com DDD.");
+            setInvalidField("phone");
+            return;
         }
         setLoading(true);
-        setError("");
 
         try {
             // Check if user exists
@@ -213,21 +217,12 @@ export default function OnboardingPage() {
         if (pin.length < 4) { setError("Crie um PIN de pelo menos 4 números."); setInvalidField("pin"); return; }
         if (pin !== confirmPin) { setError("Os PINs informados não são iguais."); setInvalidField("confirmPin"); return; }
 
-        setLoading(true);
-        try {
-            // Limpa o sonho antes de salvar para evitar redundâncias na UI (ex: remover "meu sonho é")
-            const cleanedDream = cleanDream(dream);
-            setDream(cleanedDream);
+        // We clean the dream here, but we DON'T save to DB yet.
+        const cleanedDream = cleanDream(dream);
+        setDream(cleanedDream);
 
-            // Create User & PIN (Upsert)
-            await setPin(phone, pin);
-            // Success -> Move to Maturity Intro
-            setStep(3);
-        } catch (err) {
-            setError(err.message || "Erro ao salvar PIN. Tente novamente.");
-        } finally {
-            setLoading(false);
-        }
+        // Success -> Move to Maturity Intro
+        setStep(3);
     };
 
     // --- RENDERERS ---
@@ -243,26 +238,27 @@ export default function OnboardingPage() {
                 <div className="onboarding-form-group">
                     <label className="onboarding-label">Seu telefone</label>
                     <input
-                        className="onboarding-input"
+                        className={`onboarding-input ${invalidField === 'phone' ? 'input-error-blink' : ''}`}
                         style={{ textAlign: 'center', fontSize: '20px', letterSpacing: '2px', fontWeight: 'bold' }}
                         placeholder="11-98765-4321"
                         value={phone}
                         onChange={(e) => {
                             setPhone(formatPhone(e.target.value));
+                            if (invalidField === 'phone') setInvalidField("");
                             setError("");
                         }}
-                        onKeyDown={(e) => e.key === 'Enter' && isValid && handlePhoneSubmit()}
+                        onKeyDown={(e) => e.key === 'Enter' && handlePhoneSubmit()}
                         maxLength={13}
                         autoFocus
                     />
                 </div>
 
-                {error && <p className="onboarding-error">{error}</p>}
+                {error && <p className="onboarding-error" style={{ animation: 'shake 0.4s ease-in-out' }}>{error}</p>}
 
                 <button
-                    className={`onboarding-btn ${!isValid ? 'is-inactive' : ''}`}
+                    className={`onboarding-btn ${phone.replace(/\D/g, "").length !== 11 ? 'is-inactive' : ''}`}
                     onClick={handlePhoneSubmit}
-                    disabled={!isValid || loading}
+                    disabled={loading}
                 >
                     {loading ? "Verificando..." : "Continuar →"}
                 </button>
@@ -410,7 +406,7 @@ export default function OnboardingPage() {
                 )}
             </div>
 
-            {error && <p className="onboarding-error">{error}</p>}
+            {error && <p className="onboarding-error" style={{ animation: 'shake 0.4s ease-in-out' }}>{error}</p>}
             <div style={{ display: 'flex', gap: '12px', marginTop: '32px' }}>
                 <button
                     className="tf-back-btn"
@@ -424,7 +420,7 @@ export default function OnboardingPage() {
                 <button
                     onClick={handleProfileNext}
                     className={`onboarding-btn ${!isValidProfile ? 'is-inactive' : ''}`}
-                    disabled={loading || !isValidProfile}
+                    disabled={loading}
                     style={{ flex: 1, margin: 0 }}
                 >
                     {loading ? "Salvando..." : "Tudo pronto! Vamos continuar →"}
@@ -449,20 +445,13 @@ export default function OnboardingPage() {
         setInvalidField("");
         setError("");
 
-        let hasError = false;
-        if (!revenueGoal.trim()) {
+        if (!revenueGoal.trim() || revenueGoal === "0,00") {
             setError("Informe sua meta de vendas para este mês.");
             setInvalidField("revenueGoal");
-            hasError = true;
-        } else if (!initialBalance.trim()) {
-            setError("Informe quanto você tem em caixa para começarmos.");
-            setInvalidField("initialBalance");
-            hasError = true;
+            return;
         }
 
-        if (hasError) return;
-
-        setStep(7);
+        setStep(6);
     };
 
     const EXPENSE_CATEGORIES = [
@@ -488,32 +477,69 @@ export default function OnboardingPage() {
         setInitialExpenses(prev => prev.filter(e => e.id !== id));
     };
 
-    const handleInitialFinanceNext = async () => {
-        setLoading(true);
+    const handleInitialFinanceNext = () => {
+        setInvalidField("");
         setError("");
 
+        if (!initialBalance.trim() || initialBalance === "0,00") {
+            setError("Informe seu saldo atual para podermos começar seu controle.");
+            setInvalidField("initialBalance");
+            return;
+        }
+
+        // We just move to terms, saving happens at the end.
+        setStep(7);
+    };
+
+
+    const handleFinalSubmit = async () => {
+        if (!acceptedTerms) {
+            setError("Opa! Você precisa aceitar os termos para começarmos.");
+            setInvalidField("terms");
+            return;
+        }
+        setLoading(true);
         try {
             const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
+            const goalValue = parseFloat(revenueGoal.replace(/\./g, '').replace(',', '.')) || 0;
+            const balanceValue = initialBalance ? parseFloat(initialBalance.replace(/\./g, '').replace(',', '.')) : 0;
 
-            // 1. Salvar Saldo Inicial (se houver)
-            if (initialBalance) {
-                const val = parseFloat(initialBalance.replace(/\./g, '').replace(',', '.'));
-                if (val > 0) {
-                    await fetch(`${API_BASE}/api/user/finance/record`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            phone_number: phone,
-                            type: "entrada",
-                            amount: val,
-                            category: "outros_receita",
-                            description: "Saldo Inicial (Onboarding)"
-                        })
-                    });
-                }
+            console.log("Onboarding: Finalizando e salvando tudo...", { name, phone });
+
+            // 1. CRIAR USUÁRIO E PIN (Agora sim salvamos no banco)
+            await setPin(phone, pin);
+
+            // 2. Salvar Perfil e Maturidade
+            await fetch(`${API_BASE}/api/user/maturity`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    phone_number: phone,
+                    name,
+                    business_type: businessType,
+                    dream,
+                    revenue_goal: goalValue,
+                    initial_balance: balanceValue,
+                    answers
+                }),
+            });
+
+            // 3. Salvar Saldo Inicial como Record
+            if (balanceValue > 0) {
+                await fetch(`${API_BASE}/api/user/finance/record`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        phone_number: phone,
+                        type: "entrada",
+                        amount: balanceValue,
+                        category: "outros_receita",
+                        description: "Saldo Inicial (Onboarding)"
+                    })
+                });
             }
 
-            // 2. Salvar Despesas Iniciais
+            // 4. Salvar Despesas Iniciais como Records
             for (const expense of initialExpenses) {
                 const val = parseFloat(expense.amount.replace(/\./g, '').replace(',', '.'));
                 if (val > 0) {
@@ -531,48 +557,7 @@ export default function OnboardingPage() {
                 }
             }
 
-            setStep(7); // Ir para Termos
-        } catch (err) {
-            console.error(err);
-            setError("Erro ao salvar dados financeiros. Tente novamente ou pule esta etapa.");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-
-    const handleFinalSubmit = async () => {
-        if (!acceptedTerms) {
-            setError("Opa! Você precisa aceitar os termos para começarmos.");
-            setInvalidField("terms");
-            return;
-        }
-        setLoading(true);
-        try {
-            const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
-            const goalValue = parseFloat(revenueGoal.replace(/\./g, '').replace(',', '.')) || 0;
-            const balanceValue = initialBalance ? parseFloat(initialBalance.replace(/\./g, '').replace(',', '.')) : 0;
-
-            console.log("Onboarding: Salvando dados finais...", { name, businessType, dream, goalValue, balanceValue });
-
-            // 1. Salvar Perfil e Maturidade
-            // O initial_balance já foi salvo como record em handleInitialFinanceNext, 
-            // mas aqui salvamos no perfil para persistência e contexto da IA.
-            await fetch(`${API_BASE}/api/user/maturity`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    phone_number: phone,
-                    name,
-                    business_type: businessType,
-                    dream,
-                    revenue_goal: goalValue,
-                    initial_balance: balanceValue,
-                    answers
-                }),
-            });
-
-            // 2. Aceitar Termos
+            // 5. Aceitar Termos
             await fetch(`${API_BASE}/api/user/accept-terms`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -582,8 +567,7 @@ export default function OnboardingPage() {
             localStorage.setItem("meumei_phone", phone);
             localStorage.setItem("meumei_login_at", String(Date.now()));
 
-            console.log("Onboarding: Finalizado. Redirecionando...");
-            // Pequeno delay para garantir persistência e processamento no backend
+            console.log("Onboarding: Finalizado com sucesso.");
             setTimeout(() => {
                 router.push("/chat");
             }, 1000);
@@ -605,7 +589,7 @@ export default function OnboardingPage() {
                     Voltar
                 </button>
                 <button className="onboarding-btn" onClick={() => setStep(4)} style={{ flex: 1, margin: 0 }}>
-                    Começar Diagnóstico
+                    Começar
                 </button>
             </div>
         </div>
@@ -613,38 +597,67 @@ export default function OnboardingPage() {
 
     const renderMaturity = () => {
         const question = MATURITY_DATA[currentQuestion];
-        const progress = ((currentQuestion + 1) / MATURITY_DATA.length) * 100;
+        const totalQuestions = MATURITY_DATA.length;
 
         return (
-            <div className="tf-view">
-                <div className="tf-progress-bar"><div className="tf-progress-inner" style={{ width: `${progress}%` }} /></div>
-                <div className="tf-container">
-                    <div className="tf-question-header">
-                        <div className="tf-question-number"><span>{currentQuestion + 1}</span></div>
-                        <h2 className="tf-question-text">{question.question}</h2>
+            <div className="onboarding-card" style={{ maxWidth: '480px' }}>
+                {/* Dots Progress Indicator */}
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '32px' }}>
+                    {MATURITY_DATA.map((_, idx) => (
+                        <div
+                            key={idx}
+                            style={{
+                                width: '10px',
+                                height: '10px',
+                                borderRadius: '50%',
+                                background: idx <= currentQuestion ? 'var(--green)' : 'rgba(255,255,255,0.1)',
+                                transition: 'all 0.3s ease',
+                                boxShadow: idx === currentQuestion ? '0 0 10px var(--green-glow)' : 'none'
+                            }}
+                        />
+                    ))}
+                </div>
+
+                <div className="onboarding-form-group">
+                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '16px' }}>
+                        <div className="step-icon-dot" style={{ width: '32px', height: '32px', fontSize: '14px', borderColor: 'var(--red-primary)', color: 'var(--red-primary)' }}>
+                            {currentQuestion + 1}
+                        </div>
+                        <h2 className="onboarding-title" style={{ fontSize: '18px', margin: 0, textAlign: 'left' }}>
+                            {question.question}
+                        </h2>
                     </div>
-                    <div className="tf-options-list">
+
+                    <div className="tf-options-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         {question.options.map((opt) => (
-                            <button key={opt.value} className={`tf-btn ${answers[currentQuestion] === opt.value ? 'selected' : ''}`} onClick={() => handleAnswer(opt.value)}>
-                                <span className="tf-option-key">{opt.value}</span>
+                            <button
+                                key={opt.value}
+                                className={`tf-btn ${answers[currentQuestion] === opt.value ? 'selected' : ''}`}
+                                onClick={() => handleAnswer(opt.value)}
+                                style={{ textAlign: 'left', padding: '14px', borderRadius: '12px', fontSize: '14px' }}
+                            >
+                                <span className="tf-option-key" style={{ marginRight: '10px', opacity: 0.6 }}>{opt.value}</span>
                                 <span className="tf-option-label">{opt.label}</span>
                             </button>
                         ))}
                     </div>
-                    <div className="tf-actions">
-                        <button
-                            className="tf-back-btn"
-                            onClick={() => {
-                                if (currentQuestion > 0) {
-                                    setCurrentQuestion(prev => prev - 1);
-                                } else {
-                                    setStep(3);
-                                }
-                            }}
-                        >
-                            Voltar
-                        </button>
-                        <div className="tf-counter">Questão {currentQuestion + 1} de {MATURITY_DATA.length}</div>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '24px' }}>
+                    <button
+                        className="tf-back-btn"
+                        onClick={() => {
+                            if (currentQuestion > 0) {
+                                setCurrentQuestion(prev => prev - 1);
+                            } else {
+                                setStep(3);
+                            }
+                        }}
+                    >
+                        Voltar
+                    </button>
+                    <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                        Questão {currentQuestion + 1} de {MATURITY_DATA.length}
                     </div>
                 </div>
             </div>
@@ -652,19 +665,15 @@ export default function OnboardingPage() {
     };
 
     const renderRevenueGoal = () => {
-        const isComplete = revenueGoal.trim() && initialBalance.trim();
+        const isComplete = revenueGoal.trim() && revenueGoal !== "0,00";
 
         return (
-            <div className="onboarding-card" style={{ maxWidth: '580px' }}>
-                <h2 className="onboarding-title">Defina sua Meta e Saldo</h2>
-                <p className="onboarding-subtitle">Para que o Meu MEI possa te ajudar a alcançar seus objetivos, precisamos saber onde você quer chegar e com quanto estamos começando.</p>
+            <div className="onboarding-card" style={{ maxWidth: '540px' }}>
+                <h2 className="onboarding-title">Sua Meta Mensal</h2>
+                <p className="onboarding-subtitle">Para te ajudar a focar no que importa, qual o valor de faturamento você deseja atingir este mês?</p>
 
                 <div className="onboarding-form-group">
-                    <label className="onboarding-label">
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            1. Qual é a sua meta mensal de vendas ou o valor que você gostaria de faturar?
-                        </div>
-                    </label>
+                    <label className="onboarding-label">1. Meta mensal de faturamento</label>
                     <div style={{ position: 'relative' }}>
                         <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', fontWeight: '600', color: 'var(--text-muted)' }}>R$</span>
                         <input
@@ -685,48 +694,17 @@ export default function OnboardingPage() {
                     </div>
                 </div>
 
-                <div className="onboarding-form-group" style={{ marginTop: '24px' }}>
-                    <label className="onboarding-label">
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            2. Quanto você tem disponível em caixa hoje? (Dinheiro + Banco)
-                        </div>
-                    </label>
-                    <div style={{ position: 'relative' }}>
-                        <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', fontWeight: '600', color: 'var(--text-muted)' }}>R$</span>
-                        <input
-                            className={`onboarding-input ${invalidField === 'initialBalance' ? 'input-error-blink' : ''}`}
-                            style={{ paddingLeft: '48px', fontSize: '24px', color: 'var(--green)' }}
-                            placeholder="0,00"
-                            value={initialBalance}
-                            onChange={e => {
-                                let v = e.target.value.replace(/\D/g, "");
-                                if (!v) { setInitialBalance(""); return; }
-                                const floatValue = parseInt(v) / 100;
-                                setInitialBalance(floatValue.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-                                if (invalidField === 'initialBalance') setInvalidField("");
-                                setError("");
-                            }}
-                            onKeyDown={(e) => e.key === 'Enter' && handleRevenueGoalNext()}
-                        />
-                    </div>
-                    <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '8px' }}>
-                        * Este valor será o seu saldo inicial para começarmos a acompanhar seu fluxo de caixa.
-                    </p>
-                </div>
+                {error && <p className="onboarding-error" style={{ animation: 'shake 0.4s ease-in-out' }}>{error}</p>}
 
-                {error && <p className="onboarding-error">{error}</p>}
-
-                <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
-                    <button className="tf-back-btn" onClick={() => setStep(4)} style={{ padding: '12px 24px' }}>
-                        Voltar
-                    </button>
+                <div style={{ display: 'flex', gap: '12px', marginTop: '32px' }}>
+                    <button className="tf-back-btn" onClick={() => setStep(4)} style={{ padding: '12px 24px' }}>Voltar</button>
                     <button
                         className={`onboarding-btn ${!isComplete ? 'is-inactive' : ''}`}
                         onClick={handleRevenueGoalNext}
                         disabled={loading}
                         style={{ flex: 1, margin: 0 }}
                     >
-                        {loading ? "Salvando..." : "Continuar →"}
+                        Continuar →
                     </button>
                 </div>
             </div>
@@ -735,10 +713,10 @@ export default function OnboardingPage() {
 
     const renderInitialFinance = () => (
         <div className="onboarding-card" style={{ maxWidth: '600px' }}>
-            <h2 className="onboarding-title">Primeiros Passos Financeiros</h2>
+            <h2 className="onboarding-title">Seu Ponto de Partida</h2>
             <p className="onboarding-subtitle">
-                Vamos começar com o pé direito? Se você já tem algum valor em caixa ou contas a pagar, registre aqui.
-                <br /><small style={{ opacity: 0.7 }}>(Esta etapa é opcional, mas recomendada!)</small>
+                Para começar com o pé direito, quanto você tem hoje em caixa para o seu negócio?
+                <br /><small style={{ opacity: 0.7 }}>(Este valor será seu saldo inicial no aplicativo)</small>
             </p>
 
             {/* Saldo Inicial */}
@@ -749,7 +727,7 @@ export default function OnboardingPage() {
                 <div style={{ position: 'relative' }}>
                     <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', fontWeight: '600', color: 'var(--text-muted)' }}>R$</span>
                     <input
-                        className="onboarding-input"
+                        className={`onboarding-input ${invalidField === 'initialBalance' ? 'input-error-blink' : ''}`}
                         style={{ paddingLeft: '48px', fontSize: '20px', color: 'var(--green)' }}
                         placeholder="0,00"
                         value={initialBalance}
@@ -758,67 +736,10 @@ export default function OnboardingPage() {
                             if (!v) { setInitialBalance(""); return; }
                             const floatValue = parseInt(v) / 100;
                             setInitialBalance(floatValue.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+                            if (invalidField === 'initialBalance') setInvalidField("");
+                            setError("");
                         }}
                     />
-                </div>
-            </div>
-
-            {/* Despesas Iniciais */}
-            <div className="onboarding-form-group" style={{ borderTop: '1px solid var(--border-color)', paddingTop: '20px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                    <label className="onboarding-label" style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: 0 }}>
-                        Contas a Pagar (Pendentes)
-                    </label>
-                    <button onClick={handleAddExpense} style={{ background: 'var(--surface-color)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '4px 8px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', color: 'var(--text-primary)' }}>
-                        Adicionar
-                    </button>
-                </div>
-
-                {initialExpenses.length === 0 && (
-                    <p style={{ fontSize: '13px', color: 'var(--text-muted)', textAlign: 'center', padding: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px' }}>
-                        Nenhuma conta adicionada. Se tiver boletos ou despesas próximas, adicione aqui.
-                    </p>
-                )}
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '240px', overflowY: 'auto' }}>
-                    {initialExpenses.map((exp, idx) => (
-                        <div key={exp.id} style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 24px', gap: '8px', alignItems: 'center', background: 'var(--bg-app)', padding: '8px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                <input
-                                    placeholder="Descrição (ex: Aluguel)"
-                                    value={exp.description}
-                                    onChange={e => updateExpense(exp.id, 'description', e.target.value)}
-                                    style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)', fontSize: '13px', width: '100%', outline: 'none' }}
-                                />
-                                <select
-                                    value={exp.category}
-                                    onChange={e => updateExpense(exp.id, 'category', e.target.value)}
-                                    style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', fontSize: '11px', outline: 'none', cursor: 'pointer' }}
-                                >
-                                    {EXPENSE_CATEGORIES.map(cat => (
-                                        <option key={cat.value} value={cat.value}>{cat.label}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div style={{ position: 'relative' }}>
-                                <span style={{ position: 'absolute', left: '4px', top: '50%', transform: 'translateY(-50%)', fontSize: '12px', color: 'var(--text-muted)' }}>R$</span>
-                                <input
-                                    placeholder="0,00"
-                                    value={exp.amount}
-                                    onChange={e => {
-                                        let v = e.target.value.replace(/\D/g, "");
-                                        if (!v) { updateExpense(exp.id, 'amount', ""); return; }
-                                        const floatValue = parseInt(v) / 100;
-                                        updateExpense(exp.id, 'amount', floatValue.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-                                    }}
-                                    style={{ background: 'var(--surface-color)', border: '1px solid var(--border-color)', borderRadius: '4px', padding: '4px 4px 4px 22px', color: 'var(--red-primary)', fontSize: '13px', width: '100%', textAlign: 'right' }}
-                                />
-                            </div>
-                            <button onClick={() => removeExpense(exp.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: 0 }}>
-                                X
-                            </button>
-                        </div>
-                    ))}
                 </div>
             </div>
 
@@ -826,16 +747,15 @@ export default function OnboardingPage() {
 
             <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
                 <button
-                    className="onboarding-btn"
-                    style={{ flex: 1, background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}
-                    onClick={() => setStep(7)}
-                    disabled={loading}
+                    className="tf-back-btn"
+                    style={{ padding: '12px 24px' }}
+                    onClick={() => setStep(5)}
                 >
-                    Pular
+                    Voltar
                 </button>
                 <button
-                    className="onboarding-btn"
-                    style={{ flex: 2 }}
+                    className={`onboarding-btn ${(!initialBalance.trim() || initialBalance === "0,00") ? 'is-inactive' : ''}`}
+                    style={{ flex: 1, margin: 0 }}
                     onClick={handleInitialFinanceNext}
                     disabled={loading}
                 >
@@ -919,6 +839,7 @@ export default function OnboardingPage() {
                     <span style={{ lineHeight: '1.4', fontSize: '14px', color: '#FFFFFF', textShadow: 'none !important' }}>Li e compreendo que o <strong>Meu MEI</strong> processará meus áudios e imagens para fins de gestão financeira. Autorizo o tratamento dos meus dados conforme a LGPD.</span>
                 </div>
             </div>
+            {error && <p className="onboarding-error" style={{ animation: 'shake 0.4s ease-in-out' }}>{error}</p>}
             <div style={{ display: 'grid', gridTemplateColumns: '4fr 1fr', gap: '12px', marginTop: '16px' }}>
                 <button
                     className={`onboarding-btn ${!acceptedTerms ? 'is-inactive' : ''}`}
@@ -939,10 +860,57 @@ export default function OnboardingPage() {
         </div>
     );
 
+    // --- STEP: Sidebar Stepper ---
+    const SidebarStepper = () => {
+        const onboardingSteps = [
+            { id: 'auth', label: 'Identificação', desc: 'Seu Celular', steps: [0, 1] },
+            { id: 'profile', label: 'Seu Perfil', desc: 'Dados e PIN', steps: [2] },
+            { id: 'maturity', label: 'Maturidade MEI', desc: 'Diagnóstico', steps: [3, 4] },
+            { id: 'goal', label: 'Sua Meta', desc: 'Onde quer chegar', steps: [5] },
+            { id: 'finance', label: 'Caixa Inicial', desc: 'Quanto você tem', steps: [6] },
+            { id: 'final', label: 'Finalização', desc: 'Termos e decolagem', steps: [7] },
+        ];
+
+        return (
+            <div className="onboarding-sidebar">
+                <div className="onboarding-sidebar-inner">
+                    <img src="/logo2.svg" alt="Meu MEI" className="onboarding-sidebar-logo-aside" />
+                    <div className="onboarding-steps">
+                        {onboardingSteps.map((s, idx) => {
+                            const isActive = s.steps.includes(step);
+                            const isCompleted = step > Math.max(...s.steps);
+
+                            return (
+                                <div
+                                    key={s.id}
+                                    className={`onboarding-step-item ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`}
+                                    onClick={() => (isCompleted || isActive) && setStep(s.steps[0])}
+                                    style={{ cursor: (isCompleted || isActive) ? 'pointer' : 'default' }}
+                                >
+                                    <div className="step-icon-dot">
+                                        {isCompleted ? <CheckCircle2 size={24} /> : idx + 1}
+                                    </div>
+                                    <div className="step-info">
+                                        <span className="step-label">{s.label}</span>
+                                        <span className="step-desc">{s.desc}</span>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
     return (
         <main className="onboarding-screen">
-            {(step === 0 || step === 1) && (
-                <div className="onboarding-split-container">
+            <div className="onboarding-split-container">
+                {/* 
+                    Condicional: Se for passo 0 ou 1, mostra a apresentação original.
+                    Se for passo > 1 (cadastro), mostra o Stepper.
+                */}
+                {(step === 0 || step === 1) ? (
                     <div className="onboarding-presentation">
                         <div className="presentation-content">
                             <img src="/logo2.svg" alt="Meu MEI" className="presentation-logo" />
@@ -966,17 +934,23 @@ export default function OnboardingPage() {
                             </div>
                         </div>
                     </div>
-                    <div className="onboarding-login-side">
+                ) : (
+                    <SidebarStepper />
+                )}
+
+                <div className="onboarding-main">
+                    <div className="onboarding-content">
                         {step === 0 && renderPhoneInput()}
                         {step === 1 && renderLoginPin()}
+                        {step === 2 && renderProfile()}
+                        {step === 3 && renderMaturityIntro()}
+                        {step === 4 && renderMaturity()}
+                        {step === 5 && renderRevenueGoal()}
+                        {step === 6 && renderInitialFinance()}
+                        {step === 7 && renderTerms()}
                     </div>
                 </div>
-            )}
-            {step === 2 && <div className="onboarding-content">{renderProfile()}</div>}
-            {step === 3 && <div className="onboarding-content">{renderMaturityIntro()}</div>}
-            {step === 4 && <div className="onboarding-content">{renderMaturity()}</div>}
-            {step === 5 && <div className="onboarding-content">{renderRevenueGoal()}</div>}
-            {step === 7 && <div className="onboarding-content">{renderTerms()}</div>}
+            </div>
 
             <Modal
                 isOpen={modal.isOpen}

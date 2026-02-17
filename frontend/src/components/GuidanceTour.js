@@ -158,25 +158,27 @@ export default function GuidanceTour({ onClose, phoneNumber }) {
             <div className="tour-spotlight" style={spotlightStyle}></div>
 
             <div className="tour-tooltip shadow-2xl" style={tooltipStyle}>
-                <button className="tour-close" onClick={handleFinish}>
+                <button className="tour-close" onClick={handleFinish} style={{ top: '16px', right: '16px' }}>
                     <X size={18} />
                 </button>
 
-                <div className="tour-header">
-                    {currentStep.icon}
+                <div className="tour-header" style={{ marginTop: '4px' }}>
+                    <div className="tour-icon-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '4px' }}>
+                        {currentStep.icon}
+                    </div>
                     <h3>{currentStep.title}</h3>
                 </div>
 
                 <p className="tour-content">{currentStep.content}</p>
 
                 <div className="tour-footer">
-                    <div className="tour-progress">
+                    <div className="tour-progress" style={{ gap: '8px' }}>
                         {TOUR_STEPS.map((_, i) => (
                             <span key={i} className={`progress-dot ${i === stepIndex ? 'active' : ''}`}></span>
                         ))}
                     </div>
 
-                    <div className="tour-buttons">
+                    <div className="tour-buttons" style={{ gap: '12px' }}>
                         {stepIndex > 0 && (
                             <button className="tour-btn-back" onClick={handleBack}>
                                 <ChevronLeft size={16} />
@@ -196,8 +198,8 @@ export default function GuidanceTour({ onClose, phoneNumber }) {
                     background: var(--bg-card);
                     border: 1px solid var(--border-color);
                     border-radius: 16px;
-                    width: 320px;
-                    padding: 24px;
+                    width: 360px;
+                    padding: 28px;
                     color: var(--text-primary);
                     animation: fadeInScale 0.3s ease-out;
                 }
@@ -251,20 +253,21 @@ export default function GuidanceTour({ onClose, phoneNumber }) {
                 }
                 .tour-buttons {
                     display: flex;
-                    gap: 8px;
+                    gap: 12px;
                 }
                 .tour-btn-next {
-                    background: var(--green);
+                    background: #00763D;
                     color: #fff;
                     border: none;
                     border-radius: 8px;
-                    padding: 8px 16px;
+                    padding: 10px 20px;
                     font-size: 14px;
                     font-weight: 600;
                     display: flex;
                     align-items: center;
-                    gap: 4px;
+                    gap: 6px;
                     cursor: pointer;
+                    white-space: nowrap;
                     transition: filter 0.2s;
                 }
                 .tour-btn-next:hover {
