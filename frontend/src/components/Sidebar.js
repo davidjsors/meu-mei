@@ -289,8 +289,9 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
             if (resp.ok) {
                 // Remove from local state immediately
                 setRecords(prev => prev.filter(r => r.id !== id));
+                setGoalRecords(prev => prev.filter(r => r.id !== id)); // Updates Sales Goal
+
                 // Update finance summary locally or refetch
-                // Refetching is safer to ensure consistency
                 const financeResp = await fetch(`${API_BASE}/api/user/finance/${phoneNumber}`);
                 if (financeResp.ok) {
                     const data = await financeResp.json();
