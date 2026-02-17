@@ -399,12 +399,12 @@ body {
 .sidebar-quick-actions {
   display: flex;
   flex-direction: column;
-  flex: 1;
-  /* Expand to fill available space */
-  min-height: 0;
-  /* Allow shrinking */
-  overflow: hidden;
-  /* Prevent parent scroll */
+  flex: 1 0 auto;
+  /* Grow if space, don't shrink below content */
+  min-height: auto;
+  /* Let content dictate size */
+  overflow: visible;
+  /* Allow scrolling */
 }
 
 /* Novo container para layout Lado-a-Lado */
@@ -412,11 +412,11 @@ body {
   display: flex;
   gap: 12px;
   align-items: stretch;
-  flex: 1;
-  /* Expand with parent */
-  height: 100%;
-  /* Force height match */
-  min-height: 0;
+  flex: 1 0 auto;
+  /* Grow if space */
+  height: auto;
+  /* Natural height */
+  min-height: auto;
 }
 
 .quick-actions-btns-stack {
@@ -488,24 +488,16 @@ body {
   border: 2px solid var(--border-color);
   border-radius: 14px;
   padding: 10px;
-  /* Reduzido */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  overflow-y: auto;
-  max-height: 100%;
+  /* Distribute fields */
+  width: 100%;
   animation: slideInRight 0.25s ease-out;
   transition: border-color 0.3s ease;
 }
 
-.quick-action-inline-form::-webkit-scrollbar {
-  width: 4px;
-}
-
-.quick-action-inline-form::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-}
+/* Remove internal scrollbar styling as we want natural flow */
 
 .quick-action-inline-form.entry {
   border-color: var(--green);
