@@ -1,8 +1,6 @@
-<<<<<<< HEAD
 # <img src="./engenharia/frontend/public/logo.svg" width="40" height="40"> Sobre o Projeto
-=======
-# 🤖 Meu MEI: finanças em dia, dinheiro no bolso.
->>>>>>> c02deb0f31618217a8d570b09655d014063f6a20
+
+**Meu MEI: finanças em dia, dinheiro no bolso.**
 
 ## O Meu MEI
 
