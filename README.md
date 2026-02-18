@@ -1,4 +1,4 @@
-# 🤖 Agente Financeiro Inteligente com IA Generativa
+# 🤖 Meu MEI: finanças em dia, dinheiro no bolso.
 
 ## Sobre o Projeto
 
