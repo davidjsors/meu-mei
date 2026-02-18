@@ -343,20 +343,36 @@ async def send_message(
         elif file_mime == "application/pdf":
             content_type = "pdf"
 
-        # Save to disk (backend/uploads)
-        if not os.path.exists(UPLOAD_DIR):
-            os.makedirs(UPLOAD_DIR, exist_ok=True)
-            
-        ext = file.filename.split(".")[-1] if "." in file.filename else "bin"
-        safe_filename = f"{uuid.uuid4()}.{ext}"
-        filepath = os.path.join(UPLOAD_DIR, safe_filename)
+        file_url = None
         
-        with open(filepath, "wb") as f:
-            f.write(file_bytes)
+        try:
+            # Novo Fluxo: Upload para Supabase Storage (Bucket 'uploads')
+            # 1. Definir caminho do arquivo no bucket
+            ext = file.filename.split(".")[-1] if "." in file.filename else "bin"
+            safe_filename = f"{uuid.uuid4()}.{ext}"
+            file_path_in_bucket = f"user_files/{safe_filename}" # Organiza em subpastas
 
-        # Generate URL
-        # Uses BACKEND_URL from settings (default http://localhost:8000)
-        file_url = f"{settings.BACKEND_URL}/uploads/{safe_filename}"
+            # 2. Upload usando o cliente Supabase Storage
+            # Note: file_bytes já foi lido anteriormente
+            # 'file_mime' (content-type) é importante
+            print(f"Chat: Iniciando upload para Supabase Storage: {file_path_in_bucket}")
+            
+            # Usamos o cliente injetado _get_db() que tem acesso ao storage
+            storage_resp = _get_db().storage.from_("uploads").upload(
+                file=file_bytes,
+                path=file_path_in_bucket,
+                file_options={"content-type": file_mime}
+            )
+
+            # 3. Gerar URL Pública
+            # O método get_public_url retorna a URL completa
+            file_url = _get_db().storage.from_("uploads").get_public_url(file_path_in_bucket)
+            print(f"Chat: Upload concluído. URL: {file_url}")
+
+        except Exception as e:
+            print(f"ERRO CRÍTICO NO UPLOAD PARA SUPABASE: {e}")
+            raise HTTPException(status_code=500, detail="Falha ao salvar arquivo no armazenamento nuvem.")
+
         
         # Se for áudio, transcrever para adicionar ao histórico/contexto
         if content_type == "audio":
@@ -670,15 +686,19 @@ async def send_message(
                 if audio_text:
                     audio_b64 = await text_to_speech_base64(audio_text)
                     if audio_b64:
-                        # 1. Decodificar e Salvar no Disco
+                        # 1. Decodificar e Upload para Supabase Storage
                         audio_bytes = base64.b64decode(audio_b64)
                         filename = f"tts-{uuid.uuid4()}.mp3"
-                        filepath = os.path.join(UPLOAD_DIR, filename)
+                        file_path_in_bucket = f"tts_audio/{filename}" # Subpasta tts_audio
                         
-                        with open(filepath, "wb") as f:
-                            f.write(audio_bytes)
-                            
-                        audio_url = f"{settings.BACKEND_URL}/uploads/{filename}"
+                        # Upload para bucket 'uploads'
+                        _get_db().storage.from_("uploads").upload(
+                            file=audio_bytes,
+                            path=file_path_in_bucket,
+                            file_options={"content-type": "audio/mpeg"}
+                        )
+                        
+                        audio_url = _get_db().storage.from_("uploads").get_public_url(file_path_in_bucket)
 
                         # 2. Salvar mensagem de áudio no Banco de Dados (Persistência)
                         db.table("messages").insert({
