@@ -113,7 +113,7 @@ body {
   content: '';
   position: absolute;
   right: 0;
-  top: 53px;
+  top: 64px;
   /* Começa exatamente onde termina o header */
   bottom: 0;
   width: 1px;
@@ -135,7 +135,7 @@ body {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: none;
-  height: calc(53px + env(safe-area-inset-top, 0px));
+  height: 64px;
 }
 
 
@@ -591,7 +591,7 @@ body {
   border-left: none;
   /* Garantindo que não haja linha vertical */
   z-index: 2;
-  height: 53px;
+  height: 64px;
 }
 
 .chat-header-avatar {
@@ -1315,21 +1315,27 @@ body {
     max-width: 320px !important;
   }
 
+  /* Unificando altura dos Headers */
+  .sidebar-header,
+  .chat-header {
+    height: auto !important;
+    min-height: calc(64px + env(safe-area-inset-top, 0px)) !important;
+    padding: env(safe-area-inset-top, 0px) 16px 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    padding-bottom: 12px !important;
+  }
+
   .chat-header {
     position: sticky !important;
     top: 0 !important;
     left: 0 !important;
     right: 0 !important;
     width: 100% !important;
-    height: auto !important;
-    min-height: calc(56px + env(safe-area-inset-top, 0px)) !important;
-    padding: env(safe-area-inset-top, 0px) 12px 10px !important;
     z-index: 1001 !important;
     background: #0D1117 !important;
     border-bottom: 1px solid var(--border-color) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
+    justify-content: center !important;
     gap: 8px !important;
     pointer-events: auto !important;
   }
@@ -1340,6 +1346,9 @@ body {
   }
 
   .chat-header-menu-btn {
+    position: absolute !important;
+    left: 8px !important;
+    bottom: 6px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
