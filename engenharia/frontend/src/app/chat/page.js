@@ -423,10 +423,7 @@ export default function ChatPage() {
                             color: 'var(--text-primary)',
                             padding: '10px',
                             marginRight: '4px',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
+                            cursor: 'pointer'
                         }}
                     >
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
