@@ -30,9 +30,8 @@ from app.prompts.system import get_maturity_level
 router = APIRouter(prefix="/api/chat", tags=["chat"])
 
 # Configurações de Upload
-UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "uploads")
-if not os.path.exists(UPLOAD_DIR):
-    os.makedirs(UPLOAD_DIR, exist_ok=True)
+# Configurações de Upload
+# (Removido UPLOAD_DIR local pois agora usamos Supabase Storage e Vercel é Read-Only)
 
 # Supabase client será injetado pelo main.py
 _supabase: Client | None = None
