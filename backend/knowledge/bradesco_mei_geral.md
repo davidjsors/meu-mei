@@ -1,6 +1,9 @@
-# Bradesco MEI - Informações Gerais e FAQ
+# Bradesco MEI - Informações Gerai, Seguro e FAQ
 
-> **Fonte:** BANCO BRADESCO. *Portal MEI*. Disponível em: <https://banco.bradesco/mei/>. Acesso em: 18 fev. 2026.
+> **Fontes:**
+BANCO BRADESCO. *Portal MEI*. Disponível em: <https://banco.bradesco/mei/>. Acesso em: 18 fev. 2026.
+BRADESCO SEGUROS. *Seguros para MEI*. Disponível em: <https://bancoseguros.bradesco/seguros-para-mei/>. Acesso em: 18 fev. 2026.
+
 
 ## Perguntas e Respostas Frequentes (FAQ)
 
@@ -48,13 +51,19 @@ Mais que um banco, um conjunto de soluções para o seu negócio
 
 Uma alternativa que facilita a vida financeira da sua empresa e ainda garante suporte e benefícios exclusivos. E o melhor, você não precisa nem ir à agência. Confira:
 
-Cartão empresarial com anuidade grátis**
-
+Conta MEI grátis
+Cartão empresarial com anuidade grátis (Desde que ativado até 90 dias
+após a solicitação do cartão)
 5 dias sem juros no limite de cheque empresarial
-
 É só baixar o App Bradesco Empresas e Negócios e conferir tudo o que oferecemos pra você.
+E mais: linhas de crédito, pagamentos, recebimentos, transferências e outras
+transações disponíveis na palma da sua mão.
 
-Uma alternativa que facilita a vida financeira da sua empresa e ainda garante suporte e benefícios exclusivos. E o melhor, você não precisa nem ir à agência. Confira:
+Vendas pelas redes sociais, sem precisar de loja virtual. Com o Link de Pagamento Cielo, você pode!
+
+Uma alternativa que facilita a vida financeira da sua empresa e ainda garante suporte e benefícios exclusivos. E o melhor, você não precisa nem ir à agência. 
+
+Confira:
 
 Cesta de serviços MEI grátis por 12 meses
 
@@ -84,6 +93,53 @@ A habilitação do Link de Pagamento está sujeito a aprovação.
 
 Encontre a parceria ideal que atenda às necessidades da sua empresa e facilite seu dia a dia.
 
-Venda on-line pelas redes sociais, no débito e crédito, com o Link de Pagamento Cielo.
+Venda on-line pelas redes sociais, no débito e crédito, com o Link de Pagamento Cielo.(https://onboarding.cielo.com.br/bradesco-portalmei)
 
-Cursos a distância sobre empreendedorismo, gestão de negócios e muito mais.
+Cursos a distância sobre empreendedorismo, gestão de negócios e muito mais. (https://sebrae.com.br/sites/PortalSebrae/parceriabradesco)
+
+Central de Relacionamento/PJ: 
+> Capitais / Metropolitanas: 3003 1000
+> Demais regiões: 0800 202 1000
+> Acesso do exterior: 55 11 3003 1000
+> Deficiência auditiva: 0800 722 0099
+> Site: https://banco.bradesco/mei
+
+App (Apple): https://apps.apple.com/br/app/bradesco-empresas-conta-pj/id6738925611
+
+App (Android): https://play.google.com/store/apps/details?id=br.com.bradesco.pdpjapp&hl=pt_BR 
+
+
+## Seguros
+
+Soluções para você, Microempreendedor - MEI 
+
+Olá Microempreendedor, seja bem-vindo!
+
+Invista na segurança da sua empresa, aqui você encontra a proteção ideal: Dental, Empresarial e Saúde.
+
+Proteja as pessoas, as finanças e o patrimônio da sua empresa.
+
+## Produtos e serviços
+
+### Dental DOC MEI
+
+O cuidado refletido em cada sorriso. Um plano que oferece conforto e praticidade, ideal para microempreendedor individual.
+Link <> https://www.bradescoseguros.com.br/clientes/seguros-para-mei/plano-dental
+
+### Patrimônio e Equipamentos
+
+Você começou empreender. Sabia que temos a proteção ideal do seu maior sonho?
+Link <> https://www.bradescoseguros.com.br/clientes/seguros-para-mei/patrimonio-e-equipamentos
+
+### Saúde
+
+Conte com a Bradesco Saúde para garantir proteção e tranquilidade para a sua saúde e a dos seus funcionários.
+Link <> https://www.bradescoseguros.com.br/clientes/seguros-para-mei/plano-de-saude-mei 
+
+## Central de Relacionamento
+> Seguro para MEI: https://www.bradescoseguros.com.br/clientes/seguros-para-mei
+> 4004 0237: Capitais e regiões metropolitanas
+> 0800 237 0237: Demais regiões
+> WhatsApp Bradesco Seguros: https://api.whatsapp.com/send?phone=552140042702&text=Oi,%20preciso%20de%20atendimento
+
+
