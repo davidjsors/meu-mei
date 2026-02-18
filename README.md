@@ -6,7 +6,7 @@ O **Meu MEI** é um mentor financeiro digital desenhado para transformar a vida 
 
 - **Antecipar necessidades:** Alerta sobre riscos de mistura de contas antes que o lucro seja comprometido.
 - **Personalizar sugestões:** Adapta o tom de voz e as recomendações com base no nível de maturidade IAMF-MEI.
-- **Cocriar soluções:** Atua de forma consultiva para ajudar a precificar produtos e gerenciar o fluxo de caixa.
+- **Cocriar soluções:** Atua de forma consultiva para ajudar a gerenciar as finanças da empresa.
 - **Garantir confiabilidade:** Implementa estratégias anti-alucinação através de RAG (Grounding) em fontes oficiais.
 
 🌐 **Acesse a aplicação:** [mentormei.vercel.app](https://mentormei.vercel.app)
