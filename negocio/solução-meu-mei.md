@@ -1,4 +1,3 @@
-
 Considerando os desafios da formalização e a complexidade na transição da pessoa física para a jurídica, apresentamos o **Meu MEI**: uma solução que visa transformar a gestão financeira de um fardo burocrático em um motor de crescimento. O **Meu MEI** é o braço direito nas finanças, um mentor digital baseado em inteligência artificial generativa, desenhado para o microempreendedor(a) que atua sozinho(a) e precisa de um parceiro fiel para tomar decisões seguras e alcançar a independência financeira.
 
 ---
@@ -44,5 +43,4 @@ A marca foi construída para transmitir modernidade, segurança e movimento.
 * **O Símbolo:** o centro da identidade é um **M estilizado** com dobras que lembram uma fita ou um caminho ascendente. Esse design representa a jornada do empreendedor — um percurso que, com a orientação correta, segue sempre em direção ao crescimento.
 * **Cores:** o uso do vermelho estabelece uma conexão de confiança e autoridade, enquanto o branco traz a clareza necessária para o ambiente financeiro.
 * **Tipografia e Slogan:** utilizamos fontes limpas e modernas para garantir fácil leitura em qualquer dispositivo. O slogan *finanças em dia, dinheiro no bolso* reforça o compromisso prático da marca com o resultado final do usuário.
-
-<img width="500" alt="meumei" src="https://github.com/user-attachments/assets/c2aff1f3-be13-4b47-9812-4d8514e5e3a2" />
+<img src="../engenharia/frontend/public/logo2.svg" width="400" valign="middle">
