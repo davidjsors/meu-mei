@@ -439,8 +439,9 @@ export default function ChatPage() {
                         flexShrink: 0
                     }}>
                         <img src="/logo.svg" alt="MeuMEI" style={{
-                            width: '20px', height: '20px',
-                            objectFit: 'contain'
+                            width: '80%', height: '80%',
+                            objectFit: 'contain',
+                            filter: 'brightness(0) invert(1)'
                         }} />
                     </div>
                     <div className="chat-header-info" style={{ display: 'flex', flexDirection: 'column', marginLeft: '4px' }}>

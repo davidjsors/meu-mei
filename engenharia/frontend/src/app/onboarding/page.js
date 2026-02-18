@@ -238,6 +238,8 @@ export default function OnboardingPage() {
                 <div className="onboarding-form-group">
                     <label className="onboarding-label">Seu telefone</label>
                     <input
+                        type="tel"
+                        inputMode="numeric"
                         className={`onboarding-input ${invalidField === 'phone' ? 'input-error-blink' : ''}`}
                         style={{ textAlign: 'center', fontSize: '20px', letterSpacing: '2px', fontWeight: 'bold' }}
                         placeholder="11-98765-4321"

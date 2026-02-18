@@ -10,7 +10,7 @@ export default function RootLayout({ children }) {
     return (
         <html lang="pt-BR">
             <head>
-                <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+                <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
                 <meta name="theme-color" content="#111B21" />
                 <link rel="icon" href="/logo.svg" type="image/svg+xml" />
             </head>

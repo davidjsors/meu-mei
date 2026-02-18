@@ -73,25 +73,26 @@ select {
 html,
 body {
   height: 100%;
+  min-height: 100dvh;
   font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: var(--bg-app);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* ─── App Layout ─── */
 .app-container {
   display: flex;
   height: 100vh;
+  height: 100dvh;
   max-width: 1600px;
   margin: 0 auto;
   background-color: var(--bg-app);
-  background-image:
-    radial-gradient(at 10% 10%, rgba(227, 38, 54, 0.09) 0px, transparent 80%),
-    radial-gradient(at 90% 90%, rgba(0, 210, 106, 0.06) 0px, transparent 80%);
   overflow: hidden;
+  position: relative;
 }
 
 /* ─── Sidebar ─── */
@@ -1321,21 +1322,16 @@ body {
     right: 0 !important;
     width: 100% !important;
     height: auto !important;
-    min-height: 56px !important;
-    padding-top: env(safe-area-inset-top, 0px) !important;
-    padding-left: 12px !important;
-    padding-right: 12px !important;
-    padding-bottom: 8px !important;
+    min-height: calc(56px + env(safe-area-inset-top, 0px)) !important;
+    padding: env(safe-area-inset-top, 0px) 12px 10px !important;
     z-index: 1001 !important;
     background: #0D1117 !important;
-    /* Fundo sólido para evitar transparência indesejada no topo */
-    backdrop-filter: blur(10px) !important;
-    -webkit-backdrop-filter: blur(10px) !important;
     border-bottom: 1px solid var(--border-color) !important;
     display: flex !important;
     align-items: center !important;
     justify-content: flex-start !important;
     gap: 8px !important;
+    pointer-events: auto !important;
   }
 
   .messages-container {
@@ -1365,6 +1361,16 @@ body {
     visibility: visible !important;
     opacity: 1 !important;
     z-index: 1002 !important;
+    background-color: #CC0000 !important;
+    border-radius: 50% !important;
+  }
+
+  .chat-header-avatar img {
+    filter: brightness(0) invert(1) !important;
+    /* Logo branco no fundo vermelho */
+    width: 80% !important;
+    height: 80% !important;
+    display: block !important;
   }
 
   .sidebar-close-mobile {
