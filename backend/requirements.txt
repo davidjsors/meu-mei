@@ -6,4 +6,5 @@ pydantic==2.*
 python-dotenv==1.*
 python-multipart==0.0.*
 sse-starlette==2.*
-edge-tts==6.*
+edge-tts
+aiohttp
