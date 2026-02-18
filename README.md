@@ -1,6 +1,4 @@
-# <img src="./engenharia/frontend/public/logo.svg" width="40" height="40"> Sobre o Projeto
-
-**Meu MEI: finanças em dia, dinheiro no bolso.**
+# <img src="./engenharia/frontend/public/logo.svg" width="40" valign="middle"> **Meu MEI: finanças em dia, dinheiro no bolso.**
 
 ## O Meu MEI
 
