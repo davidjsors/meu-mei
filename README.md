@@ -2,7 +2,7 @@
 
 ## O Meu MEI
 
-O **Meu MEI** é um mentor financeiro digital desenhado para transformar a vida do microempreendedor individual brasileiro. Mais do que um simples chatbot, é um agente proativo que utiliza IA Generativa para:
+O **Meu MEI** é um mentor financeiro digital desenhado para transformar a vida do(a) microempreendedor(a) individual (MEI) brasileiro(a). Mais do que um simples chatbot, é um agente proativo que utiliza IA Generativa para:
 
 - **Antecipar necessidades:** Alerta sobre riscos de mistura de contas antes que o lucro seja comprometido.
 - **Personalizar sugestões:** Adapta o tom de voz e as recomendações com base no nível de maturidade IAMF-MEI.
@@ -11,7 +11,7 @@ O **Meu MEI** é um mentor financeiro digital desenhado para transformar a vida 
 
 🌐 **Acesse a aplicação:** [mentormei.vercel.app](https://mentormei.vercel.app)
 
----
+ <img src="./engenharia/frontend/public/logo2.svg" width="400" valign="middle"> 
 
 ## Estrutura do Repositório
 
@@ -54,7 +54,7 @@ Testamos o agente sob estresse para garantir que ele não alucine e mantenha a s
 
 ---
 
-## Pilha Tecnológica
+## Stack Tecnológica
 
 | Categoria | Tecnologia |
 |-----------|------------|
