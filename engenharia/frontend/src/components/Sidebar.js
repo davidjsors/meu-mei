@@ -13,7 +13,7 @@ import {
     Smile,
     Fingerprint,
     Trophy,
-    ChevronLeft, ChevronRight, ChevronDown, ChevronUp
+    ChevronLeft, ChevronRight, ChevronDown, ChevronUp, X
 } from "lucide-react";
 import { MOTIVATIONAL_QUOTES } from "../data/quotes";
 import Modal from "./Modal";
@@ -60,7 +60,7 @@ function getMonthRange(offset = 0) {
  * Sidebar — Painel lateral com branding, resumo financeiro, ações rápidas (inline) e navegação.
  * Três views: "home" (resumo), "finance" (histórico detalhado), "terms" (termos + deletar conta).
  */
-export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTransaction }) {
+export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTransaction, isOpen, onClose }) {
     const router = useRouter();
     const [finance, setFinance] = useState({ entradas: 0, saidas: 0, saldo: 0 });
     const [view, setView] = useState("home"); // "home" | "finance" | "terms"
@@ -354,6 +354,8 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                 description: description || null,
                 categoryLabel: CATEGORY_LABELS[shortcutCategory]
             });
+            // Auto-close on mobile after transaction
+            if (window.innerWidth <= 768 && onClose) onClose();
         }
 
         // Slight delay or immediate close
@@ -434,7 +436,11 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
     }, []);
 
     return (
-        <aside className="sidebar">
+        <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
+            {/* Botão para fechar no mobile */}
+            <button className="sidebar-close-mobile" onClick={onClose}>
+                <X size={20} />
+            </button>
             {/* Header */}
             <div className="sidebar-header">
                 <img src="/logo.svg" alt="MeuMEI" width={32} height={32} style={{ objectFit: 'contain' }} />

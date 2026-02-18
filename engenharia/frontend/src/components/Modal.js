@@ -24,13 +24,15 @@ export default function Modal({
     confirmText = "Confirmar",
     cancelText = "Cancelar"
 }) {
-    if (!isOpen) return null;
-
-    // Stop scroll on body when modal is open
+    // Stop scroll on body when modal is open (must be before any early return)
     React.useEffect(() => {
-        document.body.style.overflow = 'hidden';
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        }
         return () => { document.body.style.overflow = 'unset'; };
-    }, []);
+    }, [isOpen]);
+
+    if (!isOpen) return null;
 
     const isDanger = type === 'danger';
     const isConfirm = type === 'confirm' || isDanger;

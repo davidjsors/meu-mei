@@ -21,6 +21,7 @@ export default function ChatPage() {
     const [showTour, setShowTour] = useState(false);
     const [replyingTo, setReplyingTo] = useState(null); // Mensagem sendo respondida (Estilo Zap)
     const [audioStatus, setAudioStatus] = useState(""); // Status de geração de áudio
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const chatInputRef = useRef(null);
 
     // Mapa de mensagens por ID para lookup rápido de citações
@@ -406,11 +407,32 @@ export default function ChatPage() {
                 phoneNumber={phone}
                 refreshKey={financeKey}
                 onSendTransaction={handleTransaction}
+                isOpen={isSidebarOpen}
+                onClose={() => setIsSidebarOpen(false)}
             />
 
             <main className="chat-area">
                 {/* Chat Header */}
                 <div className="chat-header">
+                    <button
+                        className="chat-header-menu-btn"
+                        onClick={() => setIsSidebarOpen(true)}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            color: 'var(--text-primary)',
+                            padding: '8px',
+                            marginRight: '8px',
+                            cursor: 'pointer',
+                            display: 'none' /* Oculto por padrão, exibido via media query */
+                        }}
+                    >
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
                     <div className="chat-header-avatar" style={{
                         backgroundColor: '#CC0000', borderRadius: '50%',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',

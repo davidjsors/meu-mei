@@ -337,7 +337,7 @@ export default function OnboardingPage() {
             <p className="onboarding-subtitle">Conte um pouco sobre você e o seu negócio, e defina sua senha de acesso.</p>
 
             <div className="onboarding-form-group">
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div className="onboarding-profile-grid">
                     <div>
                         <label className="onboarding-label">Nome</label>
                         <input className={`onboarding-input ${invalidField === 'name' ? 'input-error-blink' : ''}`} placeholder="Seu nome" value={name} onChange={e => { setName(e.target.value); if (invalidField === 'name') setInvalidField(""); }} />
@@ -356,13 +356,13 @@ export default function OnboardingPage() {
             <div className="onboarding-form-group" style={{ marginTop: '24px', borderTop: '1px solid var(--border-color)', paddingTop: '24px' }}>
                 <label className="onboarding-label" style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '6px' }}>Crie seu PIN de acesso</label>
 
-                <div style={{ background: 'rgba(55, 65, 81, 0.5)', padding: '12px', borderRadius: '8px', marginBottom: '16px', display: 'flex', gap: '10px', alignItems: 'start', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                    <p style={{ fontSize: '13px', color: 'var(--text-primary)', margin: 0, lineHeight: '1.4', textShadow: 'none !important' }}>
-                        <span style={{ color: 'var(--red-primary)', fontWeight: '600', textShadow: 'none !important' }}>Atenção:</span> Guarde bem este número! Ele será sua senha para entrar no aplicativo sempre que precisar.
+                <div className="onboarding-info-box" style={{ padding: '12px', borderRadius: '8px', marginBottom: '16px', display: 'flex', gap: '10px', alignItems: 'start' }}>
+                    <p style={{ fontSize: '13px', margin: 0, lineHeight: '1.4' }}>
+                        <span style={{ color: 'var(--red-primary)', fontWeight: '600' }}>Atenção:</span> Guarde bem este número! Ele será sua senha para entrar no aplicativo sempre que precisar.
                     </p>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div className="onboarding-pin-grid">
                     <div style={{ position: 'relative' }}>
                         <input
                             className={`onboarding-input ${invalidField === 'pin' ? 'input-error-blink' : ''}`}
@@ -434,11 +434,14 @@ export default function OnboardingPage() {
         const newAnswers = [...answers];
         newAnswers[currentQuestion] = value;
         setAnswers(newAnswers);
-        if (currentQuestion < MATURITY_DATA.length - 1) {
-            setCurrentQuestion(currentQuestion + 1);
-        } else {
-            setStep(5);
-        }
+        // Pequeno delay para o estado visual da seleção ser limpo antes de avançar
+        setTimeout(() => {
+            if (currentQuestion < MATURITY_DATA.length - 1) {
+                setCurrentQuestion(currentQuestion + 1);
+            } else {
+                setStep(5);
+            }
+        }, 200);
     };
 
     const handleRevenueGoalNext = () => {
@@ -677,7 +680,7 @@ export default function OnboardingPage() {
                 <div className="onboarding-form-group">
                     <label className="onboarding-label">1. Meta mensal de faturamento</label>
                     <div style={{ position: 'relative' }}>
-                        <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', fontWeight: '600', color: 'var(--text-muted)' }}>R$</span>
+                        <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', fontWeight: '600' }} className="onboarding-label">R$</span>
                         <input
                             autoFocus
                             className={`onboarding-input ${invalidField === 'revenueGoal' ? 'input-error-blink' : ''}`}
@@ -692,6 +695,7 @@ export default function OnboardingPage() {
                                 if (invalidField === 'revenueGoal') setInvalidField("");
                                 setError("");
                             }}
+                            onFocus={e => e.target.select()}
                         />
                     </div>
                 </div>
@@ -730,7 +734,7 @@ export default function OnboardingPage() {
                     <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', fontWeight: '600', color: 'var(--text-muted)' }}>R$</span>
                     <input
                         className={`onboarding-input ${invalidField === 'initialBalance' ? 'input-error-blink' : ''}`}
-                        style={{ paddingLeft: '48px', fontSize: '20px', color: 'var(--green)' }}
+                        style={{ paddingLeft: '48px', fontSize: '20px' }}
                         placeholder="0,00"
                         value={initialBalance}
                         onChange={e => {
@@ -741,6 +745,7 @@ export default function OnboardingPage() {
                             if (invalidField === 'initialBalance') setInvalidField("");
                             setError("");
                         }}
+                        onFocus={e => e.target.select()}
                     />
                 </div>
             </div>
@@ -905,6 +910,43 @@ export default function OnboardingPage() {
         );
     };
 
+    // --- STEP: Mobile Stepper ---
+    const MobileStepper = () => {
+        const onboardingSteps = [
+            { id: 'auth', steps: [0, 1] },
+            { id: 'profile', steps: [2] },
+            { id: 'maturity', steps: [3, 4] },
+            { id: 'goal', steps: [5] },
+            { id: 'finance', steps: [6] },
+            { id: 'final', steps: [7] },
+        ];
+
+        return (
+            <div className="mobile-stepper">
+                {onboardingSteps.map((s, idx) => {
+                    const isActive = s.steps.includes(step);
+                    const isCompleted = step > Math.max(...s.steps);
+
+                    return (
+                        <div key={s.id} className={`mobile-step-item ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`}>
+                            {idx > 0 && (
+                                <div className={`mobile-step-line ${isCompleted || isActive ? 'filled' : ''}`} />
+                            )}
+                            <div className="mobile-step-circle">
+                                {isCompleted && (
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                        <polyline points="20 6 9 17 4 12" />
+                                    </svg>
+                                )}
+                            </div>
+                            <span className="mobile-step-label">{idx + 1}</span>
+                        </div>
+                    );
+                })}
+            </div>
+        );
+    };
+
     return (
         <main className="onboarding-screen">
             <div className="onboarding-split-container">
@@ -941,6 +983,9 @@ export default function OnboardingPage() {
                 )}
 
                 <div className="onboarding-main">
+                    {/* Stepper Simplificado apenas para Mobile */}
+                    {step > 1 && <MobileStepper />}
+
                     <div className="onboarding-content">
                         {step === 0 && renderPhoneInput()}
                         {step === 1 && renderLoginPin()}
