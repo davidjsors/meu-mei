@@ -1316,18 +1316,24 @@ body {
   }
 
   .chat-header {
-    padding: 0 12px;
+    padding: env(safe-area-inset-top, 0) 12px 0;
     justify-content: flex-start;
     gap: 8px;
-    height: 56px !important;
+    height: calc(56px + env(safe-area-inset-top, 0)) !important;
     position: sticky !important;
     top: 0 !important;
     z-index: 1000 !important;
     background: rgba(13, 17, 23, 0.95) !important;
-    /* var(--bg-app) semi-transparente */
     backdrop-filter: blur(10px) !important;
     -webkit-backdrop-filter: blur(10px) !important;
     border-bottom: 1px solid var(--border-color) !important;
+    display: flex;
+    align-items: center;
+  }
+
+  .messages-container {
+    padding-bottom: 140px !important;
+    /* Mais espaço para o input flutuante */
   }
 
   .chat-header-menu-btn {
@@ -1348,7 +1354,7 @@ body {
   /* Chat Input Area Mobile - Forçar largura total */
   .chat-input-area {
     width: 94% !important;
-    bottom: 16px !important;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0)) !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
     padding: 6px 12px !important;
