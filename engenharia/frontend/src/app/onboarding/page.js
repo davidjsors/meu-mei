@@ -633,7 +633,7 @@ export default function OnboardingPage() {
                         </h2>
                     </div>
 
-                    <div className="tf-options-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div key={currentQuestion} className="tf-options-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         {question.options.map((opt) => (
                             <button
                                 key={opt.value}
