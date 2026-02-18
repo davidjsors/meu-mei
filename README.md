@@ -12,7 +12,6 @@ O **Meu MEI** é um mentor financeiro digital desenhado para transformar a vida 
 🌐 **Acesse a aplicação:** [mentormei.vercel.app](https://mentormei.vercel.app)
 
  <img src="./engenharia/frontend/public/logo2.svg" width="400" valign="middle"> 
----
 
 ## Estrutura do Repositório
 
