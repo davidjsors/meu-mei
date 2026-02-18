@@ -421,30 +421,35 @@ export default function ChatPage() {
                             background: 'none',
                             border: 'none',
                             color: 'var(--text-primary)',
-                            padding: '8px',
-                            marginRight: '8px',
-                            cursor: 'pointer'
+                            padding: '10px',
+                            marginRight: '4px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
                         }}
                     >
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                             <line x1="3" y1="12" x2="21" y2="12"></line>
                             <line x1="3" y1="6" x2="21" y2="6"></line>
                             <line x1="3" y1="18" x2="21" y2="18"></line>
                         </svg>
                     </button>
                     <div className="chat-header-avatar" style={{
+                        width: '32px', height: '32px',
                         backgroundColor: '#CC0000', borderRadius: '50%',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        flexShrink: 0
                     }}>
                         <img src="/logo.svg" alt="MeuMEI" style={{
-                            width: '95%', height: '95%',
+                            width: '20px', height: '20px',
                             objectFit: 'contain',
                             filter: 'brightness(0) invert(1)',
                         }} />
                     </div>
-                    <div className="chat-header-info">
-                        <h2>Meu MEI</h2>
-                        <p>
+                    <div className="chat-header-info" style={{ display: 'flex', flexDirection: 'column', marginLeft: '4px' }}>
+                        <h2 style={{ fontSize: '16px', margin: 0, fontWeight: '700' }}>Meu MEI</h2>
+                        <p style={{ fontSize: '12px', margin: 0, opacity: 0.8 }}>
                             {isTyping || streamingText ? "digitando..." : "online"}
                         </p>
                     </div>
