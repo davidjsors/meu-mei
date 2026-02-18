@@ -1320,10 +1320,14 @@ body {
     justify-content: flex-start;
     gap: 8px;
     height: 56px !important;
-    position: relative;
-    z-index: 1000;
-    background: var(--bg-bubble-ai);
-    /* Garantir fundo sólido no mobile */
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important;
+    background: rgba(13, 17, 23, 0.95) !important;
+    /* var(--bg-app) semi-transparente */
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border-bottom: 1px solid var(--border-color) !important;
   }
 
   .chat-header-menu-btn {
@@ -1344,13 +1348,14 @@ body {
   /* Chat Input Area Mobile - Forçar largura total */
   .chat-input-area {
     width: 94% !important;
-    bottom: 12px !important;
+    bottom: 16px !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
-    padding: 4px 10px !important;
-    border-radius: 12px !important;
-    background: rgba(32, 44, 51, 0.95) !important;
-    /* Mais opaco para leitura */
+    padding: 6px 12px !important;
+    border-radius: 16px !important;
+    background: rgba(32, 44, 51, 0.98) !important;
+    z-index: 1001 !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
   }
 
   .chat-input-wrapper {
