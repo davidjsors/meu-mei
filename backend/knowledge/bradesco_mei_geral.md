@@ -1,4 +1,4 @@
-# Bradesco MEI - Informações Gerai, Seguro e FAQ
+# Bradesco MEI - Informações Gerais, Seguro e FAQ
 
 > **Fontes:**
 BANCO BRADESCO. *Portal MEI*. Disponível em: <https://banco.bradesco/mei/>. Acesso em: 18 fev. 2026.
