@@ -1,99 +1,74 @@
-# 💰 Meu MEI - Seu Mentor Financeiro 24/7
+# 🤖 Agente Financeiro Inteligente com IA Generativa
 
-**Finanças em dia, dinheiro no bolso.**
+## Sobre o Projeto
 
-Meu MEI é um mentor financeiro digital baseado em IA generativa, desenhado para o microempreendedor individual (MEI) brasileiro.
+O **Meu MEI** é um mentor financeiro digital desenhado para transformar a vida do microempreendedor individual brasileiro. Mais do que um simples chatbot, é um agente proativo que utiliza IA Generativa para:
 
-## 🏗️ Arquitetura
+- **Antecipar necessidades:** Alerta sobre riscos de mistura de contas antes que o lucro seja comprometido.
+- **Personalizar sugestões:** Adapta o tom de voz e as recomendações com base no nível de maturidade IAMF-MEI.
+- **Cocriar soluções:** Atua de forma consultiva para ajudar a precificar produtos e gerenciar o fluxo de caixa.
+- **Garantir confiabilidade:** Implementa estratégias anti-alucinação através de RAG (Grounding) em fontes oficiais.
 
-| Camada | Tecnologia | Hospedagem |
-|--------|-----------|------------|
-| Frontend | Next.js 15 + React 19 | Vercel (grátis) |
-| Backend | FastAPI (Python) | Render (grátis) |
-| Banco de Dados | PostgreSQL | Supabase (grátis) |
-| IA | Google Gemini API | Free tier |
-
-> ⚠️ **Cold Start:** O backend no Render dorme após 15 min de inatividade. A primeira requisição pode levar ~30 segundos.
-
-## 🚀 Setup Local
-
-### Pré-requisitos
-
-- [Node.js 20+](https://nodejs.org/)
-- [Python 3.11+](https://www.python.org/)
-- Conta no [Supabase](https://supabase.com) (grátis)
-- Chave da [Google AI Studio](https://aistudio.google.com/) (grátis)
-
-### 1. Backend
-
-```bash
-cd backend
-python -m venv venv
-venv\Scripts\activate       # Windows
-# source venv/bin/activate  # Linux/Mac
-pip install -r requirements.txt
-
-# Configurar variáveis de ambiente
-copy .env.example .env
-# Edite .env com suas chaves
-
-# Rodar
-uvicorn app.main:app --reload --port 8000
-```
-
-### 2. Banco de Dados (Supabase)
-
-1. Crie um projeto em [supabase.com](https://supabase.com)
-2. No SQL Editor, execute o conteúdo de `supabase_schema.sql`
-3. Em Storage, crie um bucket chamado `attachments` (público)
-4. Copie a URL e a anon key para os `.env`
-
-### 3. Frontend
-
-```bash
-cd frontend
-npm install
-copy .env.example .env.local
-# Edite .env.local com suas chaves
-
-npm run dev
-```
-
-Abra [http://localhost:3000](http://localhost:3000).
-
-## 📚 Knowledge Base (Grounding)
-
-Adicione documentos de referência na pasta `backend/knowledge/`:
-
-- PDFs de produtos financeiros Bradesco
-- Regras MEI do Banco Central
-- Guias de gestão financeira do Sebrae
-
-Esses documentos são usados pela IA para fundamentar suas respostas.
-
-## 🌐 Deploy (Custo Zero)
-
-### Frontend → Vercel
-1. Conecte o repositório no [Vercel](https://vercel.com)
-2. Configure o Root Directory: `frontend`
-3. Adicione as variáveis de ambiente
-
-### Backend → Render
-1. Conecte o repositório no [Render](https://render.com)
-2. O `render.yaml` configura o deploy automaticamente
-3. Adicione as variáveis de ambiente
-
-## 📖 Documentação
-
-| Documento | Descrição |
-|-----------|-----------|
-| [agente-base.md](agente-base.md) | Persona, tom de voz, limitações do agente |
-| [solução-meu-mei.md](solução-meu-mei.md) | Proposta de valor e diferenciais |
-| [maturidade-mei.md](maturidade-mei.md) | Questionário IAMF-MEI |
-| [desafios-oportunidades-mei.md](desafios-oportunidades-mei.md) | Contexto, dados e referências |
+🌐 **Acesse a aplicação:** [mentormei.vercel.app](https://mentormei.vercel.app)
 
 ---
 
-<p align="center">
-  <sub>Meu MEI - Finanças em dia, dinheiro no bolso. © 2026</sub>
-</p>
+## Estrutura do Repositório
+
+Organizamos o projeto em dois pilares principais para manter a clareza entre a estratégia de negócio e a execução técnica:
+
+### 📁 [negocio/](./negocio/)
+Contém toda a documentação estratégica, definições da persona e métricas de sucesso.
+- **[`agente-base.md`](./negocio/agente-base.md):** Persona, tom de voz e limitações.
+- **[`arquitetura_sistema.md`](./negocio/arquitetura_sistema.md):** Fluxo lógico de dados e orquestração Multi-Agentes.
+- **[`avaliacao_metricas.md`](./negocio/avaliacao_metricas.md):** Avaliação de assertividade e segurança.
+- **[`solução-meu-mei.md`](./negocio/solução-meu-mei.md):** Proposta de valor e solução do problema.
+- **Outros:** Desafios do setor, maturidade financeira e auditoria.
+
+### 📁 [engenharia/](./engenharia/)
+Contém a implementação funcional da aplicação (Front e Backend).
+- **[`frontend/`](./engenharia/frontend/):** Interface em Next.js 15 com suporte multimodal.
+- **[`backend/`](./engenharia/backend/):** Orquestrador em FastAPI integrado ao Google Gemini.
+- **[`docs/`](./engenharia/docs/):** Documentação técnica complementar.
+- **[`supabase_schema.sql`](./engenharia/supabase_schema.sql):** Estrutura do banco de dados.
+
+---
+
+## Fundamentos do Agente
+
+### 1. Documentação e Caso de Uso
+Resolvemos o problema da solidão na gestão financeira do MEI através de um mentor sempre disponível e proativo.
+📄 **Detalhes:** [`negocio/agente-base.md`](./negocio/agente-base.md)
+
+### 2. Base de Conhecimento
+O agente fundamenta suas respostas em manuais do Bradesco, Sebrae e Governo Federal.
+📄 **Índice:** [`engenharia/backend/knowledge/readme.md`](./engenharia/backend/knowledge/readme.md)
+
+### 3. Engenharia de Prompts
+Instruções rígidas garantem que a IA priorize saúde financeira e a parceria com o Bradesco.
+📄 **Código:** [`engenharia/backend/app/prompts/system.py`](./engenharia/backend/app/prompts/system.py)
+
+### 4. Avaliação e Métricas
+Testamos o agente sob estresse para garantir que ele não alucine e mantenha a segurança.
+📄 **Relatório:** [`negocio/avaliacao_metricas.md`](./negocio/avaliacao_metricas.md)
+
+---
+
+## Pilha Tecnológica
+
+| Categoria | Tecnologia |
+|-----------|------------|
+| **LLM** | Google Gemini 2.0 Flash |
+| **Backend** | FastAPI (Python) |
+| **Frontend** | Next.js 15 (React 19) |
+| **Banco/Vetores** | Supabase (PostgreSQL + pgvector) |
+| **Hospedagem** | Vercel & Render |
+
+---
+
+## Pitch
+
+O **Meu MEI** elimina o atrito burocrático através da inteligência artificial, permitindo que o empreendedor foque no que realmente importa: **o seu sonho**. Seja através de um áudio, uma foto de nota fiscal ou um texto simples, nós cuidamos dos números para que eles cuidem do seu futuro.
+
+---
+<sub>Meu MEI - Finanças em dia, dinheiro no bolso. © 2026</sub>

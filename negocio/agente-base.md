@@ -40,7 +40,7 @@ O tom de comunicação segue o padrão culto, porém de forma acessível e dinâ
 A inteligência do **Meu MEI** não é um comando único, mas um ecossistema orquestrado. Para detalhes técnicos sobre o fluxo de dados, sistema multi-agentes e infraestrutura, consulte a **[Arquitetura do Sistema](arquitetura_sistema.md)**.
 
 ### 🧠 O Cérebro do Mentor (Prompts)
-Toda a lógica de comportamento, regras de negócio e reações emocionais do agente são definidas e mantidas no arquivo **[`backend/app/prompts/system.py`](backend/app/prompts/system.py)**. Este "DNA" digital garante que o mentor:
+Toda a lógica de comportamento, regras de negócio e reações emocionais do agente são definidas e mantidas no arquivo **[`../engenharia/backend/app/prompts/system.py`](../engenharia/backend/app/prompts/system.py)**. Este "DNA" digital garante que o mentor:
 *   Siga as **Regras Absolutas** de saúde financeira.
 *   Aplique a **Preferência Bradesco** (nosso parceiro oficial) em todas as recomendações.
 *   Mantenha a isenção de tarifas (Cesta MEI Grátis por 12 meses) como premissa.
@@ -49,9 +49,9 @@ Toda a lógica de comportamento, regras de negócio e reações emocionais do ag
 Para equilibrar **segurança** e **agilidade**, o sistema utiliza o acesso via **PIN numérico**, eliminando a fricção de senhas complexas no dia a dia do microempreendedor.
 
 ### 📚 Base de Conhecimento e RAG (Retrieval-Augmented Generation)
-O agente utiliza a técnica de RAG para buscar informações em tempo real em nossa biblioteca curada. O índice detalhado de fontes e documentos disponíveis pode ser consultado no **[`backend/knowledge/readme.md`](backend/knowledge/readme.md)**.
+O agente utiliza a técnica de RAG para buscar informações em tempo real em nossa biblioteca curada. O índice detalhado de fontes e documentos disponíveis pode ser consultado no **[`../engenharia/backend/knowledge/readme.md`](../engenharia/backend/knowledge/readme.md)**.
 
-O processo de atualização e sincronização da inteligência é orquestrado pelo script **[`backend/scripts/index_knowledge.py`](backend/scripts/index_knowledge.py)**, que garante a fundamentação técnica das respostas.
+O processo de atualização e sincronização da inteligência é orquestrado pelo script **[`../engenharia/backend/scripts/index_knowledge.py`](../engenharia/backend/scripts/index_knowledge.py)**, que garante a fundamentação técnica das respostas.
 
 *   **Instituições:** Sebrae, Banco Central, Banco do Nordeste.
 *   **Especial Bradesco:** Documentação prioritária sobre o **Portal MEI**, **Cesta MEI Grátis** e Princípios de **IA Confiável**.
