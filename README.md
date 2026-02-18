@@ -62,9 +62,10 @@ Testamos o agente sob estresse para garantir que ele não alucine e mantenha a s
 | **Backend** | FastAPI (Python) |
 | **Frontend** | Next.js 15 (React 19) |
 | **Banco/Vetores** | Supabase (PostgreSQL + pgvector) |
-| **Hospedagem** | Vercel & Render |
+| **Hospedagem** | Vercel (Frontend & Backend) |
 
 ---
+
 
 ## Pitch
 
