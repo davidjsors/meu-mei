@@ -54,7 +54,7 @@ Testamos o agente sob estresse para garantir que ele não alucine e mantenha a s
 
 ---
 
-## Pilha Tecnológica
+## Stack Tecnológica
 
 | Categoria | Tecnologia |
 |-----------|------------|
