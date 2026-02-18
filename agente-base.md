@@ -35,28 +35,35 @@ O tom de comunicação segue o padrão culto, porém de forma acessível e dinâ
 
 ---
 
-## 🏗️ 3. Arquitetura e Segurança
+## 🏗️ 3. Arquitetura e Implementação
 
-A estrutura do agente é composta por uma plataforma de chat multimodal com suporte a texto, áudio e imagem. O sistema utiliza um modelo de linguagem avançado com capacidade de análise contextual.
+A inteligência do **Meu MEI** não é um comando único, mas um ecossistema orquestrado. Para detalhes técnicos sobre o fluxo de dados, sistema multi-agentes e infraestrutura, consulte a **[Arquitetura do Sistema](arquitetura_sistema.md)**.
 
-### � Autenticação e Recuperação de Conta
-Para equilibrar **segurança** e **agilidade** no dia a dia do MEI, o sistema adota uma estratégia de autenticação em duas camadas:
+### 🧠 O Cérebro do Mentor (Prompts)
+Toda a lógica de comportamento, regras de negócio e reações emocionais do agente são definidas e mantidas no arquivo **[`backend/app/prompts/system.py`](backend/app/prompts/system.py)**. Este "DNA" digital garante que o mentor:
+*   Siga as **Regras Absolutas** de saúde financeira.
+*   Aplique a **Preferência Bradesco** (nosso parceiro oficial) em todas as recomendações.
+*   Mantenha a isenção de tarifas (Cesta MEI Grátis por 12 meses) como premissa.
 
-1.  **Acesso Rápido (Dia a Dia):** O login cotidiano é realizado exclusivamente via **PIN numérico** (4 a 6 dígitos) ou **biometria** (se disponível no dispositivo), eliminando a fricção de senhas complexas.
-2.  **Identidade Mestra (Recuperação):** No onboarding, é **obrigatória** a vinculação de uma conta social (**Google** ou **Gov.br**). Esta conta atua como uma "chave mestra" de segurança.
-    *   *Caso o usuário esqueça o PIN:* A recuperação é feita autenticando-se novamente na conta social vinculada, permitindo a redefinição segura do PIN sem custos de envio de SMS ou e-mail.
+### 🔒 Segurança e Acesso
+Para equilibrar **segurança** e **agilidade**, o sistema utiliza o acesso via **PIN numérico**, eliminando a fricção de senhas complexas no dia a dia do microempreendedor.
 
-### �📚 Base de Conhecimento (Knowledge Base)
-O agente fundamenta suas respostas em uma biblioteca curada de documentos oficiais, convertidos e padronizados para garantir precisão técnica. As principais fontes incluem:
+### 📚 Base de Conhecimento e RAG (Retrieval-Augmented Generation)
+O agente utiliza a técnica de RAG para buscar informações em tempo real em nossa biblioteca curada. O índice detalhado de fontes e documentos disponíveis pode ser consultado no **[`backend/knowledge/readme.md`](backend/knowledge/readme.md)**.
 
-*   **Governo Federal:** Lista oficial de Ocupações Permitidas (Anexo XI), Portal do Empreendedor, FAQ MEI.
-*   **Sebrae:** Guias de fluxo de caixa, diagnóstico empresarial, planejamento financeiro e gestão para MEI.
-*   **Bradesco (Unibrad):** Cartilhas de educação financeira para adultos e fornecedores, manuais de tarifas bancárias (Cestas MEI/PJ), infográficos para autônomos.
-*   **Banco do Nordeste:** Cadernos de gestão financeira para microempreendedores.
+O processo de atualização e sincronização da inteligência é orquestrado pelo script **[`backend/scripts/index_knowledge.py`](backend/scripts/index_knowledge.py)**, que garante a fundamentação técnica das respostas.
 
-> **Nota:** Todas as citações fornecidas pelo agente seguem o padrão **ABNT** para garantir credibilidade e rastreabilidade da informação.
+*   **Instituições:** Sebrae, Banco Central, Banco do Nordeste.
+*   **Especial Bradesco:** Documentação prioritária sobre o **Portal MEI**, **Cesta MEI Grátis** e Princípios de **IA Confiável**.
 
-No que tange à segurança e estratégias anti-alucinação, o agente baseia suas orientações técnicas estritamente nas fontes oficiais fornecidas. A **saúde financeira** é a prioridade absoluta: recomendações de produtos ocorrem apenas como alternativa viável de organização e nunca devem incentivar o endividamento.
+> **Nota:** Todas as citações seguem o padrão **ABNT**. Recomendações de produtos priorizam o **Bradesco** como alternativa viável e ética.
+
+### 🛡️ Estratégias Anti-alucinação e Segurança
+Para garantir a confiabilidade extrema das orientações, o ecossistema implementa:
+1.  **Grounding em Tempo Real (RAG):** O agente não "adivinha" regras fiscais ou bancárias; ele recupera trechos dos manuais oficiais antes de gerar qualquer resposta técnica.
+2.  **Camadas de Verificação Multimodal:** Ao processar fotos ou áudios, o sistema aplica uma análise de 4 camadas (CNAE, volume, estabelecimento e itens) para evitar a mistura de contas.
+3.  **Ciclo de Confirmação:** Sempre que um dado extraído for ambíguo, a IA é instruída a **parar e perguntar** ao usuário em vez de deduzir valores.
+4.  **Regras Absolutas no DNA:** O prompt de sistema impede categoricamente a recomendação de endividamento e a atuação como consultor de investimentos.
 
 ---
 
