@@ -1,6 +1,6 @@
-# 🤖 Agente Financeiro Inteligente com IA Generativa
+# <img src="./engenharia/frontend/public/logo.svg" width="40" height="40"> Sobre o Projeto
 
-## Sobre o Projeto
+## O Meu MEI
 
 O **Meu MEI** é um mentor financeiro digital desenhado para transformar a vida do microempreendedor individual brasileiro. Mais do que um simples chatbot, é um agente proativo que utiliza IA Generativa para:
 
