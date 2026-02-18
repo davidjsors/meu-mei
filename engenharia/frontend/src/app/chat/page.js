@@ -423,8 +423,7 @@ export default function ChatPage() {
                             color: 'var(--text-primary)',
                             padding: '8px',
                             marginRight: '8px',
-                            cursor: 'pointer',
-                            display: 'none' /* Oculto por padrão, exibido via media query */
+                            cursor: 'pointer'
                         }}
                     >
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

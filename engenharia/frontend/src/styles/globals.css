@@ -1244,6 +1244,11 @@ body {
   display: none;
 }
 
+/* Botão hamburger (oculto no desktop, visível no mobile via media query) */
+.chat-header-menu-btn {
+  display: none;
+}
+
 /* ─── Responsive ─── */
 @media (max-width: 768px) {
   .sidebar {

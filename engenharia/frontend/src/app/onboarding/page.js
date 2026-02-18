@@ -683,6 +683,7 @@ export default function OnboardingPage() {
                         <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', fontWeight: '600' }} className="onboarding-label">R$</span>
                         <input
                             autoFocus
+                            inputMode="numeric"
                             className={`onboarding-input ${invalidField === 'revenueGoal' ? 'input-error-blink' : ''}`}
                             style={{ paddingLeft: '48px', fontSize: '24px' }}
                             placeholder="0,00"
@@ -733,6 +734,7 @@ export default function OnboardingPage() {
                 <div style={{ position: 'relative' }}>
                     <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', fontWeight: '600', color: 'var(--text-muted)' }}>R$</span>
                     <input
+                        inputMode="numeric"
                         className={`onboarding-input ${invalidField === 'initialBalance' ? 'input-error-blink' : ''}`}
                         style={{ paddingLeft: '48px', fontSize: '20px' }}
                         placeholder="0,00"
