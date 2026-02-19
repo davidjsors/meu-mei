@@ -402,7 +402,7 @@ export default function OnboardingPage() {
                 </div>
 
                 {pin && confirmPin && pin !== confirmPin && (
-                    <p style={{ color: 'var(--red-primary)', fontSize: '12px', marginTop: '12px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', textShadow: 'none !important' }}>
+                    <p style={{ color: 'var(--red-primary)', fontSize: '12px', marginTop: '12px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
                         Os códigos informados não coincidem
                     </p>
                 )}
@@ -781,65 +781,65 @@ export default function OnboardingPage() {
             <h2 className="onboarding-title">Está quase tudo pronto!</h2>
             <p className="onboarding-subtitle">Para sua segurança, leia e aceite nossos termos de uso para começar.</p>
             <div className="onboarding-terms-scroller">
-                <div className="terms-body" style={{ color: '#FFFFFF', textAlign: 'left', padding: '0', textShadow: 'none !important' }}>
-                    <p style={{ color: '#FFFFFF', textShadow: 'none !important' }}>
+                <div className="terms-body" style={{ color: '#FFFFFF', textAlign: 'left', padding: '0' }}>
+                    <p style={{ color: '#FFFFFF' }}>
                         Bem-vindo ao <strong>Meu MEI</strong>. Ao utilizar nossa plataforma, você confia a nós a gestão de dados importantes para o seu crescimento. Este documento explica como protegemos seus dados, quais são seus direitos e as regras para o uso da nossa tecnologia de mentoria financeira.
                     </p>
 
-                    <h2 style={{ color: '#FFFFFF', fontSize: '18px', marginTop: '24px', marginBottom: '12px', textShadow: 'none !important' }}>1. Termos de Uso (Regras de Convivência)</h2>
+                    <h2 style={{ color: '#FFFFFF', fontSize: '18px', marginTop: '24px', marginBottom: '12px' }}>1. Termos de Uso (Regras de Convivência)</h2>
 
-                    <h3 style={{ color: '#FFFFFF', fontSize: '15px', marginTop: '16px', marginBottom: '8px', textShadow: 'none !important' }}>1.1. Objeto e Aceite</h3>
-                    <p style={{ color: '#FFFFFF', textShadow: 'none !important' }}>
+                    <h3 style={{ color: '#FFFFFF', fontSize: '15px', marginTop: '16px', marginBottom: '8px' }}>1.1. Objeto e Aceite</h3>
+                    <p style={{ color: '#FFFFFF' }}>
                         O Meu MEI é uma ferramenta de auxílio à gestão financeira e educação para Microempreendedores Individuais. Ao clicar em "Aceito os Termos", você declara ter lido e concordado com estas regras.
                     </p>
 
-                    <h3 style={{ color: '#FFFFFF', fontSize: '15px', marginTop: '16px', marginBottom: '8px', textShadow: 'none !important' }}>1.2. Elegibilidade e Cadastro</h3>
+                    <h3 style={{ color: '#FFFFFF', fontSize: '15px', marginTop: '16px', marginBottom: '8px' }}>1.2. Elegibilidade e Cadastro</h3>
                     <p style={{ color: '#FFFFFF', textShadow: 'none !important' }}>
                         A plataforma é destinada exclusivamente a MEIs devidamente registrados no território brasileiro. O usuário é responsável pela veracidade dos dados inseridos (CNPJ, faturamento, despesas).
                     </p>
 
-                    <h3 style={{ color: '#FFFFFF', fontSize: '15px', marginTop: '16px', marginBottom: '8px', textShadow: 'none !important' }}>1.3. Limitações da Inteligência Artificial</h3>
-                    <p style={{ color: '#FFFFFF', textShadow: 'none !important' }}>
+                    <h3 style={{ color: '#FFFFFF', fontSize: '15px', marginTop: '16px', marginBottom: '8px' }}>1.3. Limitações da Inteligência Artificial</h3>
+                    <p style={{ color: '#FFFFFF' }}>
                         O Meu MEI atua como um mentor educativo. Você declara estar ciente de que:
                     </p>
-                    <ul style={{ paddingLeft: '20px', color: '#FFFFFF', textShadow: 'none !important' }}>
-                        <li style={{ color: '#FFFFFF', textShadow: 'none !important' }}>As recomendações da IA são baseadas em dados inseridos por você e em modelos estatísticos.</li>
-                        <li style={{ color: '#FFFFFF', textShadow: 'none !important' }}>O agente não substitui o aconselhamento profissional de um contador ou advogado.</li>
-                        <li style={{ color: '#FFFFFF', textShadow: 'none !important' }}>O sistema não realiza transações bancárias nem investimentos em seu nome.</li>
+                    <ul style={{ paddingLeft: '20px', color: '#FFFFFF' }}>
+                        <li style={{ color: '#FFFFFF' }}>As recomendações da IA são baseadas em dados inseridos por você e em modelos estatísticos.</li>
+                        <li style={{ color: '#FFFFFF' }}>O agente não substitui o aconselhamento profissional de um contador ou advogado.</li>
+                        <li style={{ color: '#FFFFFF' }}>O sistema não realiza transações bancárias nem investimentos em seu nome.</li>
                     </ul>
 
-                    <h3 style={{ color: '#FFFFFF', fontSize: '15px', marginTop: '16px', marginBottom: '8px', textShadow: 'none !important' }}>1.4. Uso Proibido</h3>
-                    <p style={{ color: '#FFFFFF', textShadow: 'none !important' }}>
+                    <h3 style={{ color: '#FFFFFF', fontSize: '15px', marginTop: '16px', marginBottom: '8px' }}>1.4. Uso Proibido</h3>
+                    <p style={{ color: '#FFFFFF' }}>
                         É terminantemente proibido utilizar a plataforma para registrar atividades ilícitas, sonegação fiscal ou práticas que configurem lavagem de dinheiro ou fraude.
                     </p>
 
-                    <h2 style={{ color: '#FFFFFF', fontSize: '18px', marginTop: '24px', marginBottom: '12px', textShadow: 'none !important' }}>2. Política de Privacidade (LGPD)</h2>
+                    <h2 style={{ color: '#FFFFFF', fontSize: '18px', marginTop: '24px', marginBottom: '12px' }}>2. Política de Privacidade (LGPD)</h2>
 
-                    <h3 style={{ color: '#FFFFFF', fontSize: '15px', marginTop: '16px', marginBottom: '8px', textShadow: 'none !important' }}>2.1. Quais dados coletamos?</h3>
-                    <ul style={{ paddingLeft: '20px', color: '#FFFFFF', textShadow: 'none !important' }}>
-                        <li style={{ color: '#FFFFFF', textShadow: 'none !important' }}><strong>Dados Cadastrais:</strong> Nome, e-mail, CPF e CNPJ.</li>
-                        <li style={{ color: '#FFFFFF', textShadow: 'none !important' }}><strong>Dados Financeiros:</strong> Registros de entradas, saídas, boletos e fluxo de caixa.</li>
-                        <li style={{ color: '#FFFFFF', textShadow: 'none !important' }}><strong>Dados Multimodais:</strong> Textos, áudios enviados para registro de voz, arquivos e imagens/PDFs de recibos.</li>
-                        <li style={{ color: '#FFFFFF', textShadow: 'none !important' }}><strong>Dados de Diagnóstico:</strong> Respostas ao instrumento IAMF-MEI.</li>
+                    <h3 style={{ color: '#FFFFFF', fontSize: '15px', marginTop: '16px', marginBottom: '8px' }}>2.1. Quais dados coletamos?</h3>
+                    <ul style={{ paddingLeft: '20px', color: '#FFFFFF' }}>
+                        <li style={{ color: '#FFFFFF' }}><strong>Dados Cadastrais:</strong> Nome, e-mail, CPF e CNPJ.</li>
+                        <li style={{ color: '#FFFFFF' }}><strong>Dados Financeiros:</strong> Registros de entradas, saídas, boletos e fluxo de caixa.</li>
+                        <li style={{ color: '#FFFFFF' }}><strong>Dados Multimodais:</strong> Textos, áudios enviados para registro de voz, arquivos e imagens/PDFs de recibos.</li>
+                        <li style={{ color: '#FFFFFF' }}><strong>Dados de Diagnóstico:</strong> Respostas ao instrumento IAMF-MEI.</li>
                     </ul>
 
-                    <h3 style={{ color: '#FFFFFF', fontSize: '15px', marginTop: '16px', marginBottom: '8px', textShadow: 'none !important' }}>2.2. Para que usamos seus dados?</h3>
-                    <p style={{ color: '#FFFFFF', textShadow: 'none !important' }}>
+                    <h3 style={{ color: '#FFFFFF', fontSize: '15px', marginTop: '16px', marginBottom: '8px' }}>2.2. Para que usamos seus dados?</h3>
+                    <p style={{ color: '#FFFFFF' }}>
                         As finalidades incluem a personalização da linguagem conforme sua maturidade financeira, processamento automatizado de recibos e análise de progresso rumo ao seu "Caminho para o Sonho".
                     </p>
 
-                    <h3 style={{ color: '#FFFFFF', fontSize: '15px', marginTop: '16px', marginBottom: '8px', textShadow: 'none !important' }}>2.3. Compartilhamento de Dados</h3>
-                    <p style={{ color: '#FFFFFF', textShadow: 'none !important' }}>
+                    <h3 style={{ color: '#FFFFFF', fontSize: '15px', marginTop: '16px', marginBottom: '8px' }}>2.3. Compartilhamento de Dados</h3>
+                    <p style={{ color: '#FFFFFF' }}>
                         Seus dados financeiros não são vendidos. Compartilhamos apenas com parceiros essenciais (Google Cloud/Vertex AI) ou com o ecossistema Bradesco mediante sua autorização prévia.
                     </p>
 
-                    <h2 style={{ color: '#FFFFFF', fontSize: '18px', marginTop: '24px', marginBottom: '12px', textShadow: 'none !important' }}>3. Segurança da Informação</h2>
-                    <p style={{ color: '#FFFFFF', textShadow: 'none !important' }}>
+                    <h2 style={{ color: '#FFFFFF', fontSize: '18px', marginTop: '24px', marginBottom: '12px' }}>3. Segurança da Informação</h2>
+                    <p style={{ color: '#FFFFFF' }}>
                         Adotamos criptografia rigorosa em trânsito e em repouso, isolamento de domínio e monitoramento constante de logs para garantir a integridade do sistema.
                     </p>
 
-                    <h2 style={{ color: '#FFFFFF', fontSize: '18px', marginTop: '24px', marginBottom: '12px', textShadow: 'none !important' }}>4. Atualizações</h2>
-                    <p style={{ color: '#FFFFFF', textShadow: 'none !important' }}>
+                    <h2 style={{ color: '#FFFFFF', fontSize: '18px', marginTop: '24px', marginBottom: '12px' }}>4. Atualizações</h2>
+                    <p style={{ color: '#FFFFFF' }}>
                         Este documento pode ser atualizado para refletir melhorias técnicas. Notificaremos você sobre alterações importantes.
                     </p>
                 </div>
@@ -847,7 +847,7 @@ export default function OnboardingPage() {
             <div className={invalidField === 'terms' ? 'input-error-blink' : ''} style={{ margin: '24px 0', textAlign: 'left', borderRadius: '12px', transition: 'all 0.3s ease' }}>
                 <div className="custom-checkbox-container" onClick={() => { setAcceptedTerms(!acceptedTerms); if (invalidField === 'terms') setInvalidField(""); }} style={{ padding: '4px' }}>
                     <div className={`custom-checkbox-circle ${acceptedTerms ? 'checked' : ''}`}><div className="custom-checkbox-dot" /></div>
-                    <span style={{ lineHeight: '1.4', fontSize: '14px', color: '#FFFFFF', textShadow: 'none !important' }}>Li e compreendo que o <strong>Meu MEI</strong> processará meus áudios e imagens para fins de gestão financeira. Autorizo o tratamento dos meus dados conforme a LGPD.</span>
+                    <span style={{ lineHeight: '1.4', fontSize: '14px', color: '#FFFFFF' }}>Li e compreendo que o <strong>Meu MEI</strong> processará meus áudios e imagens para fins de gestão financeira. Autorizo o tratamento dos meus dados conforme a LGPD.</span>
                 </div>
             </div>
             {error && <p className="onboarding-error" style={{ animation: 'shake 0.4s ease-in-out' }}>{error}</p>}
@@ -862,7 +862,7 @@ export default function OnboardingPage() {
                 </button>
                 <button
                     className="onboarding-btn"
-                    style={{ background: 'transparent', border: '1px solid var(--border-color)', color: 'rgba(255, 255, 255, 0.6)', textShadow: 'none', boxShadow: 'none' }}
+                    style={{ background: 'transparent', border: '1px solid var(--border-color)', color: 'rgba(255, 255, 255, 0.6)', boxShadow: 'none' }}
                     onClick={() => router.push("/")}
                 >
                     Sair

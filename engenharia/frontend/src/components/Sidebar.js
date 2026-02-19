@@ -520,7 +520,7 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                 <Target size={18} color="var(--green)" />
-                                <h3 style={{ margin: 0, color: 'var(--green)' }}>Meta de Vendas</h3>
+                                <h3 style={{ margin: 0, color: 'var(--green)', fontWeight: 'bold' }}>Meta de Vendas</h3>
                             </div>
                             {revenueGoal && !isEditingGoal && (
                                 <button onClick={() => {

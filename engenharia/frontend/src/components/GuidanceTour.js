@@ -348,7 +348,7 @@ export default function GuidanceTour({ onClose, phoneNumber }) {
         <div className="tour-overlay" style={{ position: "fixed", inset: 0, zIndex: 9999 }}>
             <div className="tour-spotlight" style={spotlightStyle}></div>
 
-            <div className={`tour-tooltip shadow-2xl`} style={tooltipStyle}>
+            <div className={`tour-tooltip`} style={tooltipStyle}>
                 <button className="tour-close" onClick={handleFinish} style={{ top: '16px', right: '16px' }}>
                     <X size={18} />
                 </button>
