@@ -30,6 +30,7 @@ Contém a implementação funcional da aplicação (Front e Backend).
 - **[`frontend/`](./engenharia/frontend/):** Interface em Next.js 15 com suporte multimodal.
 - **[`backend/`](./engenharia/backend/):** Orquestrador em FastAPI integrado ao Google Gemini.
 - **[`docs/`](./engenharia/docs/):** Documentação técnica complementar.
+  - **[`guia_responsividade.md`](./engenharia/docs/guia_responsividade.md):** Guia técnico de design mobile-first e padrões de UI.
 - **[`supabase_schema.sql`](./engenharia/supabase_schema.sql):** Estrutura do banco de dados.
 
 ---
