@@ -36,6 +36,17 @@ A IA passa a monitorar a distância entre o status atual e esse objetivo, agindo
 
 ---
 
+## 📱 Liberdade e Acessibilidade Total (Omnicanal)
+
+O **Meu MEI** foi projetado com uma arquitetura *Device-Agnostic* e design totalmente responsivo. Isso significa que o(a) empreendedor(a) tem a liberdade de gerenciar seu negócio de qualquer lugar e em qualquer aparelho:
+* 💻 **No Computador:** para uma visão detalhada e estratégica no escritório.
+* 📱 **No Celular (iPhone/Android):** para registros rápidos por áudio, foto ou texto durante a correria do dia a dia.
+* 🏷️ **Em Tablets:** para um equilíbrio entre portabilidade e visualização.
+
+A interface se adapta automaticamente, respeitando as particularidades de cada sistema, garantindo que o mentor financeiro esteja sempre presente, sem barreiras técnicas ou de hardware.
+
+---
+
 ## 🎨 Identidade Visual
 
 A marca foi construída para transmitir modernidade, segurança e movimento.
