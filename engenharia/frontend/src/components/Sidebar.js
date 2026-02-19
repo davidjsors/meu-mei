@@ -519,8 +519,8 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                     <div className="finance-card goal-bg" id="tour-sidebar-goal">
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <Target size={18} color="var(--green)" />
-                                <h3 style={{ margin: 0, color: 'var(--green)', fontWeight: 'bold' }}>Meta de Vendas</h3>
+                                <Target size={18} color="#00D26A" />
+                                <h3 style={{ margin: 0, color: '#00D26A', fontWeight: 'bold' }}>Meta de Vendas</h3>
                             </div>
                             {revenueGoal && !isEditingGoal && (
                                 <button onClick={() => {
