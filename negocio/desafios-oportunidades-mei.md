@@ -15,10 +15,10 @@ Este documento apresenta um panorama estratégico, os desafios de sustentabilida
 
 ## 1. Evolução e Importância Econômica do MEI no Brasil
 
-O modelo de Microempreendedor Individual (MEI) consolidou-se como o principal motor de formalização e inclusão produtiva no país. Entre os anos de 2020 e 2022, o número de MEIs saltou de 11,1 milhões para 14,6 milhões, o que representa um crescimento de aproximadamente 31,5% em apenas dois anos (IBGE, 2022). Em 2025, o segmento já representava 52,3% do total de empresas ativas no Brasil, superando a marca de 12,7 milhões de negócios em operação (BRASIL, 2025). 
+O modelo de Microempreendedor Individual (MEI) consolidou-se como o principal motor de formalização e inclusão produtiva no país. Entre os anos de 2020 e 2022, o número de MEIs saltou de 11,1 milhões para 14,6 milhões, o que representa um crescimento de aproximadamente 31,5% em apenas dois anos; na média, possuem 40,8 anos, sendo composto por 54,7% de homens e 45,3% de mulheres (IBGE, 2022). Em 2025, o segmento já representava 52,3% do total de empresas ativas no Brasil, superando a marca de 12,7 milhões de negócios em operação (BRASIL, 2025). 
 
 Contudo, existe um descompasso entre a formalização jurídica e a bancarização empresarial: de acordo com dados do Banco Central do Brasil (2026), por meio do Sistema Gerenciador de Séries Temporais, em 2022, apenas 2 milhões MEIs possuíam relacionamento bancário na pessoa jurídica. 
-> Assim, considerando a quantidade de MEIs em 2022 (11,1 milhões), apenas 18% deles mantiveram algum tipo de relacionamento com instituições bancárias do país; indicando que a vasta maioria ainda não é bancarizada ou utiliza contas de pessoa física ou para transacionar seus negócios, o que dificulta a construção de um histórico de crédito e a separação patrimonial.
+> Assim, considerando a quantidade de MEIs em 2022 (11,1 milhões), apenas 18% deles mantiveram algum tipo de relacionamento com instituições bancárias do país; indicando que a vasta maioria ainda não é bancarizada ou utiliza contas de pessoa física para transacionar seus negócios, o que dificulta a construção de um histórico de crédito e a separação patrimonial.
 
 ---
 
@@ -68,4 +68,4 @@ Para que a implementação da IA seja efetiva e sustentável, sua aplicação de
 * **BRASIL.** Ministério do Empreendedorismo, da Microempresa e da Empresa de Pequeno Porte. Mapa de Empresas: Boletim do 2º Quadrimestre de 2025. Brasília: Governo Federal, 2025. Disponível em: https://www.gov.br/empresas-e-negocios/pt-br/mapa-de-empresas/boletins/mapa-de-empresas-boletim-2o-quadrimestre-2025.pdf. Acesso em: 30 jan. 2026.
 * **DAMBROVSKI, Wancley.** Gestão financeira aplicada ao Microempreendedor Individual: um estudo de caso sobre controle de capital de giro e sustentabilidade empresarial. Revista Multidisciplinar Focus, [S. l.], v. 1, n. 14, p. 110–123, 2024. Disponível em: https://periodicos.faculdadefocus.com.br/revista-multidisciplinar-focus/article/view/105/105. Acesso em: 30 jan. 2026.
 * **IBGE.** Estatísticas dos Cadastros de Microempreendedores Individuais 2022. Rio de Janeiro: IBGE, 2022. Disponível em: https://agenciadenoticias.ibge.gov.br/media/com_mediaibge/arquivos/3f98b7eb14543b18d4ca6a693cacaff5.pdf. Acesso em: 30 jan. 2026.
-* **SEBRAE.** Sondagem Econômica MEI. Curitiba: Sebrae/PR, out. 2025. Disponível em: https://sebraepr.com.br/wp-content/uploads/2025/10/PUB_BO4.pdf. Acesso em: 30 jan. 2026.
+* **SEBRAE.** Sondagem Econômica MEI. Curitiba: Sebrae/PR, ago. 2024. Disponível em: https://sebraepr.com.br/wp-content/uploads/2025/10/PUB_BO4.pdf. Acesso em: 30 jan. 2026.

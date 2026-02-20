@@ -4,7 +4,7 @@ Considerando os desafios da formalização e a complexidade na transição da pe
 
 ## 💡 Proposta de Valor
 
-> Para o(a) microempreendedor(a) que se sente sobrecarregado(a), o **Meu MEI** oferece uma assessoria financeira 24/7 que aprende com a maturidade do usuário. Diferente de sistemas tradicionais, nossa IA utiliza conversas naturais (texto e áudio) e visão computacional para organizar toda a vida financeira do negócio e conectar o empreendedor(a) às soluções estratégicas do Bradesco no momento exato da necessidade.
+> Para o(a) microempreendedor(a) que se sente sobrecarregado(a), o **Meu MEI** oferece uma assessoria financeira 24/7 que aprende com a maturidade do usuário. Diferente de sistemas tradicionais, nossa IA utiliza conversas naturais (texto e áudio) e visão computacional para organizar toda a vida financeira do negócio.
 
 ---
 
