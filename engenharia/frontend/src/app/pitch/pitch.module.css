@@ -8,7 +8,10 @@
 /* ─── Root ─── */
 .root {
   min-height: 100dvh;
-  background-color: #080C10;
+  background-color: var(--bg-app);
+  background-image:
+    radial-gradient(at 10% 10%, rgba(227, 38, 54, 0.09) 0px, transparent 80%),
+    radial-gradient(at 90% 90%, rgba(0, 210, 106, 0.06) 0px, transparent 80%);
   font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
   color: #E9EDEF;
   position: relative;
@@ -189,10 +192,7 @@
 }
 
 .heroHighlight {
-  background: linear-gradient(90deg, #E32636, #FF6B7A);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #E32636;
 }
 
 .heroSub {
@@ -689,6 +689,33 @@
     border-radius: 10px;
   }
 
+  .headerInner {
+    padding: 0 10px;
+  }
+
+  .pathway {
+    gap: 6px;
+  }
+
+  .pathwayStep {
+    gap: 6px;
+  }
+
+  .pathwayLine {
+    width: 15px;
+  }
+
+  .pathwayLabel {
+    display: none;
+    /* Esconde os labels na barra superior do mobile para caber tudo */
+  }
+
+  .ctaBtn {
+    padding: 7px 12px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
   /* Mobile collapsed: horizontal */
   .collapsedFace {
     flex-direction: row;
@@ -697,20 +724,25 @@
     align-items: center;
   }
 
-  .collapsedNum {
-    font-size: 28px;
+  .collapsedNumSmall {
+    position: static;
+    font-size: 16px;
   }
 
-  .collapsedRight {
-    writing-mode: horizontal-tb;
-    transform: none;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
+  .collapsedBottom {
+    width: auto;
+    padding-right: 0;
+    flex: 1;
+    justify-content: center;
   }
 
   .collapsedTitle {
     font-size: 14px;
+    text-align: center;
+  }
+
+  .collapsedPlus {
+    position: static;
   }
 
   /* Mobile expanded */
