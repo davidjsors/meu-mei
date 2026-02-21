@@ -26,14 +26,14 @@ Este documento lista todas as mensagens, instruções e erros apresentados ao us
   - **Sonho:** Label "Qual o seu maior sonho relacionado ao seu negócio?", Placeholder "Ex: Abrir minha loja física ou vender 10 mil por mês"
 - **Criação de PIN:**
   - **Aviso:** "Atenção: Guarde bem este número! Ele será sua senha para entrar no Meu MEI sempre que precisar."
-  - **Input:** Placeholder "PIN (de 4 a 6 números)"
+  - **Input:** Placeholder "PIN (6 números)"
   - **Confirmação:** Placeholder "Confirme o PIN"
 - **Botão:** "Tudo pronto! Vamos continuar →" (Carregando: "Salvando...")
 - **Erros:**
   - "Opa! Como podemos te chamar? Informe seu nome."
   - "Qual a sua profissão? (ex: Eletricista)"
   - "Conte para a gente qual o seu maior sonho!"
-  - "Crie um PIN de pelo menos 4 números."
+  - "Crie um PIN de exatamente 6 números."
   - "Os PINs informados não são iguais."
   - "Os códigos informados não coincidem" (feedback visual abaixo do campo)
 

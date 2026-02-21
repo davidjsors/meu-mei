@@ -36,12 +36,12 @@ class ProfileResponse(BaseModel):
 
 class PinRequest(BaseModel):
     phone_number: str = Field(..., pattern=r"^\d{2}-\d{5}-\d{4}$")
-    pin: str = Field(..., min_length=4, max_length=6, description="PIN numérico de 4 a 6 dígitos")
+    pin: str = Field(..., min_length=6, max_length=6, description="PIN numérico de 6 dígitos")
 
 
 class VerifyPinRequest(BaseModel):
     phone_number: str = Field(..., pattern=r"^\d{2}-\d{5}-\d{4}$")
-    pin: str = Field(..., min_length=4, max_length=6)
+    pin: str = Field(..., min_length=6, max_length=6)
 
 
 class SocialLoginRequest(BaseModel):

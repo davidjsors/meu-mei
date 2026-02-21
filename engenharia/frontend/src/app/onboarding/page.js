@@ -180,7 +180,7 @@ export default function OnboardingPage() {
         setInvalidField("");
         setError("");
 
-        if (!pin || pin.length < 4) {
+        if (!pin || pin.length !== 6) {
             setError("Por favor, informe seu PIN completo para acessar.");
             setInvalidField("pin");
             return;
@@ -214,7 +214,7 @@ export default function OnboardingPage() {
         if (!dream.trim()) { setError("Conte para a gente qual o seu maior sonho!"); setInvalidField("dream"); return; }
 
         // PIN Validations
-        if (pin.length < 4) { setError("Crie um PIN de pelo menos 4 números."); setInvalidField("pin"); return; }
+        if (pin.length !== 6) { setError("Crie um PIN de exatamente 6 números."); setInvalidField("pin"); return; }
         if (pin !== confirmPin) { setError("Os PINs informados não são iguais."); setInvalidField("confirmPin"); return; }
 
         // We clean the dream here, but we DON'T save to DB yet.
@@ -304,7 +304,7 @@ export default function OnboardingPage() {
                     Voltar
                 </button>
                 <button
-                    className={`onboarding-btn ${pin.length < 4 ? 'is-inactive' : ''}`}
+                    className={`onboarding-btn ${pin.length !== 6 ? 'is-inactive' : ''}`}
                     onClick={handleLoginPin}
                     disabled={loading}
                     style={{ flex: 1, margin: 0 }}
@@ -331,7 +331,7 @@ export default function OnboardingPage() {
         </div>
     );
 
-    const isValidProfile = name.trim() && businessType.trim() && dream.trim() && pin.length >= 4 && pin === confirmPin;
+    const isValidProfile = name.trim() && businessType.trim() && dream.trim() && pin.length === 6 && pin === confirmPin;
 
     const renderProfile = () => (
         <div className="onboarding-card" style={{ maxWidth: '580px' }}>
@@ -370,7 +370,7 @@ export default function OnboardingPage() {
                             className={`onboarding-input ${invalidField === 'pin' ? 'input-error-blink' : ''}`}
                             type={showPin ? "text" : "password"}
                             inputMode="numeric"
-                            placeholder="PIN (de 4 a 6 números)"
+                            placeholder="PIN (6 números)"
                             value={pin}
                             onChange={e => { setPinValue(e.target.value.replace(/\D/g, "").slice(0, 6)); if (invalidField === 'pin') setInvalidField(""); }}
                             style={{ paddingRight: '40px' }}
