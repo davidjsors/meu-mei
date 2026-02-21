@@ -11,7 +11,7 @@ const sections = [
         label: "A Potência dos MEIs",
         color: "#9333EA",
         gradient: "linear-gradient(160deg, #0a0814 0%, #160d2e 55%, #231050 100%)",
-        bgImage: "/pitch/caminhoneira.png",
+        bgImage: "/pitch/caminhoneira.webp",
         stats: [
             { value: "+50%", label: "das empresas ativas no Brasil" },
             { value: "12,7M", label: "negócios em operação" },
@@ -37,7 +37,7 @@ const sections = [
         label: "Desafios",
         color: "#D97706",
         gradient: "linear-gradient(160deg, #1a0e00 0%, #3d2400 55%, #7a4500 100%)",
-        bgImage: "/pitch/mestre-obras.png",
+        bgImage: "/pitch/mestre-obras.webp",
         stats: [
             { value: "18%", label: "bancarizados como PJ" },
             { value: "3", label: "dores críticas" },
@@ -74,7 +74,7 @@ const sections = [
         label: "Oportunidades",
         color: "#00D26A",
         gradient: "linear-gradient(160deg, #001a0d 0%, #003520 55%, #005c36 100%)",
-        bgImage: "/pitch/costureiro.png",
+        bgImage: "/pitch/costureiro.webp",
         stats: [
             { value: "50K", label: "MEIs na plataforma Bradesco" },
             { value: "90%", label: "permaneceram ativos" },
@@ -105,7 +105,7 @@ const sections = [
         label: "Meu MEI",
         color: "#E32636",
         gradient: "linear-gradient(160deg, #1a0408 0%, #3d0910 55%, #7a1020 100%)",
-        bgImage: "/pitch/mecanica.png",
+        bgImage: "/pitch/mecanica.webp",
         stats: [
             { value: "24/7", label: "copiloto disponível" },
             { value: "∞", label: "de qualquer aparelho" },
@@ -131,7 +131,6 @@ export default function PitchPage() {
             className={styles.root}
             onClick={() => active && setActive(null)}
         >
-
             {/* Header */}
             <header className={styles.header}>
                 <div className={styles.headerInner}>

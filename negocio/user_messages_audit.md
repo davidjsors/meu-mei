@@ -191,7 +191,58 @@ Estes erros substituem falhas técnicas na interface de chat:
 
 ---
 
-## 6. Observações Gerais
+## 6. Página de Pitch (Apresentação Inicial)
+**Arquivo:** `frontend/src/app/pitch/page.js`
+
+### Cabeçalho & Hero
+- **Pathway Navegação:** "A Potência dos MEIs", "Desafios", "Oportunidades", "Meu MEI"
+- **Botão Principal:** "Acessar plataforma"
+- **Título Hero:** "Transformando a gestão financeira de 12,7 milhões de empreendedores(as)"
+- **Subtítulo Hero:** "Uma solução que torna a gestão financeira, antes um fardo burocrático, em motor de crescimento para o ecossistema MEI brasileiro."
+- **Dica Interativa:** "Clique em um painel para explorar"
+
+### Painel 1: A Potência dos MEIs
+- **Estatísticas:** "+50% das empresas ativas no Brasil", "12,7M negócios em operação"
+- **Itens:**
+  - "O segmento já representa mais de 50% do total de empresas ativas no Brasil." (Fonte: BRASIL, 2025 — Mapa de Empresas)
+  - "São mais de 12,7 milhões de negócios em operação."
+  - "Na média, possuem 40,8 anos."
+  - "45,3% de mulheres."
+  - "54,7% de homens."
+
+### Painel 2: Desafios
+- **Estatísticas:** "18% bancarizados como PJ", "3 dores críticas"
+- **Itens:**
+  - "As principais dores do segmento incluem: a falta de estabilidade financeira, a dificuldade de acesso a crédito e o baixo apoio para empreender." (Fonte: SEBRAE, 2024)
+  - "Apenas 2 milhões (18%), dos mais de 14,6 milhões de MEIs, possuíam relacionamento bancário na pessoa jurídica, em 2022." (Fonte: Banco Central do Brasil, 2026)
+  - "Indicando que esse segmento não é bancarizado ou utiliza contas de pessoa física para transacionar seus negócios, o que dificulta a construção de um histórico de crédito e a separação patrimonial."
+
+### Painel 3: Oportunidades
+- **Estatísticas:** "50K MEIs na plataforma Bradesco", "90% permaneceram ativos"
+- **Itens:**
+  - "IA: elevar a produtividade por meio da automação de rotinas administrativas, permitindo que o empreendedor foque em sua atividade-fim."
+  - "Nova plataforma digital do Bradesco: adesão de 50 mil clientes MEI e 90% deles permaneceram ativos." (Fonte: BRADESCO, 2025 — Relatório de Resultados)
+  - "Demanda reprimida e uma necessidade latente por digitalização e acesso a ferramentas tecnológicas."
+
+### Painel 4: Meu MEI
+- **Estatísticas:** "24/7 copiloto disponível", "∞ de qualquer aparelho"
+- **Itens:**
+  - "Organiza toda a vida financeira do negócio, permitindo ver o lucro real e a saúde do dinheiro constantemente."
+  - "Reduz a ansiedade sobre o futuro financeiro e a sensação de estar trabalhando apenas para pagar boleto."
+  - "Profissionaliza a gestão para facilitar o acesso a crédito e o relacionamento com agentes do sistema financeiro nacional."
+  - "Alerta sobre as dificuldades que poderão surgir no futuro e sugere ações práticas para manter as contas no azul."
+  - "Orientado a um objetivo real: o agente monitora a distância entre o status atual e esse objetivo, agindo como um copiloto que comemora vitórias e sugere ajustes de rota."
+  - "Liberdade de gerenciar seu negócio de qualquer lugar e em qualquer aparelho."
+  - "Conexão com o ecossistema Bradesco, indicando possíveis produtos e serviços para cada momento da jornada."
+
+### Elementos do Acordeão e Rodapé
+- **Links de Fonte:** "Ver fonte ↗" ou "Ver fonte [X] ↗" (dependendo do número de fontes).
+- **Botões do Acordeão:** Etiqueta para próximo painel ou "✕" para fechar.
+- **Rodapé:** "Meu MEI: finanças em dia, dinheiro no bolso. © 2026"
+
+---
+
+## 7. Observações Gerais
 - **Moeda:** Todos os valores são formatados como BRL (R$).
 - **Capitalização:** O sonho do usuário é automaticamente formatado para iniciar com letra minúscula após o texto "meu sonho é...", a menos que seja nome próprio (lógica simples de string).
 - **Tour:** O tour guiado possui mensagens próprias explicativas sobre cada seção da tela (não listadas aqui exaustivamente, mas presentes em `components/GuidanceTour.js`).
