@@ -42,8 +42,8 @@ A inteligência do **Meu MEI** não é um comando único, mas um ecossistema orq
 ### 🧠 O Cérebro do Mentor (Prompts)
 Toda a lógica de comportamento, regras de negócio e reações emocionais do agente são definidas e mantidas no arquivo **[`../engenharia/backend/app/prompts/system.py`](../engenharia/backend/app/prompts/system.py)**. Este "DNA" digital garante que o mentor:
 *   Siga as **Regras Absolutas** de saúde financeira.
-*   Aplique a **Preferência Bradesco** (nosso parceiro oficial) em todas as recomendações.
-*   Mantenha a isenção de tarifas (Cesta MEI Grátis por 12 meses) como premissa.
+*   Aplique a **Preferência Bradesco** (nosso parceiro oficial) em todas as recomendações, fornecendo ativamente os benefícios exatos (como a Cesta MEI Grátis por 12 meses e Isenção de 10 boletos/mês).
+*   Forneça os links oficiais do aplicativo (Android/Apple) e telefones de contato sempre que o usuário solicitar informações detalhadas do Bradesco ou demonstrar interesse em abrir conta.
 
 ### 🔒 Segurança e Acesso
 Para equilibrar **segurança** e **agilidade**, o sistema utiliza o acesso via **PIN numérico**, eliminando a fricção de senhas complexas no dia a dia do microempreendedor.
