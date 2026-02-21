@@ -57,7 +57,7 @@ const MOBILE_STEPS = [
         id: "welcome",
         emoji: "👋",
         title: "Bem-vindo ao Meu MEI!",
-        content: "Sou seu mentor financeiro pessoal. Vou te ajudar a organizar as finanças do seu negócio de um jeito simples. Vamos dar uma olhada rápida?",
+        content: "Sou seu mentor financeiro. Vou te ajudar a organizar as finanças do seu negócio de um jeito simples. Vamos dar uma olhada rápida?",
         highlight: null,
     },
     {
@@ -85,7 +85,7 @@ const MOBILE_STEPS = [
         id: "quick",
         emoji: "⚡",
         title: "Registros em 1 Toque",
-        content: "No painel lateral há botões rápidos para registrar uma venda ou gasto sem precisar digitar nada. Rápido e fácil!",
+        content: "No painel lateral há botões rápidos para registrar uma venda ou gasto. Rápido e fácil!",
         highlight: null,
     },
     {

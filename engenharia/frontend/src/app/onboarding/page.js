@@ -262,7 +262,7 @@ export default function OnboardingPage() {
                     onClick={handlePhoneSubmit}
                     disabled={loading}
                 >
-                    {loading ? "Verificando..." : "Continuar →"}
+                    {loading ? "Validando..." : "Continuar →"}
                 </button>
 
                 <p className="onboarding-footer-note">
@@ -352,7 +352,7 @@ export default function OnboardingPage() {
             </div>
             <div className="onboarding-form-group">
                 <label className="onboarding-label">Qual o seu maior sonho relacionado ao seu negócio?</label>
-                <textarea className={`onboarding-input ${invalidField === 'dream' ? 'input-error-blink' : ''}`} style={{ minHeight: '80px', resize: 'none' }} placeholder="Ex: Abrir minha loja física..." value={dream} onChange={e => { setDream(e.target.value); if (invalidField === 'dream') setInvalidField(""); }} />
+                <textarea className={`onboarding-input ${invalidField === 'dream' ? 'input-error-blink' : ''}`} style={{ minHeight: '80px', resize: 'none' }} placeholder="Ex: Abrir minha loja física ou vender 10 mil por mês" value={dream} onChange={e => { setDream(e.target.value); if (invalidField === 'dream') setInvalidField(""); }} />
             </div>
 
             <div className="onboarding-form-group" style={{ marginTop: '24px', borderTop: '1px solid var(--border-color)', paddingTop: '24px' }}>
@@ -360,7 +360,7 @@ export default function OnboardingPage() {
 
                 <div className="onboarding-info-box" style={{ padding: '12px', borderRadius: '8px', marginBottom: '16px', display: 'flex', gap: '10px', alignItems: 'start' }}>
                     <p style={{ fontSize: '13px', margin: 0, lineHeight: '1.4' }}>
-                        <span style={{ color: 'var(--red-primary)', fontWeight: '600' }}>Atenção:</span> Guarde bem este número! Ele será sua senha para entrar no aplicativo sempre que precisar.
+                        <span style={{ color: 'var(--red-primary)', fontWeight: '600' }}>Atenção:</span> Guarde bem este número! Ele será sua senha para entrar no Meu MEI sempre que precisar.
                     </p>
                 </div>
 
@@ -370,7 +370,7 @@ export default function OnboardingPage() {
                             className={`onboarding-input ${invalidField === 'pin' ? 'input-error-blink' : ''}`}
                             type={showPin ? "text" : "password"}
                             inputMode="numeric"
-                            placeholder="PIN (4-6 dígitos)"
+                            placeholder="PIN (de 4 a 6 números)"
                             value={pin}
                             onChange={e => { setPinValue(e.target.value.replace(/\D/g, "").slice(0, 6)); if (invalidField === 'pin') setInvalidField(""); }}
                             style={{ paddingRight: '40px' }}
@@ -451,7 +451,7 @@ export default function OnboardingPage() {
         setError("");
 
         if (!revenueGoal.trim() || revenueGoal === "0,00") {
-            setError("Informe sua meta de vendas para este mês.");
+            setError("Informe sua meta de vendas mensal.");
             setInvalidField("revenueGoal");
             return;
         }
@@ -677,10 +677,10 @@ export default function OnboardingPage() {
         return (
             <div className="onboarding-card" style={{ maxWidth: '540px' }}>
                 <h2 className="onboarding-title">Sua Meta Mensal</h2>
-                <p className="onboarding-subtitle">Para te ajudar a focar no que importa, qual o valor de faturamento você deseja atingir este mês?</p>
+                <p className="onboarding-subtitle">Para te ajudar a focar no que importa, qual o valor de faturamento (vendas) você deseja atingir todo mês?</p>
 
                 <div className="onboarding-form-group">
-                    <label className="onboarding-label">1. Meta mensal de faturamento</label>
+                    <label className="onboarding-label">1. Meta mensal de vendas</label>
                     <div style={{ position: 'relative' }}>
                         <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', fontWeight: '600' }} className="onboarding-label">R$</span>
                         <input
@@ -725,13 +725,13 @@ export default function OnboardingPage() {
             <h2 className="onboarding-title">Seu Ponto de Partida</h2>
             <p className="onboarding-subtitle">
                 Para começar com o pé direito, quanto você tem hoje em caixa para o seu negócio?
-                <br /><small style={{ opacity: 0.7 }}>(Este valor será seu saldo inicial no aplicativo)</small>
+                <br /><small style={{ opacity: 0.7 }}>(Este valor será seu saldo inicial no Meu MEI)</small>
             </p>
 
             {/* Saldo Inicial */}
             <div className="onboarding-form-group" style={{ marginBottom: '24px' }}>
                 <label className="onboarding-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    Saldo Atual (Dinheiro em mãos + Banco)
+                    Caixa Atual (Dinheiro em mãos + Banco)
                 </label>
                 <div style={{ position: 'relative' }}>
                     <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', fontWeight: '600', color: 'var(--text-muted)' }}>R$</span>

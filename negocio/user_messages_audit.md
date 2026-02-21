@@ -12,7 +12,7 @@ Este documento lista todas as mensagens, instruções e erros apresentados ao us
   - "Digite seu telefone para começar sua jornada rumo à independência financeira."
 - **Label:** "Seu telefone"
 - **Placeholder:** "11-98765-4321"
-- **Botão:** "Continuar →" (Carregando: "Verificando...")
+- **Botão:** "Continuar →" (Carregando: "Validando...")
 - **Nota de rodapé:** "Sua conta é vinculada ao seu número."
 - **Erros:**
   - "Por favor, informe seu celular completo com DDD."
@@ -23,10 +23,10 @@ Este documento lista todas as mensagens, instruções e erros apresentados ao us
 - **Campos:**
   - **Nome:** Label "Nome", Placeholder "Seu nome"
   - **Profissão:** Label "Profissão", Placeholder "Ex: Eletricista..."
-  - **Sonho:** Label "Qual o seu maior sonho relacionado ao seu negócio?", Placeholder "Ex: Abrir minha loja física..."
+  - **Sonho:** Label "Qual o seu maior sonho relacionado ao seu negócio?", Placeholder "Ex: Abrir minha loja física ou vender 10 mil por mês"
 - **Criação de PIN:**
-  - **Aviso:** "Atenção: Guarde bem este número! Ele será sua senha para entrar no aplicativo sempre que precisar."
-  - **Input:** Placeholder "PIN (4-6 dígitos)"
+  - **Aviso:** "Atenção: Guarde bem este número! Ele será sua senha para entrar no Meu MEI sempre que precisar."
+  - **Input:** Placeholder "PIN (de 4 a 6 números)"
   - **Confirmação:** Placeholder "Confirme o PIN"
 - **Botão:** "Tudo pronto! Vamos continuar →" (Carregando: "Salvando...")
 - **Erros:**
@@ -53,16 +53,16 @@ Este documento lista todas as mensagens, instruções e erros apresentados ao us
 
 ### Etapa 5: Meta de Faturamento
 - **Título:** "Sua Meta Mensal"
-- **Subtítulo:** "Para te ajudar a focar no que importa, qual o valor de faturamento você deseja atingir este mês?"
-- **Label:** "1. Meta mensal de faturamento"
+- **Subtítulo:** "Para te ajudar a focar no que importa, qual o valor de faturamento (vendas) você deseja atingir todo mês?"
+- **Label:** "1. Meta mensal de vendas"
 - **Placeholder:** "0,00"
 - **Botão:** "Continuar →"
-- **Erro:** "Informe sua meta de vendas para este mês."
+- **Erro:** "Informe sua meta de vendas mensal."
 
 ### Etapa 6: Saldo Inicial
 - **Título:** "Seu Ponto de Partida"
-- **Subtítulo:** "Para começar com o pé direito, quanto você tem hoje em caixa para o seu negócio? (Este valor será seu saldo inicial no aplicativo)"
-- **Label:** "Saldo Atual (Dinheiro em mãos + Banco)"
+- **Subtítulo:** "Para começar com o pé direito, quanto você tem hoje em caixa para o seu negócio? (Este valor será seu saldo inicial no Meu MEI)"
+- **Label:** "Caixa Atual (Dinheiro em mãos + Banco)"
 - **Placeholder:** "0,00"
 - **Botão:** "Salvar e Continuar →" (Carregando: "Salvando...")
 - **Erro:** "Informe seu saldo atual para podermos começar seu controle."
@@ -77,30 +77,7 @@ Este documento lista todas as mensagens, instruções e erros apresentados ao us
 
 ---
 
-## 2. Fluxo de Login
-**Arquivo:** `frontend/src/app/login/page.js`
-
-### Identificação (Passo 1)
-- **Título:** "Bem-vindo!"
-- **Subtítulo:** "Digite seu telefone para entrar."
-- **Placeholder:** "11-99999-9999"
-- **Botão:** "Continuar"
-- **Link:** "Não tem conta? Cadastre-se"
-- **Erro:** "Telefone inválido"
-
-### Senha/PIN (Passo 2)
-- **Título:** "Olá, [Nome]!"
-- **Subtítulo:** "Digite seu PIN de acesso."
-- **Placeholder:** "••••"
-- **Botão:** "Entrar"
-- **Link:** "Trocar telefone"
-- **Botão Esqueci Senha:** "Esqueci meu PIN" -> Exibe: "Para recuperar, envie e-mail para: david.sors@gmail.com"
-- **Erros:**
-  - "PIN incorreto" (Vem da API)
-
----
-
-## 3. Sidebar e Navegação
+## 2. Sidebar e Navegação
 **Arquivo:** `frontend/src/components/Sidebar.js`
 
 ### Cabeçalho
@@ -141,7 +118,7 @@ Este documento lista todas as mensagens, instruções e erros apresentados ao us
 
 ---
 
-## 4. Interface de Chat
+## 3. Interface de Chat
 **Arquivo:** `frontend/src/app/chat/page.js`
 
 ### Cabeçalho
@@ -157,7 +134,7 @@ Este documento lista todas as mensagens, instruções e erros apresentados ao us
 
 ---
 
-## 5. Erros e Respostas de API (Backend & Utils)
+## 4. Erros e Respostas de API (Backend & Utils)
 **Arquivos:** `backend/app/routers/*.py`, `frontend/src/lib/utils.js`
 
 ### Erros de Autenticação (Backend)
@@ -179,19 +156,19 @@ Este documento lista todas as mensagens, instruções e erros apresentados ao us
 Estes erros substituem falhas técnicas na interface de chat:
 
 1.  **Cota Excedida / Rate Limit:**
-    - "Ops! Estamos conversando tão rápido que meu sistema pediu 1 minutinho para respirar. 😅 Tente novamente em alguns segundos!"
+    - "Ops! Estamos conversando tão rápido que meu sistema pediu 1 minutinho para respirar. 😅 Tente novamente em alguns minutos!"
 2.  **Erro de Autenticação / API Key:**
-    - "Parece que há um problema com a minha chave de acesso (API Key). Por favor, verifique as configurações do sistema! 🔑"
+    - "Ops! Estamos conversando tão rápido que meu sistema pediu 1 minutinho para respirar. 😅 Tente novamente em alguns minutos!"
 3.  **Modelo Indisponível (404 do LLM):**
-    - "Estou tentando usar um modelo de inteligência que parece estar indisponível ou em manutenção agora. 🛠️"
+    - "Ops! Estamos conversando tão rápido que meu sistema pediu 1 minutinho para respirar. 😅 Tente novamente em alguns minutos!"
 4.  **Erro de Conexão / Internet:**
-    - "Hmm, não consegui me conectar ao servidor. Verifique sua internet ou tente novamente em instantes. 🌐"
+    - "Hmm, não consegui me conectar a sua conta. Verifique sua internet ou tente novamente em instantes. 🌐"
 5.  **Erro Genérico:**
     - "Tive um probleminha técnico aqui, mas não se preocupe: recebi sua mensagem e vou processá-la assim que meu sistema estabilizar! 😊"
 
 ---
 
-## 6. Página de Pitch (Apresentação Inicial)
+## 5. Página de Pitch (Apresentação Inicial)
 **Arquivo:** `frontend/src/app/pitch/page.js`
 
 ### Cabeçalho & Hero
@@ -242,7 +219,55 @@ Estes erros substituem falhas técnicas na interface de chat:
 
 ---
 
+## 6. Tour Guiado (Onboarding na Plataforma)
+**Arquivo:** `frontend/src/components/GuidanceTour.js`
+
+### Tour Desktop (Telas Grandes)
+- **Passo 1:**
+  - **Título:** "Bem-vindo ao Meu MEI! 👋"
+  - **Conteúdo:** "Parabéns por dar esse passo! Eu sou seu mentor e vou te ajudar a organizar suas finanças de um jeito simples e rápido. Vamos conhecer as ferramentas?"
+- **Passo 2:**
+  - **Título:** "Seu Resumo Financeiro"
+  - **Conteúdo:** "Aqui você acompanha o que entra e o que sai em tempo real. Toque nos valores para ver o histórico detalhado do mês!"
+- **Passo 3:**
+  - **Título:** "Sua Meta de Vendas"
+  - **Conteúdo:** "Defina quanto você quer faturar este mês. O gráfico mostra o quanto você já caminhou para realizar seus sonhos!"
+- **Passo 4:**
+  - **Título:** "Registros Rápidos"
+  - **Conteúdo:** "Vendeu algo ou teve um gasto? Use estes botões para registrar em segundos sem precisar digitar."
+- **Passo 5:**
+  - **Título:** "Fale Comigo!"
+  - **Conteúdo:** "Você pode me enviar mensagens, áudios ou até fotos de comprovantes. Eu entendo tudo e organizo para você!"
+- **Passo 6:**
+  - **Título:** "Lembre-se do seu Sonho"
+  - **Conteúdo:** "Sempre que precisar de um incentivo, olhe aqui. Estou aqui para garantir que você chegue lá!"
+- **Botões (Desktop):** "Anterior", "Próximo", "Começar Agora!" (último passo).
+
+### Tour Mobile (Telas Pequenas)
+- **Passo 1:**
+  - **Título:** "👋 Bem-vindo ao Meu MEI!"
+  - **Conteúdo:** "Sou seu mentor financeiro. Vou te ajudar a organizar as finanças do seu negócio de um jeito simples. Vamos dar uma olhada rápida?"
+- **Passo 2:**
+  - **Título:** "💬 Converse Comigo"
+  - **Conteúdo:** "Esta é a tela principal. Você pode me mandar mensagens de texto, áudios ou até fotos de comprovantes. Eu entendo tudo!"
+  - **Aviso visual:** "Use o campo de texto abaixo para começar a conversar"
+- **Passo 3:**
+  - **Título:** "☰ Seu Painel Financeiro"
+  - **Conteúdo:** "Toque no ícone de menu (☰) no canto superior esquerdo para ver seu saldo, metas e registrar entradas e saídas rapidinho."
+  - **Aviso visual:** "Procure o ícone ☰ no canto superior esquerdo da tela"
+- **Passo 4:**
+  - **Título:** "💰 Saldo e Metas"
+  - **Conteúdo:** "No painel lateral você acompanha quanto entrou, quanto saiu e o progresso da sua meta mensal em tempo real."
+- **Passo 5:**
+  - **Título:** "⚡ Registros em 1 Toque"
+  - **Conteúdo:** "No painel lateral há botões rápidos para registrar uma venda ou gasto. Rápido e fácil!"
+- **Passo 6:**
+  - **Título:** "🚀 Tudo Pronto!"
+  - **Conteúdo:** "Agora você já sabe tudo. Comece me contando como foi seu dia no negócio, ou registre sua primeira transação!"
+- **Botões (Mobile):** "Anterior" (ícone), "Próximo", "Vamos lá! 🚀" (último passo).
+
+---
+
 ## 7. Observações Gerais
 - **Moeda:** Todos os valores são formatados como BRL (R$).
 - **Capitalização:** O sonho do usuário é automaticamente formatado para iniciar com letra minúscula após o texto "meu sonho é...", a menos que seja nome próprio (lógica simples de string).
-- **Tour:** O tour guiado possui mensagens próprias explicativas sobre cada seção da tela (não listadas aqui exaustivamente, mas presentes em `components/GuidanceTour.js`).

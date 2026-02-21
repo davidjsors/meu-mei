@@ -36,10 +36,10 @@ export const cleanMarkers = (text) => {
  * Dicionário de Erros amigáveis.
  */
 export const ERROR_DICTIONARY = {
-    QUOTA: "Ops! Estamos conversando tão rápido que meu sistema pediu 1 minutinho para respirar. 😅 Tente novamente em alguns segundos!",
-    AUTH: "Parece que há um problema com a minha chave de acesso (API Key). Por favor, verifique as configurações do sistema! 🔑",
-    MODEL: "Estou tentando usar um modelo de inteligência que parece estar indisponível ou em manutenção agora. 🛠️",
-    CONNECTION: "Hmm, não consegui me conectar ao servidor. Verifique sua internet ou tente novamente em instantes. 🌐",
+    QUOTA: "Ops! Estamos conversando tão rápido que meu sistema pediu 1 minutinho para respirar. 😅 Tente novamente em alguns minutos!",
+    AUTH: "Ops! Estamos conversando tão rápido que meu sistema pediu 1 minutinho para respirar. 😅 Tente novamente em alguns minutos!",
+    MODEL: "Ops! Estamos conversando tão rápido que meu sistema pediu 1 minutinho para respirar. 😅 Tente novamente em alguns minutos!",
+    CONNECTION: "Hmm, não consegui me conectar a sua conta. Verifique sua internet ou tente novamente em instantes. 🌐",
     GENERIC: "Tive um probleminha técnico aqui, mas não se preocupe: recebi sua mensagem e vou processá-la assim que meu sistema estabilizar! 😊"
 };
 
