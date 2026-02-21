@@ -29,7 +29,7 @@ const DESKTOP_STEPS = [
     {
         id: "actions",
         title: "Registros Rápidos",
-        content: "Vendeu algo ou teve um gasto? Use estes botões para registrar em segundos sem precisar digitar.",
+        content: "Vendeu algo ou teve um gasto? Use estes botões para registrar em segundos.",
         targetId: "tour-sidebar-actions",
         icon: <TrendingUp size={24} className="tour-icon" style={{ color: "var(--green)" }} />
     },

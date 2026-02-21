@@ -33,7 +33,7 @@ Este documento lista todas as mensagens, instruções e erros apresentados ao us
   - "Opa! Como podemos te chamar? Informe seu nome."
   - "Qual a sua profissão? (ex: Eletricista)"
   - "Conte para a gente qual o seu maior sonho!"
-  - "Crie um PIN de exatamente 6 números."
+  - "Crie um PIN de 6 números."
   - "Os PINs informados não são iguais."
   - "Os códigos informados não coincidem" (feedback visual abaixo do campo)
 
@@ -234,7 +234,7 @@ Estes erros substituem falhas técnicas na interface de chat:
   - **Conteúdo:** "Defina quanto você quer faturar este mês. O gráfico mostra o quanto você já caminhou para realizar seus sonhos!"
 - **Passo 4:**
   - **Título:** "Registros Rápidos"
-  - **Conteúdo:** "Vendeu algo ou teve um gasto? Use estes botões para registrar em segundos sem precisar digitar."
+  - **Conteúdo:** "Vendeu algo ou teve um gasto? Use estes botões para registrar em segundos."
 - **Passo 5:**
   - **Título:** "Fale Comigo!"
   - **Conteúdo:** "Você pode me enviar mensagens, áudios ou até fotos de comprovantes. Eu entendo tudo e organizo para você!"
