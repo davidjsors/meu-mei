@@ -181,7 +181,7 @@ export default function OnboardingPage() {
         setError("");
 
         if (!pin || pin.length !== 6) {
-            setError("Por favor, informe seu PIN completo para acessar.");
+            setError("Por favor, informe seu PIN de 6 números para acessar.");
             setInvalidField("pin");
             return;
         }

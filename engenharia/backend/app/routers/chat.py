@@ -82,6 +82,7 @@ RE_FIELD_NAME = re.compile(r"(?:\*+)?nome:(?:\*+)?\s*(.+)", re.IGNORECASE)
 RE_FIELD_NEGOCIO = re.compile(r"(?:\*+)?negocio:(?:\*+)?\s*(.+)", re.IGNORECASE)
 RE_FIELD_SONHO = re.compile(r"(?:\*+)?sonho:(?:\*+)?\s*(.+)", re.IGNORECASE)
 RE_FIELD_SCORE = re.compile(r"(?:\*+)?score:(?:\*+)?\s*(\d+)", re.IGNORECASE)
+RE_FIELD_PONTOS_FRACOS = re.compile(r"(?:\*+)?pontos_fracos:(?:\*+)?\s*(.+)", re.IGNORECASE)
 
 RE_FIELD_TIPO = re.compile(r"(?:\*+)?tipo:(?:\*+)?\s*(entrada|saída|saida|receita|despesa)", re.IGNORECASE)
 RE_FIELD_VALOR = re.compile(r"(?:\*+)?valor:(?:\*+)?\s*(.+)", re.IGNORECASE)
@@ -120,6 +121,7 @@ def _parse_onboarding(text: str) -> dict | None:
     biz_m = RE_FIELD_NEGOCIO.search(inner)
     dream_m = RE_FIELD_SONHO.search(inner)
     score_m = RE_FIELD_SCORE.search(inner)
+    pontos_m = RE_FIELD_PONTOS_FRACOS.search(inner)
     
     if all([name_m, biz_m, dream_m, score_m]):
         return {
@@ -127,6 +129,7 @@ def _parse_onboarding(text: str) -> dict | None:
             "business_type": biz_m.group(1).strip(),
             "dream": dream_m.group(1).strip(),
             "score": int(score_m.group(1).strip()),
+            "pontos_fracos": pontos_m.group(1).strip() if pontos_m else None
         }
     return None
 
@@ -588,13 +591,17 @@ async def send_message(
                 onboarding_data = _parse_onboarding(assistant_content)
                 if onboarding_data:
                     level = get_maturity_level(onboarding_data["score"])
-                    db.table("profiles").update({
+                    update_payload = {
                         "name": onboarding_data["name"],
                         "business_type": onboarding_data["business_type"],
                         "dream": onboarding_data["dream"],
                         "maturity_score": onboarding_data["score"],
                         "maturity_level": level,
-                    }).eq("phone_number", phone_number).execute()
+                    }
+                    if onboarding_data.get("pontos_fracos"):
+                        update_payload["summary"] = f"Pontos de atenção (Diagnóstico IAMF-MEI): {onboarding_data['pontos_fracos']}"
+                        
+                    db.table("profiles").update(update_payload).eq("phone_number", phone_number).execute()
 
                     # Limpar marcadores da resposta antes de salvar
                     assistant_content = _clean_onboarding_markers(assistant_content)
