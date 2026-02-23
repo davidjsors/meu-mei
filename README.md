@@ -12,6 +12,15 @@ O **Meu MEI** é um mentor financeiro digital desenhado para transformar a vida 
 🌐 **Acesse a aplicação:** [mentormei.vercel.app](https://mentormei.vercel.app)
 
  <img src="./engenharia/frontend/public/logo2.svg" width="400" valign="middle"> 
+ 
+---
+## Pitch
+
+ > Imagine trabalhar de domingo a domingo, sendo o vendedor, o entregador e o gerente do seu negócio, e sentir que o seu esforço serve apenas para pagar boleto. Essa é a solidão financeira que assombra um dos pilares da nossa economia, os MEIs. O **Meu MEI** ajuda os microempreendedores e microempreendedoras a retomar o controle e voltar a sonhar, através de um mentor inteligente que descomplica a gestão do dinheiro.
+
+🌐[mentormei.vercel.app/pitch](https://mentormei.vercel.app/pitch)
+
+---
 
 ## Estrutura do Repositório
 
@@ -67,14 +76,6 @@ Testamos o agente sob estresse para garantir que ele não alucine e mantenha a s
 
 ---
 
-
-## Pitch
-
- > Imagine trabalhar de domingo a domingo, sendo o vendedor, o entregador e o gerente do seu negócio, e sentir que o seu esforço serve apenas para pagar boleto. Essa é a solidão financeira que assombra um dos pilares da nossa economia, os MEIs. O **Meu MEI** ajuda os microempreendedores e microempreendedoras a retomar o controle e voltar a sonhar, através de um mentor inteligente que descomplica a gestão do dinheiro.
-
-🌐[mentormei.vercel.app/pitch](https://mentormei.vercel.app/pitch)
-
----
 <sub>Meu MEI - Finanças em dia, dinheiro no bolso. © 2026</sub>
 
 <sub>Este projeto contou com a assistência de Inteligência Artificial (**Gemini** e **Claude**) em seu desenvolvimento e foi potencializado pela ferramenta **Antigravity** do Google.<sub>
