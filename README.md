@@ -59,7 +59,7 @@ Testamos o agente sob estresse para garantir que ele não alucine e mantenha a s
 
 | Categoria | Tecnologia |
 |-----------|------------|
-| **LLM** | Google Gemini 2.0 Flash |
+| **LLM** | Google Gemini 2.5 Flash |
 | **Backend** | FastAPI (Python) |
 | **Frontend** | Next.js 15 (React 19) |
 | **Banco/Vetores** | Supabase (PostgreSQL + pgvector) |
