@@ -13,15 +13,13 @@ const sections = [
         gradient: "linear-gradient(160deg, #0a0814 0%, #160d2e 55%, #231050 100%)",
         bgImage: "/pitch/caminhoneira.webp",
         stats: [
-            { value: "+50%", label: "das empresas ativas no Brasil" },
-            { value: "12,7M", label: "negócios em operação" },
+            { value: "12,7 milhões", label: "de negócios no Brasil" },
+            { value: "52,3%", label: "das empresas ativas (2025)" },
         ],
         items: [
-            { text: "O segmento já representa mais de 50% do total de empresas ativas no Brasil.", ref: 1 },
-            { text: "São mais de 12,7 milhões de negócios em operação.", ref: 1 },
-            { text: "Na média, possuem 40,8 anos.", ref: 1 },
-            { text: "45,3% de mulheres.", ref: 1 },
-            { text: "54,7% de homens.", ref: 1 },
+            { text: "Esse público é o verdadeiro motor de inclusão produtiva no país, representando a maior base de empresas em operação (53%)." },
+            { text: "São responsáveis por movimentar a economia local diariamente, superando a marca de 12,7 milhões de negócios formalizados." },
+            { text: "São pessoas movidas por objetivos reais e práticos, como abrir uma loja ou garantir um salário fixo no final do mês." },
         ],
         sources: [
             {
@@ -43,17 +41,9 @@ const sections = [
             { value: "3", label: "dores críticas" },
         ],
         items: [
-            {
-                text: "As principais dores do segmento incluem: a falta de estabilidade financeira, a dificuldade de acesso a crédito e o baixo apoio para empreender.",
-                ref: 1,
-            },
-            {
-                text: "Apenas 2 milhões (18%), dos mais de 14,6 milhões de MEIs, possuíam relacionamento bancário na pessoa jurídica, em 2022.",
-                ref: 2,
-            },
-            {
-                text: "Indicando que esse segmento não é bancarizado ou utiliza contas de pessoa física para transacionar seus negócios, o que dificulta a construção de um histórico de crédito e a separação patrimonial.",
-            },
+            { text: "As principais dores do segmento incluem a falta de estabilidade financeira, a dificuldade de acesso a crédito e o baixo apoio para empreender." },
+            { text: "No dia a dia, isso se traduz na famosa confusão patrimonial: a necessidade de usar a mesma conta para as despesas de casa e da empresa." },
+            { text: "Como resultado, apenas 18% mantêm algum relacionamento bancário como pessoa jurídica, o que dificulta o acesso a crédito estruturado." },
         ],
         sources: [
             {
@@ -76,26 +66,19 @@ const sections = [
         gradient: "linear-gradient(160deg, #001a0d 0%, #003520 55%, #005c36 100%)",
         bgImage: "/pitch/costureiro.webp",
         stats: [
-            { value: "50K", label: "MEIs na plataforma Bradesco" },
-            { value: "90%", label: "permaneceram ativos" },
+            { value: "+70%", label: "operam sem conta PJ" },
+            { value: "IA", label: "alavanca de produtividade" },
         ],
         items: [
-            {
-                text: "IA: elevar a produtividade por meio da automação de rotinas administrativas, permitindo que o empreendedor foque em sua atividade-fim.",
-            },
-            {
-                text: "Nova plataforma digital do Bradesco: adesão de 50 mil clientes MEI e 90% deles permaneceram ativos.",
-                ref: 1,
-            },
-            {
-                text: "Demanda reprimida e uma necessidade latente por digitalização e acesso a ferramentas tecnológicas.",
-            },
+            { text: "Existe uma oportunidade gigantesca de inclusão e bancarização, visto que mais de 70% dos MEIs operam na informalidade bancária." },
+            { text: "A verdadeira oportunidade é usar a Inteligência Artificial para automatizar a rotina do microempreendedor, permitindo que ele foque no seu objetivo." },
+            { text: "Ao quebrar essa barreira, integramos a maior base de CNPJs do país ao ecossistema financeiro, destravando o acesso a crédito com segurança." },
         ],
         sources: [
             {
                 num: 1,
-                label: "BRADESCO, 2025 — Relatório de Resultados",
-                url: "https://api.mziq.com/mzfilemanager/v2/d/80f2e993-0a30-421a-9470-a4d5c8ad5e9f/cc64fbeb-59bc-7be5-37b4-333b2fee64a9",
+                label: "Banco Central do Brasil, 2026",
+                url: "https://www3.bcb.gov.br/sgspub/localizarseries/localizarSeries.do?method=prepararTelaLocalizarSeries",
             },
         ],
     },
@@ -107,17 +90,14 @@ const sections = [
         gradient: "linear-gradient(160deg, #1a0408 0%, #3d0910 55%, #7a1020 100%)",
         bgImage: "/pitch/mecanica.webp",
         stats: [
-            { value: "24/7", label: "copiloto disponível" },
-            { value: "∞", label: "de qualquer aparelho" },
+            { value: "Zero", label: "atrito burocrático" },
+            { value: "100%", label: "foco no sonho" },
         ],
         items: [
-            { text: "Organiza toda a vida financeira do negócio, permitindo ver o lucro real e a saúde do dinheiro constantemente." },
-            { text: "Reduz a ansiedade sobre o futuro financeiro e a sensação de estar trabalhando apenas para pagar boleto." },
-            { text: "Profissionaliza a gestão para facilitar o acesso a crédito e o relacionamento com agentes do sistema financeiro nacional." },
-            { text: "Alerta sobre as dificuldades que poderão surgir no futuro e sugere ações práticas para manter as contas no azul." },
-            { text: "Orientado a um objetivo real: o agente monitora a distância entre o status atual e esse objetivo, agindo como um copiloto que comemora vitórias e sugere ajustes de rota." },
-            { text: "Liberdade de gerenciar seu negócio de qualquer lugar e em qualquer aparelho." },
-            { text: "Conexão com o ecossistema Bradesco, indicando possíveis produtos e serviços para cada momento da jornada." },
+            { text: "Ajudamos o microempreendedor a retomar o controle e voltar a focar no seu verdadeiro sonho, através de um mentor inteligente que descomplica a gestão do dinheiro." },
+            { text: "Eliminamos a burocracia: o usuário envia um áudio ou foto de cupom, e nosso agente organiza tudo com segurança e fundamentado em boas práticas do mercado." },
+            { text: "Atuamos de forma proativa como um copiloto que monitora o dinheiro para garantir que o objetivo do empreendedor seja atingido." },
+            { text: "Nós cuidamos dos números para que eles trabalhem pelos seus sonhos." },
         ],
         sources: [],
     },

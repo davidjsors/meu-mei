@@ -22,8 +22,11 @@ function formatMarkdown(text) {
         .replace(/__(.+?)__/g, "<strong>$1</strong>")
         // Italic: *texto* ou _texto_
         .replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, "<em>$1</em>")
-        // Links: [Texto](URL)
-        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" style="color: var(--blue-primary); text-decoration: underline;">$1</a>')
+        // Links: [Texto](URL) resistindo a quebra de linha do bot
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, p1, p2) => {
+            const cleanUrl = p2.replace(/\s+/g, "");
+            return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer" style="color: var(--blue-primary); text-decoration: underline;">${p1}</a>`;
+        })
         // Listas com - ou •
         .replace(/^[-•]\s+(.+)$/gm, "<li>$1</li>")
         // Listas numeradas
