@@ -132,6 +132,7 @@ export default function ChatPage() {
 
             // Limpar citação imediatamente para evitar delay visual (UX)
             const currentReplyId = replyingTo?.id;
+            const currentReplyText = replyingTo?.content;
             setReplyingTo(null);
             if (chatInputRef.current) {
                 // Remove focus to prevent keyboard popping up again if on mobile, 
@@ -164,7 +165,7 @@ export default function ChatPage() {
             pendingAudioRef.current = null; // Reset pending audio
 
             try {
-                const response = await sendMessage(phone, text, file, currentReplyId);
+                const response = await sendMessage(phone, text, file, currentReplyId, currentReplyText);
 
                 // Stream the response
                 setReplyingTo(null);

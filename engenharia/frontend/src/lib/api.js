@@ -9,7 +9,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
  * Envia mensagem de texto (e opcionalmente um arquivo) ao chat.
  * Retorna um ReadableStream para SSE.
  */
-export async function sendMessage(phoneNumber, message, file = null, parentId = null) {
+export async function sendMessage(phoneNumber, message, file = null, parentId = null, repliedToText = null) {
     const formData = new FormData();
     formData.append("phone_number", phoneNumber);
     formData.append("message", message);
@@ -20,6 +20,10 @@ export async function sendMessage(phoneNumber, message, file = null, parentId = 
 
     if (parentId) {
         formData.append("parent_id", parentId);
+    }
+
+    if (repliedToText) {
+        formData.append("replied_to_text", repliedToText);
     }
 
     const response = await fetch(`${API_BASE}/api/chat/send`, {

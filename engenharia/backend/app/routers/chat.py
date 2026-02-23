@@ -280,6 +280,7 @@ async def send_message(
     message: str | None = Form(None),
     file: UploadFile | None = File(None),
     parent_id: str | None = Form(None), # ID da mensagem sendo respondida
+    replied_to_text: str | None = Form(None), # Texto da mensagem original (fallback se ID falhar)
 ):
     """
     Envia mensagem ao Meu MEI.
@@ -479,6 +480,9 @@ async def send_message(
             pmsg = parent_resp.data[0]
             author = "Meu MEI" if pmsg["role"] == "assistant" else "Você"
             replied_to_content = f"[{author}: {pmsg['content']}]"
+    
+    if not replied_to_content and replied_to_text:
+        replied_to_content = f"[{replied_to_text}]"
 
     # 7. Streaming da resposta via SSE
     async def event_generator():
