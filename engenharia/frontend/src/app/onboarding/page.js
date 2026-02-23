@@ -198,7 +198,6 @@ export default function OnboardingPage() {
             setError(err.message || "PIN incorreto");
             setInvalidField("pin");
             setPinValue("");
-        } finally {
             setLoading(false);
         }
     };
