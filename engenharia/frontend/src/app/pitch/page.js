@@ -42,7 +42,7 @@ const sections = [
         ],
         items: [
             { text: "As principais dores do segmento incluem a falta de estabilidade financeira, a dificuldade de acesso a crédito e o baixo apoio para empreender." },
-            { text: "No dia a dia, isso se traduz na famosa confusão patrimonial: a necessidade de usar a mesma conta para as despesas de casa e da empresa." },
+            { text: "No dia a dia, isso se traduz na famosa confusão patrimonial: usar a mesma conta para as despesas de casa e da empresa." },
             { text: "Como resultado, apenas 18% mantêm algum relacionamento bancário como pessoa jurídica, o que dificulta o acesso a crédito estruturado." },
         ],
         sources: [
