@@ -254,25 +254,31 @@ export default function PitchPage() {
                                     )}
                                 </div>
 
-                                {/* Botão de navegação: → Próximo ou fechar */}
-                                <button
-                                    className={styles.nextBtn}
-                                    style={{ color: sec.color, borderColor: sec.color }}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        nextSec ? setActive(nextSec.id) : setActive(null);
-                                    }}
-                                    aria-label={nextSec ? `Ir para ${nextSec.label}` : "Fechar"}
-                                >
-                                    {nextSec ? (
-                                        <>
-                                            <span className={styles.nextLabel}>{nextSec.label}</span>
-                                            <span className={styles.nextArrow}>→</span>
-                                        </>
-                                    ) : (
-                                        <span className={styles.nextArrow}>✕</span>
-                                    )}
-                                </button>
+                                {/* Botão de navegação: → Próximo ou Acessar plataforma */}
+                                {nextSec ? (
+                                    <button
+                                        className={styles.nextBtn}
+                                        style={{ color: sec.color, borderColor: sec.color }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setActive(nextSec.id);
+                                        }}
+                                        aria-label={`Ir para ${nextSec.label}`}
+                                    >
+                                        <span className={styles.nextLabel}>{nextSec.label}</span>
+                                        <span className={styles.nextArrow}>→</span>
+                                    </button>
+                                ) : (
+                                    <a
+                                        href="/onboarding"
+                                        className={styles.nextBtn}
+                                        style={{ color: sec.color, borderColor: sec.color, textDecoration: 'none' }}
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        <span className={styles.nextLabel}>Acessar plataforma</span>
+                                        <span className={styles.nextArrow}>→</span>
+                                    </a>
+                                )}
                             </div>
                         </div>
                     );

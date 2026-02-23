@@ -304,11 +304,11 @@
 
 /* Ativo: overlay mais pesado, foto atua apenas como sombra para destacar o texto */
 .panelActive .panelBg {
-  filter: saturate(0.2) brightness(0.5);
+  filter: saturate(0.2) brightness(0.35);
 }
 
 .panelActive .panelBg::after {
-  opacity: 0.88;
+  opacity: 0.85;
 }
 
 /* ══════════════════════════════════════════════════
@@ -508,7 +508,7 @@
 }
 
 .statValue {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 800;
   letter-spacing: -0.5px;
   line-height: 1;
@@ -516,7 +516,7 @@
 }
 
 .statLabel {
-  font-size: 10.5px;
+  font-size: 11.5px;
   color: rgba(255, 255, 255, 0.45);
   line-height: 1.3;
 }
@@ -538,16 +538,16 @@
 }
 
 .bullet {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 700;
   flex-shrink: 0;
   line-height: 1.6;
 }
 
 .itemText {
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .refSup {
