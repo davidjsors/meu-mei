@@ -76,3 +76,5 @@ Testamos o agente sob estresse para garantir que ele não alucine e mantenha a s
 
 ---
 <sub>Meu MEI - Finanças em dia, dinheiro no bolso. © 2026</sub>
+
+<sub>Este projeto contou com a assistência de Inteligência Artificial (**Gemini** e **Claude**) em seu desenvolvimento e foi potencializado pela ferramenta **Antigravity** do Google.<sub>
