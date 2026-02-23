@@ -70,7 +70,9 @@ Testamos o agente sob estresse para garantir que ele não alucine e mantenha a s
 
 ## Pitch
 
-O **Meu MEI** elimina o atrito burocrático através da inteligência artificial, permitindo que o empreendedor foque no que realmente importa: **o seu sonho**. Seja através de um áudio, uma foto de nota fiscal ou um texto simples, nós cuidamos dos números para que eles cuidem do seu futuro.
+ > Imagine trabalhar de domingo a domingo, sendo o vendedor, o entregador e o gerente do seu negócio, e sentir que o seu esforço serve apenas para pagar boleto. Essa é a solidão financeira que assombra um dos pilares da nossa economia, os MEIs. O **Meu MEI** ajuda os microempreendedores e microempreendedoras a retomar o controle e voltar a sonhar, através de um mentor inteligente que descomplica a gestão do dinheiro.
+
+🌐[mentormei.vercel.app/pitch](https://mentormei.vercel.app/pitch)
 
 ---
 <sub>Meu MEI - Finanças em dia, dinheiro no bolso. © 2026</sub>
