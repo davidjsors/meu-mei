@@ -12,7 +12,9 @@ O **Meu MEI** é um mentor financeiro digital desenhado para transformar a vida 
 🌐 **Acesse a aplicação:** [mentormei.vercel.app](https://mentormei.vercel.app)
 
  <img src="./engenharia/frontend/public/logo2.svg" width="400" valign="middle"> 
- 
+
+ > [!IMPORTANT]
+> **Disponibilidade de Tokens:** o pleno  funcionamento do Meu MEI está condicionado aos limites de tokens disponíveis na API. O serviço pode apresentar instabilidade ou indisponibilidade temporária caso os limites de cota (rate limits) sejam atingidos.
 ---
 ## Pitch
 
