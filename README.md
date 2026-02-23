@@ -39,19 +39,19 @@ Contém a implementação funcional da aplicação (Front e Backend).
 
 ### 1. Documentação e Caso de Uso
 Resolvemos o problema da solidão na gestão financeira do MEI através de um mentor sempre disponível e proativo.
-📄 **Detalhes:** [`negocio/agente-base.md`](./negocio/agente-base.md)
+📄 **Detalhes:**[`negocio/agente-base.md`](./negocio/agente-base.md)
 
 ### 2. Base de Conhecimento
 O agente fundamenta suas respostas em manuais do Bradesco, Sebrae e Governo Federal.
-📄 **Índice:** [`engenharia/backend/knowledge/readme.md`](./engenharia/backend/knowledge/readme.md)
+📄 **Índice:**[`engenharia/backend/knowledge/readme.md`](./engenharia/backend/knowledge/readme.md)
 
 ### 3. Engenharia de Prompts
-Instruções rígidas garantem que a IA priorize saúde financeira e a parceria com o Bradesco.
-📄 **Código:** [`engenharia/backend/app/prompts/system.py`](./engenharia/backend/app/prompts/system.py)
+Instruções rígidas garantem que a IA priorize saúde financeira e a parceria com o **Bradesco**.
+📄 **Código:**[`engenharia/backend/app/prompts/system.py`](./engenharia/backend/app/prompts/system.py)
 
 ### 4. Avaliação e Métricas
 Testamos o agente sob estresse para garantir que ele não alucine e mantenha a segurança.
-📄 **Relatório:** [`negocio/avaliacao_metricas.md`](./negocio/avaliacao_metricas.md)
+📄 **Relatório:**[`negocio/avaliacao_metricas.md`](./negocio/avaliacao_metricas.md)
 
 ---
 
