@@ -1,0 +1,12 @@
+## Commit Message Formatting
+When generating git commit messages, DO NOT use "feat:" for everything. Use Conventional Commits properly by analyzing the code diff:
+- **feat:** A new feature (only when adding new capabilities or functionality).
+- **fix:** A bug fix (fixing an issue, fixing overlapping UI, correcting a prompt, etc.).
+- **docs:** Documentation changes only (e.g. updating README.md).
+- **style:** Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc).
+- **refactor:** A code change that neither fixes a bug nor adds a feature.
+- **perf:** A code change that improves performance.
+- **test:** Adding missing tests or correcting existing tests.
+- **chore:** Changes to the build process, tooling, dependencies, configs, or auxiliary tools.
+
+Write the summary in lowercase, imperative mood, without a period at the end. Explain the "why" in the description if necessary.
