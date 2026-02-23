@@ -236,7 +236,7 @@
   flex-direction: row;
   align-items: stretch;
   gap: 4px;
-  height: 520px;
+  height: 620px;
 }
 
 /* ── Panel base ── */
@@ -746,10 +746,19 @@
   }
 
   /* Mobile expanded */
+  .panelActive .expandedFace {
+    position: relative;
+    /* Permite que o conteúdo empurre a altura do card (que está height: auto) */
+    inset: auto;
+  }
+
   .expandedContent {
     margin-left: 0;
     width: 100%;
     min-width: unset;
+    max-height: none;
+    /* Reduz limite de scroll no mobile, deixa o card crescer orgânico */
+    overflow-y: visible;
   }
 
   .expandedNum {
@@ -759,7 +768,8 @@
   }
 
   .expandedFace {
-    padding: 20px 18px;
+    padding: 20px 18px 80px 18px;
+    /* 80px bottom for nextBtn */
   }
 
   .expandedTitle {
