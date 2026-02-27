@@ -27,37 +27,37 @@ O **Meu MEI** é um mentor financeiro digital desenhado para transformar a vida 
 ## Demos
 
 <details>
-<summary>🎬 <strong>1. Pitch do Produto</strong> — Navegação pelas 4 seções do pitch</summary>
+<summary>🎬 <strong>1. Pitch do Produto</strong> </summary>
 
 <img src="./engenharia/docs/demos/demo_pitch.webp" width="800" alt="Demo Pitch">
 
 </details>
 
 <details>
-<summary>📝 <strong>2. Onboarding — Cadastro Completo</strong> — Telefone → Perfil → PIN → Maturidade → Meta → Termos</summary>
+<summary>📝 <strong>2. Onboarding </strong> </summary>
 
 <img src="./engenharia/docs/demos/demo_onboarding_cadastro.webp" width="800" alt="Demo Onboarding">
 
 </details>
 
 <details>
-<summary>🧭 <strong>3. Tour Guiado</strong> — Passeio interativo pelas funcionalidades</summary>
+<summary>🧭 <strong>3. Tour Guiado</strong> </summary>
 
 <img src="./engenharia/docs/demos/demo_onboarding_guiado.webp" width="800" alt="Demo Tour Guiado">
 
 </details>
 
 <details>
-<summary>💬 <strong>4. Interação com o Agente</strong> — Perguntas, cálculos, registro de entradas e saídas</summary>
+<summary>💬 <strong>4. Interação com o Mentor</strong> </summary>
 
 <img src="./engenharia/docs/demos/demo_agente_interacao.webp" width="800" alt="Demo Agente">
 
 </details>
 
 <details>
-<summary>📊 <strong>5. Sidebar</strong> — Meta de vendas, botões rápidos, histórico, exclusão e logout</summary>
+<summary>📊 <strong>5. Ferramentas</strong> </summary>
 
-<img src="./engenharia/docs/demos/demo_sidebar_funcoes.webp" width="800" alt="Demo Sidebar">
+<img src="./engenharia/docs/demos/demo_sidebar_funcoes.webp" width="800" alt="Demo Ferramentas">
 
 </details>
 
