@@ -52,8 +52,10 @@ Contém a implementação funcional da aplicação (Front e Backend).
 Resolvemos o problema da solidão na gestão financeira do MEI através de um mentor sempre disponível e proativo.
 📄 **Detalhes:**[`negocio/agente-base.md`](./negocio/agente-base.md)
 
-### 2. Base de Conhecimento
-O agente fundamenta suas respostas em manuais do Bradesco, Sebrae e Governo Federal.
+### 2. Base de Conhecimento e RAG Avançado (PageIndex)
+O agente fundamenta suas respostas em manuais do Bradesco, Sebrae e Governo Federal utilizando uma arquitetura robusta de RAG baseada no padrão **PageIndex (Multi-Vector Retriever)**.
+Na etapa de indexação (Supabase pgvector + `text-embedding-004`), o sistema vetoriza apenas o **resumo** altamente condensado de cada página. Na etapa de recuperação (Retrieval), o sistema injeta o **conteúdo completo** (armazenado nos metadados) no contexto do modelo principal (Gemini Flash).
+**Resultado esperado:** altíssima precisão na busca semântica, eliminação da perda de contexto (comum em chunkings arbitrários) e mitigação drástica de alucinações, garantindo respostas fiéis e fundamentadas.
 📄 **Índice:**[`engenharia/backend/knowledge/readme.md`](./engenharia/backend/knowledge/readme.md)
 
 ### 3. Engenharia de Prompts

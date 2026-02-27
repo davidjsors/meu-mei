@@ -8,9 +8,11 @@ CREATE TABLE IF NOT EXISTS knowledge_embeddings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   content TEXT NOT NULL,
   embedding VECTOR(3072), -- Dimensão 3072 para o modelo gemini-embedding-001
-  metadata JSONB,
-  created_at TIMESTAMPTZ DEFAULT now()
+  metadata JSONB
 );
+
+-- 3. Desativar RLS (Row Level Security) para permitir que o backend insira embeddings usando a chave Anon
+ALTER TABLE knowledge_embeddings DISABLE ROW LEVEL SECURITY;
 
 -- 3. (Opcional) Limpar antes de recriar
 -- DROP TABLE IF EXISTS knowledge_embeddings CASCADE;

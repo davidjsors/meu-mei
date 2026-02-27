@@ -100,9 +100,14 @@ async def search_knowledge(query: str, limit: int = 5) -> str:
             
         context_parts = []
         for match in resp.data:
-            content = str(match.get("content", ""))
-            source = str(match.get("metadata", {}).get("filename", "desconhecido"))
-            context_parts.append("--- Fonte: " + source + " ---\n" + content)
+            meta = match.get("metadata", {})
+            # Recupera o contexto GIGANTE que salvamos na indexação, o LLM lê isso em vez do resumo de busca
+            full_content = str(meta.get("full_content", match.get("content", ""))) 
+            source = str(meta.get("filename", "desconhecido"))
+            page = str(meta.get("page_number", "?"))
+            title = str(meta.get("page_title", "Página " + page))
+            
+            context_parts.append(f"--- Fonte: {source} (Seção: {title}) ---\n{full_content}")
             
         return "\n\n".join(context_parts)
     except Exception as e:
