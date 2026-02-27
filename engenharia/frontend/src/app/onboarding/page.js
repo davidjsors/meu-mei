@@ -351,7 +351,8 @@ export default function OnboardingPage() {
             </div>
             <div className="onboarding-form-group">
                 <label className="onboarding-label">Qual o seu maior sonho relacionado ao seu negócio?</label>
-                <textarea className={`onboarding-input ${invalidField === 'dream' ? 'input-error-blink' : ''}`} style={{ minHeight: '80px', resize: 'none' }} placeholder="Ex: Abrir minha loja física ou vender 10 mil por mês" value={dream} onChange={e => { setDream(e.target.value); if (invalidField === 'dream') setInvalidField(""); }} />
+                <textarea className={`onboarding-input ${invalidField === 'dream' ? 'input-error-blink' : ''}`} style={{ minHeight: '80px', resize: 'none' }} placeholder="Ex: Abrir minha loja física ou vender 10 mil por mês" value={dream} maxLength={80} onChange={e => { setDream(e.target.value); if (invalidField === 'dream') setInvalidField(""); }} />
+                <div style={{ textAlign: 'right', fontSize: '11px', color: dream.length >= 70 ? 'var(--red-primary)' : 'var(--text-muted)', marginTop: '4px' }}>{dream.length}/80</div>
             </div>
 
             <div className="onboarding-form-group" style={{ marginTop: '24px', borderTop: '1px solid var(--border-color)', paddingTop: '24px' }}>

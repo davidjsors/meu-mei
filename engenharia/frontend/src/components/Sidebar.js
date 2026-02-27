@@ -461,14 +461,15 @@ export default function Sidebar({ profile, phoneNumber, refreshKey = 0, onSendTr
                         </div>
 
                         {profile.business_type && (
-                            <div style={{ color: "var(--text-secondary)", fontSize: 11, marginTop: 4, lineHeight: '1.4' }}>
+                            <div style={{ color: "var(--text-secondary)", fontSize: 11, marginTop: 4, lineHeight: '1.4', wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
                                 <span>
                                     Eu sou {profile.business_type}
                                     {profile.dream ? (
                                         <> e meu sonho é <strong>{(() => {
                                             let d = profile.dream.trim();
+                                            if (d.length > 80) d = d.slice(0, 77) + '...';
                                             d = d.charAt(0).toLowerCase() + d.slice(1);
-                                            if (!/[.!?]$/.test(d)) d += '.';
+                                            if (!/[.!?…]$/.test(d)) d += '.';
                                             return d;
                                         })()}</strong></>
                                     ) : '.'}
