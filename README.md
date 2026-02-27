@@ -61,12 +61,6 @@ O **Meu MEI** é um mentor financeiro digital desenhado para transformar a vida 
 
 </details>
 
-<details>
-<summary>🔐 <strong>6. Login de Retorno</strong> — Telefone + PIN com dados preservados</summary>
-
-<img src="./engenharia/docs/demos/demo_login_retorno.webp" width="800" alt="Demo Login Retorno">
-
-</details>
 
 ---
 
