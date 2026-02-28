@@ -20,7 +20,7 @@ O **Meu MEI** é um mentor financeiro digital desenhado para transformar a vida 
 
  > Imagine trabalhar de domingo a domingo, sendo o vendedor, o entregador e o gerente do seu negócio, e sentir que o seu esforço serve apenas para pagar boleto. Essa é a solidão financeira que assombra um dos pilares da nossa economia, os MEIs. O **Meu MEI** ajuda os microempreendedores e microempreendedoras a retomar o controle e voltar a sonhar, através de um mentor inteligente que descomplica a gestão do dinheiro.
 
-🌐 **Acesse o Pitch:**[meumei.cariama.com.br/pitch](https://meumei.cariama.com.br/pitch)
+🌐 **Veja o Pitch:** [meumei.cariama.com.br/pitch](https://meumei.cariama.com.br/pitch)
 
 ---
 
