@@ -13,6 +13,7 @@ import re
 import json
 import uuid
 import base64
+import asyncio
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from sse_starlette.sse import EventSourceResponse
 from supabase import Client
@@ -73,206 +74,12 @@ def _normalize_mime(mime: str) -> str:
     # Fallback para procurar nos valores se for um set virando dict
     return base
 
-# Marcadores base (apenas tags externas)
-ONBOARDING_RE_BLOCK = re.compile(r"\[ONBOARDING_COMPLETE\](.*?)\[/ONBOARDING_COMPLETE\]", re.IGNORECASE | re.DOTALL)
-TRANSACTION_RE_BLOCK = re.compile(r"\[TRANSACTION\](.*?)\[/TRANSACTION\]", re.IGNORECASE | re.DOTALL)
-
-# Padrões para extração interna de campos
-RE_FIELD_NAME = re.compile(r"(?:\*+)?nome:(?:\*+)?\s*(.+)", re.IGNORECASE)
-RE_FIELD_NEGOCIO = re.compile(r"(?:\*+)?negocio:(?:\*+)?\s*(.+)", re.IGNORECASE)
-RE_FIELD_SONHO = re.compile(r"(?:\*+)?sonho:(?:\*+)?\s*(.+)", re.IGNORECASE)
-RE_FIELD_SCORE = re.compile(r"(?:\*+)?score:(?:\*+)?\s*(\d+)", re.IGNORECASE)
-RE_FIELD_PONTOS_FRACOS = re.compile(r"(?:\*+)?pontos_fracos:(?:\*+)?\s*(.+)", re.IGNORECASE)
-
-RE_FIELD_TIPO = re.compile(r"(?:\*+)?tipo:(?:\*+)?\s*(entrada|saída|saida|receita|despesa)", re.IGNORECASE)
-RE_FIELD_VALOR = re.compile(r"(?:\*+)?valor:(?:\*+)?\s*(.+)", re.IGNORECASE)
-RE_FIELD_DESC = re.compile(r"(?:\*+)?descricao:(?:\*+)?\s*(.+)", re.IGNORECASE)
-RE_FIELD_CAT = re.compile(r"(?:\*+)?categoria:(?:\*+)?\s*(.+)", re.IGNORECASE)
-RE_FIELD_META = re.compile(r"(?:\*+)?meta:(?:\*+)?\s*(.+)", re.IGNORECASE)
-
-# Marcador de atualização de perfil (Meta e Sonho)
-UPDATE_PROFILE_RE_BLOCK = re.compile(r"\[UPDATE_PROFILE\](.*?)\[/UPDATE_PROFILE\]", re.IGNORECASE | re.DOTALL)
-
-# Regex para extrair áudio (voz do mentor)
-AUDIO_PATTERN = re.compile(r"\[AUDIO\](.*?)\[/AUDIO\]", re.IGNORECASE | re.DOTALL)
-
-# Regex para resetar finanças (agora com argumento opcional)
-# Ex: [RESET_FINANCE: ALL] ou [RESET_FINANCE: 2023-01-01]
-RESET_PATTERN = re.compile(r"\[RESET_FINANCE(?::\s*(ALL|[\d-]+))?\]", re.IGNORECASE)
-
-# Regex para deletar uma transação específica (Flexibilizado)
-DELETE_TRANSACTION_PATTERN = re.compile(
-    r"\[DELETE_TRANSACTION\]\s*"
-    r"(?:\*+)?valor:(?:\*+)?\s*([\d.]+)\s*\n"
-    r"(?:\*+)?descricao:(?:\*+)?\s*(.+?)\s*"
-    r"\[/DELETE_TRANSACTION\]",
-    re.IGNORECASE | re.DOTALL,
-)
-
-
-def _parse_onboarding(text: str) -> dict | None:
-    """Extrai dados do onboarding via blocos."""
-    match_block = ONBOARDING_RE_BLOCK.search(text)
-    if not match_block:
-        return None
-    
-    inner = match_block.group(1)
-    name_m = RE_FIELD_NAME.search(inner)
-    biz_m = RE_FIELD_NEGOCIO.search(inner)
-    dream_m = RE_FIELD_SONHO.search(inner)
-    score_m = RE_FIELD_SCORE.search(inner)
-    pontos_m = RE_FIELD_PONTOS_FRACOS.search(inner)
-    
-    if all([name_m, biz_m, dream_m, score_m]):
-        return {
-            "name": name_m.group(1).strip(),
-            "business_type": biz_m.group(1).strip(),
-            "dream": dream_m.group(1).strip(),
-            "score": int(score_m.group(1).strip()),
-            "pontos_fracos": pontos_m.group(1).strip() if pontos_m else None
-        }
-    return None
-
-def _clean_onboarding_markers(text: str) -> str:
-    """Remove blocos de onboarding."""
-    return ONBOARDING_RE_BLOCK.sub("", text).strip()
-
-
-def _parse_amount(val_text: str) -> float:
-    """Extrai valor numérico tratando gírias (k) e formatos (BR/US)."""
-    v_raw = val_text.strip().lower()
-    multiplier = 1000 if "k" in v_raw else 1
-    v_clean = re.sub(r"[^\d,.]", "", v_raw.replace("k", ""))
-    
-    if "," in v_clean and "." in v_clean:
-        if v_clean.rfind(",") > v_clean.rfind("."):
-            v_clean = v_clean.replace(".", "").replace(",", ".")
-        else:
-            v_clean = v_clean.replace(",", "")
-    elif "," in v_clean:
-        v_clean = v_clean.replace(",", ".")
-    
-    return float(v_clean) * multiplier
-
-def _parse_transactions(text: str) -> list[dict]:
-    """Extrai transações via blocos."""
-    transactions = []
-    seen = set()
-    
-    for match_block in TRANSACTION_RE_BLOCK.finditer(text):
-        inner = match_block.group(1)
-        
-        tipo_m = RE_FIELD_TIPO.search(inner)
-        valor_m = RE_FIELD_VALOR.search(inner)
-        desc_m = RE_FIELD_DESC.search(inner)
-        cat_m = RE_FIELD_CAT.search(inner)
-        
-        if not all([tipo_m, valor_m, desc_m, cat_m]):
-            continue
-            
-        try:
-            tipo_raw = tipo_m.group(1).strip().lower()
-            tipo = "entrada" if tipo_raw in ["entrada", "receita"] else "saida"
-            valor = _parse_amount(valor_m.group(1))
-            desc = desc_m.group(1).strip()
-            cat = cat_m.group(1).strip().lower()
-            
-            tx_key = (tipo, valor, desc, cat)
-            if tx_key not in seen:
-                transactions.append({
-                    "type": tipo,
-                    "amount": valor,
-                    "description": desc,
-                    "category": cat,
-                })
-                seen.add(tx_key)
-        except Exception:
-            continue
-            
-    return transactions
-
-def _clean_transaction_markers(text: str) -> str:
-    """Remove blocos de transação."""
-    cleaned = TRANSACTION_RE_BLOCK.sub("", text)
-    return re.sub(r"\n{3,}", "\n\n", cleaned).strip()
-
-
-def _has_reset_marker(text: str) -> bool:
-    """Verifica se há marcador de reset de finanças."""
-    return bool(RESET_PATTERN.search(text))
-
-
-def _get_reset_arg(text: str) -> str | None:
-    """Retorna o argumento do reset (ALL ou DATA)."""
-    match = RESET_PATTERN.search(text)
-    if match:
-        return match.group(1).upper() if match.group(1) else "ALL"
-    return None
-
-def _parse_profile_update(text: str) -> dict | None:
-    """Extrai dados de atualização de perfil (Meta/Sonho)."""
-    match_block = UPDATE_PROFILE_RE_BLOCK.search(text)
-    if not match_block:
-        return None
-    
-    inner = match_block.group(1)
-    meta_m = RE_FIELD_META.search(inner)
-    dream_m = RE_FIELD_SONHO.search(inner)
-    
-    updates = {}
-    if meta_m:
-        try:
-            updates["revenue_goal"] = _parse_amount(meta_m.group(1))
-        except: pass
-    if dream_m:
-        updates["dream"] = dream_m.group(1).strip()
-        
-    return updates if updates else None
-
-def _clean_profile_update_markers(text: str) -> str:
-    """Remove blocos de atualização de perfil."""
-    return UPDATE_PROFILE_RE_BLOCK.sub("", text).strip()
-
-
-def _clean_reset_marker(text: str) -> str:
-    """Remove marcador [RESET_FINANCE...]."""
-    return RESET_PATTERN.sub("", text).strip()
-
-
-def _parse_deletions(text: str) -> list[dict]:
-    """Extrai transações para deletar."""
-    deletions = []
-    for match in DELETE_TRANSACTION_PATTERN.finditer(text):
-        try:
-            deletions.append({
-                "amount": float(match.group(1).strip()),
-                "description": match.group(2).strip(),
-            })
-        except (ValueError, IndexError):
-            continue
-    return deletions
-
-
-def _clean_delete_markers(text: str) -> str:
-    """Remove [DELETE_TRANSACTION] da resposta."""
-    return DELETE_TRANSACTION_PATTERN.sub("", text).strip()
-
+# Removemos todos os regex e funcoes de marcação de texto antigas (onboarding, finance, tags html-like).
+# A lógica de processar estes eventos foi movida para as Function Calls (Tools) nativas do Gemini.
 
 def _is_onboarding_mode(profile: dict) -> bool:
     """Verifica se o usuário ainda está no onboarding (sem maturity_score)."""
     return profile.get("maturity_score") is None
-
-
-def _parse_audio(text: str) -> str | None:
-    """Extrai o texto para conversão em áudio."""
-    match = AUDIO_PATTERN.search(text)
-    return match.group(1).strip() if match else None
-
-
-def _clean_audio_markers(text: str) -> str:
-    """Remove [AUDIO] marcadores da resposta."""
-    return AUDIO_PATTERN.sub("", text).strip()
-
 
 @router.post("/send")
 async def send_message(
@@ -435,8 +242,8 @@ async def send_message(
     # Só sumariza se houver pelo menos 25 mensagens (para dar um fôlego de 5 mensagens entre resumos)
     if len(messages) >= 25:
         # Separa: [mensagens para sumarizar] ... [contexto ativo]
-        to_summarize: list[dict] = list(messages[:-10])
-        active_context: list[dict] = list(messages[-10:])
+        to_summarize = list(messages[:-10])
+        active_context = list(messages[-10:])
         
         # Só gera resumo se o último resumo gravado não for de AGORA (evita repetição inútil)
         # (Nesta versão simplificada, apenas aumentamos o threshold para 25 para economizar chamadas)
@@ -486,18 +293,10 @@ async def send_message(
 
     # 7. Streaming da resposta via SSE
     async def event_generator():
-        # Envia logo um sinal de vida para evitar timeout do browser
         yield {"event": "status", "data": json.dumps({"status": "Iniciando mentor..."})}
         
         full_response_list = []
-        buffer = ""
-        in_tag = False
-        hidden_depth = 0 # > 0 significa que estamos dentro de um bloco oculto (ex: [AUDIO]...[/AUDIO])
-        
-        # Comandos que abrem/fecham blocos de conteúdo oculto
-        BLOCK_COMMANDS = ["AUDIO", "TRANSACTION", "DELETE_TRANSACTION", "ONBOARDING_COMPLETE"]
-        # Comandos de tag única que devem ser ocultados (mas não têm conteúdo fechado)
-        SINGLE_COMMANDS = ["RESET_FINANCE", "DELETE", "CONTEXTO", "ONBOARDING"] 
+        has_tool_calls_flag = False
 
         try:
             async for chunk in generate_response_stream(
@@ -515,232 +314,143 @@ async def send_message(
                 pending_messages=pending_messages,
                 replied_to_content=replied_to_content,
             ):
-                buffer += chunk
-
-                while True:
-                    if not in_tag:
-                        start = buffer.find('[')
-                        if start == -1:
-                            if buffer:
-                                full_response_list.append(buffer)
-                                # Só envia para front se NÃO estiver dentro de um bloco oculto
-                                if hidden_depth == 0:
-                                    yield {"event": "message", "data": json.dumps({"text": buffer})}
-                                buffer = ""
-                            break
-                        else:
-                            safe_text = buffer[:start]
-                            if safe_text:
-                                full_response_list.append(safe_text)
-                                if hidden_depth == 0:
-                                    yield {"event": "message", "data": json.dumps({"text": safe_text})}
-                            
-                            buffer = buffer[start:]
-                            in_tag = True
-                    else:
-                        end = buffer.find(']')
-                        if end == -1:
-                            break
-                        else:
-                            tag_content = buffer[:end+1]
-                            full_response_list.append(tag_content)
-                            
-                            # Analisar a Tag
-                            inner = tag_content[1:-1].strip().upper() # Remove [] e espaços
-                            is_closing = inner.startswith("/")
-                            clean_tag = inner[1:] if is_closing else inner
-                            # Remover argumentos (ex: RESET_FINANCE: ALL -> RESET_FINANCE)
-                            clean_cmd = clean_tag.split(":")[0].strip()
-                            
-                            # Lógica de Bloco
-                            if clean_cmd in BLOCK_COMMANDS:
-                                if is_closing:
-                                    hidden_depth = max(0, hidden_depth - 1)
-                                    if hidden_depth == 0:
-                                        yield {"event": "status", "data": json.dumps({"status": "Finalizando processamento..."})}
-                                else:
-                                    hidden_depth = hidden_depth + 1
-                                    if clean_cmd == "AUDIO":
-                                        yield {"event": "status", "data": json.dumps({"status": "Gerando resposta em áudio..."})}
-                                    elif clean_cmd == "TRANSACTION":
-                                        yield {"event": "status", "data": json.dumps({"status": "Registrando transação..."})}
-                                is_hidden_tag = True
-                            elif clean_cmd in SINGLE_COMMANDS:
-                                is_hidden_tag = True # Tag isolada oculta
-                            else:
-                                is_hidden_tag = False # Tag normal (ex: [1])
-                            
-                            # Se a tag NÃO for oculta E não estivermos em um bloco oculto, enviamos a tag
-                            # Se estivermos em bloco oculto, a tag também é oculta
-                            if not is_hidden_tag and hidden_depth == 0:
-                                yield {"event": "message", "data": json.dumps({"text": tag_content})}
-                            
-                            buffer = buffer[end+1:]
-                            in_tag = False
-
-            # Processar resto do buffer
-            if buffer:
-                full_response_list.append(buffer)
-                if hidden_depth == 0 and not in_tag:
-                    yield {"event": "message", "data": json.dumps({"text": buffer})}
+                is_tool_call = False
+                if "__tool_call" in chunk:
+                    try:
+                        chunk_data = json.loads(chunk.strip())
+                        if isinstance(chunk_data, dict) and chunk_data.get("__tool_call"):
+                            is_tool_call = True
+                            has_tool_calls_flag = True
+                            tool_queue.append(chunk_data)
+                    except json.JSONDecodeError:
+                        pass
+                
+                if not is_tool_call:
+                    full_response_list.append(chunk)
+                    yield {"event": "message", "data": json.dumps({"text": chunk})}
 
             # Sinalizar que o texto visível acabou
             yield {"event": "text_done", "data": json.dumps({"done": True})}
-
-            # Resposta completa para processamento
-            assistant_content = "".join(full_response_list)
-
-            # Verificar se o onboarding foi concluído
-            if is_onboarding:
-                onboarding_data = _parse_onboarding(assistant_content)
-                if onboarding_data:
-                    level = get_maturity_level(onboarding_data["score"])
-                    update_payload = {
-                        "name": onboarding_data["name"],
-                        "business_type": onboarding_data["business_type"],
-                        "dream": onboarding_data["dream"],
-                        "maturity_score": onboarding_data["score"],
-                        "maturity_level": level,
-                    }
-                    if onboarding_data.get("pontos_fracos"):
-                        update_payload["summary"] = f"Pontos de atenção (Diagnóstico IAMF-MEI): {onboarding_data['pontos_fracos']}"
-                        
-                    db.table("profiles").update(update_payload).eq("phone_number", phone_number).execute()
-
-                    # Limpar marcadores da resposta antes de salvar
-                    assistant_content = _clean_onboarding_markers(assistant_content)
-
-                    yield {
-                        "event": "onboarding_complete",
-                        "data": json.dumps({"level": level}),
-                    }
-
-            # Verificar e salvar transações financeiras
-            transactions = _parse_transactions(assistant_content)
-            if transactions:
-                for txn in transactions:
+            
+            # Processa as ferramentas empilhadas agora que o stream da API Gemini já finalizou (evitar timeout/lock)
+            for chunk_data in tool_queue:
+                tool_name = chunk_data.get("name")
+                args = chunk_data.get("args", {})
+                
+                if tool_name == "registrar_transacao":
                     db.table("financial_records").insert({
                         "phone_number": phone_number,
-                        "type": txn["type"],
-                        "amount": txn["amount"],
-                        "description": txn["description"],
-                        "category": txn["category"],
+                        "type": args.get("tipo"),
+                        "amount": args.get("valor"),
+                        "description": args.get("descricao"),
+                        "category": args.get("categoria", ""),
+                        "created_at": datetime.utcnow().isoformat()
                     }).execute()
+                    yield {"event": "finance_updated", "data": json.dumps({"count": 1})}
+                    yield {"event": "status", "data": json.dumps({"status": "Registrando transação..."})}
 
-                # Limpar marcadores de transação
-                assistant_content = _clean_transaction_markers(assistant_content)
-
-                yield {
-                    "event": "finance_updated",
-                    "data": json.dumps({"count": len(transactions)}),
-                }
-
-            # Verificar comando de RESET
-            if _has_reset_marker(assistant_content):
-                reset_arg = _get_reset_arg(assistant_content)
-                
-                query = db.table("financial_records").delete().eq("phone_number", phone_number)
-                
-                # Se for data, adiciona filtro
-                if reset_arg and reset_arg != "ALL":
-                    # Assume formato YYYY-MM-DD
-                    # Filtra registros criados APÓS ou IGUAL a data (usando string comparison no ISO)
-                    query = query.gte("created_at", reset_arg)
-
-                query.execute()
-                
-                # Só limpa resumo do perfil se for reset total
-                if reset_arg == "ALL":
-                    db.table("profiles").update({
-                        "summary": None, 
-                        "last_summary_at": None
-                    }).eq("phone_number", phone_number).execute()
-                
-                # 3. Limpar marcador da resposta
-                assistant_content = _clean_reset_marker(assistant_content)
-                
-                # 4. Enviar evento de atualização
-                yield {
-                    "event": "finance_updated",
-                    "data": json.dumps({"reset": True, "arg": reset_arg}),
-                }
-
-            # Verificar e excluir transações (Estorno)
-            deletions = _parse_deletions(assistant_content)
-            if deletions:
-                for dln in deletions:
-                    # Tenta deletar pelo valor e descrição (match parcial na descrição)
+                elif tool_name == "deletar_transacao_estorno":
                     db.table("financial_records").delete().eq(
                         "phone_number", phone_number
-                    ).eq("amount", dln["amount"]).ilike("description", f"%{dln['description']}%").execute()
-                
-                assistant_content = _clean_delete_markers(assistant_content)
-                yield {
-                    "event": "finance_updated",
-                    "data": json.dumps({"deleted": len(deletions)}),
-                }
+                    ).eq("amount", args.get("valor")).ilike("description", f"%{args.get('descricao')}%").execute()
+                    yield {"event": "finance_updated", "data": json.dumps({"deleted": 1})}
 
-            # Verificar e atualizar perfil (Meta/Sonho)
-            profile_updates = _parse_profile_update(assistant_content)
-            if profile_updates:
-                db.table("profiles").update(profile_updates).eq("phone_number", phone_number).execute()
-                assistant_content = _clean_profile_update_markers(assistant_content)
-                yield {
-                    "event": "profile_updated",
-                    "data": json.dumps({"updated_fields": list(profile_updates.keys())}),
-                }
+                elif tool_name == "concluir_onboarding":
+                    level = get_maturity_level(args.get("score"))
+                    update_payload = {
+                        "name": args.get("nome"),
+                        "business_type": args.get("negocio"),
+                        "dream": args.get("sonho"),
+                        "maturity_score": args.get("score"),
+                        "maturity_level": level,
+                    }
+                    if args.get("pontos_fracos"):
+                        update_payload["summary"] = f"Pontos de atenção (Diagnóstico IAMF-MEI): {args['pontos_fracos']}"
+                    
+                    db.table("profiles").update(update_payload).eq("phone_number", phone_number).execute()
+                    yield {"event": "onboarding_complete", "data": json.dumps({"level": level})}
 
-            # Verificar se há áudio para gerar
-            try:
-                audio_text = _parse_audio(assistant_content)
-                if audio_text:
-                    audio_b64 = await text_to_speech_base64(audio_text)
-                    if audio_b64:
-                        # 1. Decodificar e Upload para Supabase Storage
-                        audio_bytes = base64.b64decode(audio_b64)
-                        filename = f"tts-{uuid.uuid4()}.mp3"
-                        file_path_in_bucket = f"tts_audio/{filename}" # Subpasta tts_audio
-                        
-                        # Upload para bucket 'uploads'
-                        _get_db().storage.from_("uploads").upload(
-                            file=audio_bytes,
-                            path=file_path_in_bucket,
-                            file_options={"content-type": "audio/mpeg"}
-                        )
-                        
-                        audio_url = _get_db().storage.from_("uploads").get_public_url(file_path_in_bucket)
+                elif tool_name == "atualizar_perfil":
+                    updates = {}
+                    if "nova_meta_vendas" in args:
+                        updates["revenue_goal"] = args["nova_meta_vendas"]
+                    if "novo_sonho" in args:
+                        updates["dream"] = args["novo_sonho"]
+                    if updates:
+                        db.table("profiles").update(updates).eq("phone_number", phone_number).execute()
+                        yield {"event": "profile_updated", "data": json.dumps({"updated_fields": list(updates.keys())})}
 
-                        # 2. Salvar mensagem de áudio no Banco de Dados (Persistência)
-                        db.table("messages").insert({
-                            "phone_number": phone_number,
-                            "role": "assistant",
-                            "content": "Áudio do Mentor",
-                            "content_type": "audio",
-                            "file_url": audio_url,
-                            "created_at": datetime.utcnow().isoformat()
-                        }).execute()
+                elif tool_name == "resetar_financas":
+                    reset_arg = str(args.get("data_corte", "ALL")).upper()
+                    query = db.table("financial_records").delete().eq("phone_number", phone_number)
+                    if reset_arg and reset_arg != "ALL":
+                        query = query.gte("created_at", reset_arg)
+                    query.execute()
+                    
+                    if reset_arg == "ALL":
+                        db.table("profiles").update({"summary": None, "last_summary_at": None}).eq("phone_number", phone_number).execute()
+                    yield {"event": "finance_updated", "data": json.dumps({"reset": True, "arg": reset_arg})}
 
-                        # 3. Enviar URL para o frontend
-                        yield {
-                            "event": "agent_audio",
-                            "data": json.dumps({"audio": audio_url}),
-                        }
-            except Exception as audio_err:
-                print(f"Erro silencioso no áudio: {audio_err}")
+                elif tool_name == "gerar_resposta_audio":
+                    yield {"event": "status", "data": json.dumps({"status": "Gerando resposta em áudio..."})}
+                    audio_text = args.get("texto_para_falar")
+                    import logging
+                    logger = logging.getLogger("uvicorn.error")
+                    logger.warning(f"DEBUG AUDIO: Starting generation for text len {len(audio_text) if audio_text else 0}")
+                    if audio_text:
+                        logger.warning("DEBUG AUDIO: Calling text_to_speech_base64 locally via thread")
+                        def _run_tts():
+                            return asyncio.run(text_to_speech_base64(audio_text))
+                        audio_b64 = await asyncio.to_thread(_run_tts)
+                        logger.warning(f"DEBUG AUDIO: Got base64 with length {len(audio_b64) if audio_b64 else 0}")
+                        if audio_b64:
+                            if "," in audio_b64:
+                                audio_b64_data = audio_b64.split(",", 1)[1]
+                            else:
+                                audio_b64_data = audio_b64
+                            audio_bytes = base64.b64decode(audio_b64_data)
+                            filename = f"tts-{uuid.uuid4()}.mp3"
+                            file_path_in_bucket = f"tts_audio/{filename}"
+                            def _upload_audio():
+                                logger.warning("DEBUG AUDIO: Inside thread, uploading to supabase...")
+                                _get_db().storage.from_("uploads").upload(
+                                    file=audio_bytes, path=file_path_in_bucket,
+                                    file_options={"content-type": "audio/mpeg"}
+                                )
+                                logger.warning("DEBUG AUDIO: Upload complete.")
+                            logger.warning("DEBUG AUDIO: Awaiting thread")
+                            await asyncio.to_thread(_upload_audio)
+                            logger.warning("DEBUG AUDIO: Getting public URL...")
+                            audio_url = _get_db().storage.from_("uploads").get_public_url(file_path_in_bucket)
+                            logger.warning(f"DEBUG AUDIO: Inserting message. File URL: {audio_url}")
+                            db.table("messages").insert({
+                                "phone_number": phone_number,
+                                "role": "assistant",
+                                "content": "Áudio do Mentor",
+                                "content_type": "audio",
+                                "file_url": audio_url,
+                                "created_at": datetime.utcnow().isoformat()
+                            }).execute()
+                            logger.warning("DEBUG AUDIO: Emitting SSE agent_audio...")
+                            yield {"event": "agent_audio", "data": json.dumps({"audio": audio_url})}
+
+            assistant_content = "".join(full_response_list)
             
-            # Limpar marcadores de áudio do conteúdo final ANTES de salvar
-            assistant_content = _clean_audio_markers(assistant_content)
+            if not assistant_content.strip() and has_tool_calls_flag:
+                assistant_content = "Ação registrada com sucesso! Como posso continuar te ajudando?"
+                yield {"event": "message", "data": json.dumps({"text": assistant_content})}
 
-            # Salvar resposta de texto no banco (Sempre salvar, mesmo se o áudio falhar)
-            try:
-                db.table("messages").insert({
-                    "phone_number": phone_number,
-                    "role": "assistant",
-                    "content": assistant_content,
-                    "content_type": "text",
-                }).execute()
-            except Exception as db_err:
-                print(f"Erro ao salvar mensagem no banco: {db_err}")
+            # Salvar resposta de texto no banco
+            if assistant_content.strip():
+                try:
+                    db.table("messages").insert({
+                        "phone_number": phone_number,
+                        "role": "assistant",
+                        "content": assistant_content,
+                        "content_type": "text",
+                    }).execute()
+                except Exception as db_err:
+                    print(f"Erro ao salvar mensagem no banco: {db_err}")
 
             # 4. Marcar a mensagem do usuário ORIGINAL como processada (Sucesso Total)
             if current_msg_id:

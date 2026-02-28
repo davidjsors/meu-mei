@@ -5,7 +5,7 @@ Este diretório contém a implementação técnica da plataforma **Meu MEI**, di
 ## Estrutura
 - `/backend`: Orquestrador em FastAPI, lógica de IA e integração com Supabase.
 - `/frontend`: Interface Web construída com Next.js 15 e React 19.
-- `/docs`: Documentações técnicas adicionais.
+- `/docs`: Documentações técnicas adicionais, incluindo o [**Contrato de API**](./docs/api_reference.md).
 
 ---
 

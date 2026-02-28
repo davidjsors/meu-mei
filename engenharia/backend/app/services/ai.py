@@ -148,6 +148,97 @@ async def transcribe_audio(file_bytes: bytes, mime_type: str) -> str:
     return ""
 
 
+registrar_transacao_func = types.FunctionDeclaration(
+    name="registrar_transacao",
+    description="Registra uma nova transação financeira de entrada ou saída",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "tipo": types.Schema(type=types.Type.STRING, description="Tipo da transação: 'entrada' ou 'saida'"),
+            "valor": types.Schema(type=types.Type.NUMBER, description="Valor numérico da transação. Use formato decimal com ponto."),
+            "descricao": types.Schema(type=types.Type.STRING, description="Descrição curta do gasto ou receita"),
+            "categoria": types.Schema(type=types.Type.STRING, description="Categoria do gasto ou receita"),
+        },
+        required=["tipo", "valor", "descricao", "categoria"]
+    )
+)
+
+deletar_transacao_func = types.FunctionDeclaration(
+    name="deletar_transacao_estorno",
+    description="Exclui ou cancela uma transação registrada anteriormente (estorno)",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "valor": types.Schema(type=types.Type.NUMBER, description="Valor da transação a ser deletada"),
+            "descricao": types.Schema(type=types.Type.STRING, description="Trecho da descrição para identificar a transação"),
+        },
+        required=["valor", "descricao"]
+    )
+)
+
+concluir_onboarding_func = types.FunctionDeclaration(
+    name="concluir_onboarding",
+    description="Acionada APENAS quando o questionário de diagnóstico chegar ao fim e for possível calcular o score.",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "nome": types.Schema(type=types.Type.STRING, description="Nome do empreendedor"),
+            "negocio": types.Schema(type=types.Type.STRING, description="Tipo do negócio"),
+            "sonho": types.Schema(type=types.Type.STRING, description="O sonho do dono do negócio"),
+            "score": types.Schema(type=types.Type.INTEGER, description="A soma dos pontos do diagnóstico IAMF-MEI (0 a 10)"),
+            "pontos_fracos": types.Schema(type=types.Type.STRING, description="Pontos fracos ou de atenção identificados"),
+        },
+        required=["nome", "negocio", "sonho", "score", "pontos_fracos"]
+    )
+)
+
+atualizar_perfil_func = types.FunctionDeclaration(
+    name="atualizar_perfil",
+    description="Atualiza a meta de vendas ou o sonho do empreendedor",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "nova_meta_vendas": types.Schema(type=types.Type.NUMBER, description="Nova meta de faturamento mensal em Reais"),
+            "novo_sonho": types.Schema(type=types.Type.STRING, description="Novo sonho ou objetivo do negócio"),
+        }
+    )
+)
+
+resetar_financas_func = types.FunctionDeclaration(
+    name="resetar_financas",
+    description="Apaga o histórico financeiro do usuário ou parte dele, APENAS mediante confirmação.",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "data_corte": types.Schema(type=types.Type.STRING, description="Se for para apagar tudo, mande 'ALL'. Se for uma data, formato YYYY-MM-DD para apagar registros daquela data em diante."),
+        }
+    )
+)
+
+gerar_resposta_audio_func = types.FunctionDeclaration(
+    name="gerar_resposta_audio",
+    description="Gera um áudio que o usuário poderá escutar, ideal para explicações mais densas (pílula educativa)",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "texto_para_falar": types.Schema(type=types.Type.STRING, description="Texto escrito da forma que deve ser falada, de forma natural, sem markdown."),
+        },
+        required=["texto_para_falar"]
+    )
+)
+
+meu_mei_tools = types.Tool(
+    function_declarations=[
+        registrar_transacao_func,
+        deletar_transacao_func,
+        concluir_onboarding_func,
+        atualizar_perfil_func,
+        resetar_financas_func,
+        gerar_resposta_audio_func
+    ]
+)
+
+
 async def generate_response_stream(
     message: str,
     chat_history: list[dict],
@@ -204,6 +295,9 @@ async def generate_response_stream(
 
     tried_indices = {manager.current_index}
     max_retries = len(manager.api_keys)
+    
+    ag_tools = [meu_mei_tools] if not is_onboarding else [types.Tool(function_declarations=[concluir_onboarding_func])]
+
     for attempt in range(max_retries):
         chunk_count = 0
         try:
@@ -214,6 +308,7 @@ async def generate_response_stream(
                     system_instruction=system_prompt,
                     temperature=0.7,
                     max_output_tokens=8192,
+                    tools=ag_tools,
                     safety_settings=[
                         types.SafetySetting(
                             category=types.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
@@ -235,11 +330,23 @@ async def generate_response_stream(
                 ),
             )
 
+            import json
             for chunk in response:
-                if chunk.text:
-                    chunk_count = chunk_count + 1
+                print(f"CHUNK RAW: {repr(chunk)}")
+                if chunk.function_calls:
+                    for fc in chunk.function_calls:
+                        args_dict = dict(fc.args) if fc.args else {}
+                        # Yield as a structured internal string that our SSE router can parse easily
+                        fc_data = json.dumps({
+                            "__tool_call": True,
+                            "name": fc.name,
+                            "args": args_dict
+                        })
+                        yield fc_data + "\n"
+                elif chunk.text:
+                    chunk_count += 1
                     # Log para debug no terminal
-                    print("Yielding chunk " + str(chunk_count) + ": " + str(chunk.text)[:40].replace('\n', ' '))
+                    print(f"Yielding chunk {chunk_count}: {str(chunk.text)[:40].replace(chr(10), ' ')}")
                     yield str(chunk.text)
             return
             
@@ -279,9 +386,9 @@ async def summarize_context(current_summary: str | None, recent_messages: list[d
         role = "Usuário" if msg["role"] == "user" else "Meu MEI"
         content = str(msg.get("content", ""))
         if content:
-            history_text = history_text + role + ": " + content + "\n"
+            history_text += f"{role}: {content}\n"
 
-    prompt = "Sumarize o perfil do usuário:\nResumo Anterior: " + str(current_summary) + "\nNovas: " + str(history_text)
+    prompt = f"Sumarize o perfil do usuário:\nResumo Anterior: {current_summary}\nNovas: {history_text}"
 
     max_retries = len(manager.api_keys)
     for _ in range(max_retries):

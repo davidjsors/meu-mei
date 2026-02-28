@@ -81,8 +81,10 @@ Contém a implementação funcional da aplicação (Front e Backend).
 - **[`frontend/`](./engenharia/frontend/):** Interface em Next.js 15 com suporte multimodal.
 - **[`backend/`](./engenharia/backend/):** Orquestrador em FastAPI integrado ao Google Gemini.
 - **[`docs/`](./engenharia/docs/):** Documentação técnica complementar.
+  - **[`api_reference.md`](./engenharia/docs/api_reference.md):** Contrato das rotas da API (FastAPI).
   - **[`guia_responsividade.md`](./engenharia/docs/guia_responsividade.md):** Guia técnico de design mobile-first e padrões de UI.
-- **[`supabase_schema.sql`](./engenharia/supabase_schema.sql):** Estrutura do banco de dados.
+- **[`README.md`](./engenharia/README.md):** Guia de Instalação Rápida e Dependências (Setup Local).
+- **[`Migrations de Banco`](./engenharia/backend/database/migrations/):** DDLs e Scripts SQL do Supabase.
 
 ---
 
