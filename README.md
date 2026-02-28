@@ -9,7 +9,7 @@ O **Meu MEI** é um mentor financeiro digital desenhado para transformar a vida 
 - **Cocriar soluções:** Atua de forma consultiva para ajudar a gerenciar as finanças da empresa.
 - **Garantir confiabilidade:** Implementa estratégias anti-alucinação através de RAG (Grounding) em fontes oficiais.
 
-🌐 **Acesse a aplicação:** [mentormei.vercel.app](https://mentormei.vercel.app)
+🌐 **Acesse a aplicação:** [meumei.cariama.com.br](https://meumei.cariama.com.br/)
 
  <img src="./engenharia/frontend/public/logo2.svg" width="400" valign="middle"> 
 
@@ -20,7 +20,7 @@ O **Meu MEI** é um mentor financeiro digital desenhado para transformar a vida 
 
  > Imagine trabalhar de domingo a domingo, sendo o vendedor, o entregador e o gerente do seu negócio, e sentir que o seu esforço serve apenas para pagar boleto. Essa é a solidão financeira que assombra um dos pilares da nossa economia, os MEIs. O **Meu MEI** ajuda os microempreendedores e microempreendedoras a retomar o controle e voltar a sonhar, através de um mentor inteligente que descomplica a gestão do dinheiro.
 
-🌐[mentormei.vercel.app/pitch](https://mentormei.vercel.app/pitch)
+🌐[meumei.cariama.com.br/pitch](https://meumei.cariama.com.br/pitch)
 
 ---
 
